@@ -24,6 +24,7 @@ void print_grid();
 void clear_grid();
 void destroy_grid();
 void move_player(Direction dir);
+void print_laser(const int row, const int column, const Direction dir);
 bool play();
 
 #endif // L1T_H_

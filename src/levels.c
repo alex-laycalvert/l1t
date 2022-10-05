@@ -4,6 +4,7 @@
 #include "levels.h"
 #include "l1t.h"
 #include "node.h"
+#include <stdbool.h>
 
 void init_walls(const int rows, const int columns, Node **grid) {
     for (int r = 0; r < rows; r++) {
@@ -23,8 +24,10 @@ void init_walls(const int rows, const int columns, Node **grid) {
     }
 }
 
-void place_item(NodeType item, const int row, const int column, Node **grid) {
+void place_item(NodeType item, Direction dir, bool on, const int row, const int column, Node **grid) {
     (&grid[row][column])->type = item;
+    (&grid[row][column])->dir = dir;
+    (&grid[row][column])->on = on;
     switch (item) {
         case EMPTY:
             (&grid[row][column])->ch = EMPTY_CH;
@@ -69,8 +72,10 @@ void place_item(NodeType item, const int row, const int column, Node **grid) {
  */
 void init_level_000(const int rows, const int columns, Node **grid) {
     init_walls(rows, columns, grid);
-    place_item(PLAYER, rows / 2, columns / 2, grid);
-    place_item(WALL, rows / 4, columns / 2, grid);
+    place_item(PLAYER, UP, false, rows / 2, columns / 2, grid);
+    place_item(WALL, UP, false, rows / 4, columns / 2, grid);
+    place_item(LASER, LEFT, true, rows / 4, 3 * columns / 4, grid);
+    place_item(STATUE, UP, false, rows / 4, columns / 4, grid);
 }
 
 /*
@@ -79,5 +84,5 @@ void init_level_000(const int rows, const int columns, Node **grid) {
  */
 void init_level_001(const int rows, const int columns, Node **grid) {
     init_walls(rows, columns, grid);
-    place_item(PLAYER, rows / 2, columns / 2, grid);
+    place_item(PLAYER, UP, false, rows / 2, columns / 2, grid);
 }

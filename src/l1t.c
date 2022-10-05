@@ -60,7 +60,71 @@ void print_grid() {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
             print_node(r, c, &grid[r][c]);
+            if (grid[r][c].type == LASER && grid[r][c].on) {
+                print_laser(r, c, grid[r][c].dir);
+            }
         }
+    }
+}
+
+void print_laser(const int row, const int column, const Direction dir) {
+    if (!is_grid_initialized) {
+        err_exit("grid is not initialized");
+    }
+    int current_row, current_column;
+    switch (dir) {
+        case UP:
+            current_row = row - 1;
+            if (current_row <= 0) {
+                break;
+            }
+            while (grid[current_row][column].type == EMPTY) {
+                mvprintw(current_row, column, "|");
+                current_row -= 1;
+            }
+            if (grid[current_row + 1][column].type == EMPTY) {
+                mvprintw(current_row + 1, column, "^");
+            }
+            break;
+        case DOWN:
+            current_row = row + 1;
+            if (current_row >= rows - 1) {
+                break;
+            }
+            while (grid[current_row][column].type == EMPTY) {
+                mvprintw(current_row, column, "|");
+                current_row += 1;
+            }
+            if (grid[current_row - 1][column].type == EMPTY) {
+                mvprintw(current_row - 1, column, "v");
+            }
+            break;
+        case LEFT:
+            current_column = column - 1;
+            if (current_column <= 0) {
+                break;
+            }
+            while (grid[row][current_column].type == EMPTY) {
+                mvprintw(row, current_column, "-");
+                current_column -= 1;
+            }
+            if (grid[row][current_column + 1].type == EMPTY) {
+                mvprintw(row, current_column + 1, "<");
+            }
+            break;
+        case RIGHT:
+            current_column = column + 1;
+            if (current_column >= columns - 1) {
+                break;
+            }
+            while (grid[row][current_column].type == EMPTY) {
+                mvprintw(row, current_column, "-");
+                current_column += 1;
+            }
+            if (grid[row][current_column - 1].type == EMPTY) {
+                mvprintw(row, current_column - 1, ">");
+            }
+            break;
     }
 }
 
@@ -70,6 +134,7 @@ void clear_grid() {
     }
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
+            mvprintw(r, c, " ");
         }
     }
 }
