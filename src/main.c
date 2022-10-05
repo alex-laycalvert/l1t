@@ -2,7 +2,6 @@
 // https://github.com/alex-laycalvert/l1t
 
 #include "l1t.h"
-#include "levels.h"
 #include <stdlib.h>
 #include <ncurses.h>
 

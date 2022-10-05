@@ -4,6 +4,9 @@
 #ifndef L1T_H_
 #define L1T_H_
 
+#include "node.h"
+#include <stdbool.h>
+
 #define QUIT_KEY 'q'
 #define MOVE_UP_KEY 'k'
 #define MOVE_DOWN_KEY 'j'
@@ -22,28 +25,13 @@
 #define SWITCH_CH 'W'
 #define LASER_CH 'L'
 
-typedef enum node_type {
-    EMPTY,
-    PLAYER,
-    WALL,
-    MIRROR_FORWARD,
-    MIRROR_BACKWARD,
-    BLOCK,
-    STATUE,
-    TOGGLE_BLOCK,
-    BUTTON,
-    SWITCH,
-    LASER,
-} NodeType;
-
-typedef enum direction { UP, DOWN, LEFT, RIGHT } Direction;
-
-typedef struct node {
-    int row;
-    int column;
-    NodeType type;
-    char ch;
-    Direction dir;
-} Node;
+void init_grid(const int terminal_rows, const int terminal_columns);
+void init_level(const int level, const int terminal_rows, const int terminal_columns);
+void init_walls();
+void print_grid();
+void clear_grid();
+void destroy_grid();
+void move_player(Direction dir);
+bool play();
 
 #endif // L1T_H_

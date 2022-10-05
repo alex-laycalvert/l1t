@@ -2,7 +2,6 @@
 // https://github.com/alex-laycalvert/l1t
 
 #include "utils.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
 
