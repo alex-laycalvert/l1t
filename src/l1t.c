@@ -53,27 +53,6 @@ void init_level(const int level, const int terminal_rows, const int terminal_col
     }
 }
 
-void init_walls() {
-    if (!is_grid_initialized) {
-        err_exit("grid is not initialized");
-    }
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < columns; c++) {
-            Node node;
-            node.row = r;
-            node.column = c;
-            if (r == 0 || r == rows - 1 || c == 0 || c == columns - 1) {
-                node.type = WALL;
-                node.ch = WALL_CH;
-            } else {
-                node.type = EMPTY;
-                node.ch = EMPTY_CH;
-            }
-            grid[r][c] = node;
-        }
-    }
-}
-
 void print_grid() {
     if (!is_grid_initialized) {
         err_exit("grid is not initialized");

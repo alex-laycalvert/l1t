@@ -5,7 +5,7 @@
 #define L1T_H_
 
 #define TERMINAL_ROWS 40
-#define TERMINAL_COLUMNS 170
+#define TERMINAL_COLUMNS 150
 #define TERMINAL_ROW_OFFSET 0
 #define TERMINAL_COLUMN_OFFSET 0
 
@@ -20,7 +20,6 @@
 
 void init_grid(const int terminal_rows, const int terminal_columns);
 void init_level(const int level, const int terminal_rows, const int terminal_columns);
-void init_walls();
 void print_grid();
 void clear_grid();
 void destroy_grid();

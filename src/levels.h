@@ -6,6 +6,8 @@
 
 #include "node.h"
 
+void init_walls(const int rows, const int columns, Node **grid);
+void place_item(NodeType item, const int row, const int column, Node **grid);
 void init_level_000(const int rows, const int columns, Node **grid);
 void init_level_001(const int rows, const int columns, Node **grid);
 
