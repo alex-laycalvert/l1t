@@ -67,7 +67,7 @@ with the desired item and grid location.
 
 The `place_item()` function takes the following 6 arguments in order:
 
-- `item`: The type of item you are placing (see [Node Types](#Node Types) below) 
+- `item`: The type of item you are placing (see [NodeTypes](#Node Types) below) 
 - `dir`: The direction the item is pointing (only applies to `LASER`s, see [Directions](#Directions) below)
 - `on`: A boolean representing whether the item is on or not (only applies to `LASER`s, set to false for others)
 - `row`: The row the item is on (must be greater than `0` and less than `TERMINAL_ROWS`)
