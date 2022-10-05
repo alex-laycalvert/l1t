@@ -15,19 +15,9 @@ int main(int argc, char **argv) {
     int rows, columns;
     getmaxyx(stdscr, rows, columns);
 
-    init_level(0, rows, columns);
+    int level = 1;
+    do {
+        init_level(level, rows, columns);
+    } while (play());
 
-    while (true) {
-        print_grid();
-        char input = getch();
-        switch (input) {
-            case QUIT_KEY:
-                destroy_grid();
-                endwin();
-                exit(0);
-                break;
-            default:
-                break;
-        }
-    }
 }

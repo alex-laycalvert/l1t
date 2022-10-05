@@ -11,5 +11,5 @@ void err_exit(const char *message) {
     if (stdscr != NULL) {
         endwin();
     }
-    exit(1);
+    exit(EXIT_FAILURE);
 }
