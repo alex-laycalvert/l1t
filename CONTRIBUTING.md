@@ -67,14 +67,14 @@ with the desired item and grid location.
 
 The `place_item()` function takes the following 6 arguments in order:
 
-- `item`: The type of item you are placing (see [Node Types](#NodeTypes) below) 
+- `item`: The type of item you are placing (see [NodeTypes](#NodeTypes) below) 
 - `dir`: The direction the item is pointing (only applies to `LASER`s, see [Directions](#Directions) below)
 - `on`: A boolean representing whether the item is on or not (only applies to `LASER`s, set to false for others)
 - `row`: The row the item is on (must be greater than `0` and less than `TERMINAL_ROWS`)
 - `column`: The column the item is on (must be greater than `0` and less than `TERMINAL_COLUMNS`)
 - `grid`: The grid the game is played on, ALWAYS set this to `grid`
 
-#### Node Types
+#### NodeTypes
 
 These are the following types of nodes you can add to your grid:
 
