@@ -73,7 +73,7 @@ void place_item(NodeType item, Direction dir, bool on, const int row, const int 
 void init_level_000(const int rows, const int columns, Node **grid) {
     init_walls(rows, columns, grid);
     place_item(PLAYER, UP, false, rows / 2, columns / 2, grid);
-    place_item(WALL, UP, false, rows / 4, columns / 2, grid);
+    place_item(BLOCK, UP, false, rows / 4, columns / 2, grid);
     place_item(LASER, LEFT, true, rows / 4, 3 * columns / 4, grid);
     place_item(STATUE, UP, false, rows / 4, columns / 4, grid);
 }

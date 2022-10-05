@@ -173,8 +173,31 @@ void move_player(Direction dir) {
     }
 
     Node *tmp;
+    Node *block_tmp;
     switch (grid[player->row + row_offset][player->column + column_offset].type) {
         case EMPTY:
+            tmp = &grid[player->row + row_offset][player->column + column_offset];
+            tmp->type = PLAYER;
+            tmp->ch = PLAYER_CH;
+            player->type = EMPTY;
+            player->ch = EMPTY_CH;
+            player = tmp;
+            break;
+        case BLOCK:
+            if (
+                player->row + row_offset * 2 < 0 ||
+                player->row + row_offset * 2 >= rows ||
+                player->column + column_offset * 2 < 0 ||
+                player->column + column_offset * 2 >= columns
+            ) {
+                break;
+            }
+            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
+                break;
+            }
+            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
+            block_tmp->type = BLOCK;
+            block_tmp->ch = BLOCK_CH;
             tmp = &grid[player->row + row_offset][player->column + column_offset];
             tmp->type = PLAYER;
             tmp->ch = PLAYER_CH;
