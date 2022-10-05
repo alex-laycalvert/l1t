@@ -38,3 +38,7 @@ make dev
 ## Gameplay
 
 ***WORK IN PROGRESS***
+
+## Contributing
+
+See the guidelines for contributing [here](CONTRIBUTING.md)
