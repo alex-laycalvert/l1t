@@ -80,45 +80,7 @@ void print_grid() {
     }
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-            attron(A_BOLD);
-            switch (grid[r][c].type) {
-                case EMPTY:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case PLAYER:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case WALL:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case MIRROR_FORWARD:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case MIRROR_BACKWARD:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case BLOCK:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case STATUE:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case TOGGLE_BLOCK:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case BUTTON:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case SWITCH:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                case LASER:
-                    mvprintw(r, c, "%c", grid[r][c].ch);
-                    break;
-                default:
-                    break;
-            }
-            attroff(A_BOLD);
+            print_node(r, c, &grid[r][c]);
         }
     }
 }
@@ -182,6 +144,9 @@ void move_player(Direction dir) {
 }
 
 bool play() {
+    if (!is_grid_initialized) {
+        err_exit("grid is not initialized");
+    }
     bool playing = true;
     while (playing) {
         print_grid();

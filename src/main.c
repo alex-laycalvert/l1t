@@ -11,12 +11,13 @@ int main(int argc, char **argv) {
     raw();
     keypad(stdscr, true);
     curs_set(0);
+
+    resizeterm(TERMINAL_ROWS, TERMINAL_COLUMNS);
     int rows, columns;
     getmaxyx(stdscr, rows, columns);
 
-    int level = 1;
+    int level = 0;
     do {
         init_level(level, rows, columns);
     } while (play());
-
 }

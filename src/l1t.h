@@ -4,6 +4,11 @@
 #ifndef L1T_H_
 #define L1T_H_
 
+#define TERMINAL_ROWS 40
+#define TERMINAL_COLUMNS 170
+#define TERMINAL_ROW_OFFSET 0
+#define TERMINAL_COLUMN_OFFSET 0
+
 #include "node.h"
 #include <stdbool.h>
 
@@ -12,18 +17,6 @@
 #define MOVE_DOWN_KEY 'j'
 #define MOVE_LEFT_KEY 'h'
 #define MOVE_RIGHT_KEY 'l'
-
-#define EMPTY_CH ' '
-#define PLAYER_CH 'X'
-#define WALL_CH 'I'
-#define MIRROR_FORWARD_CH '/'
-#define MIRROR_BACKWARD_CH '\\'
-#define BLOCK_CH 'K'
-#define STATUE_CH 'S'
-#define TOGGLE_BLOCK_CH 'T'
-#define BUTTON_CH 'B'
-#define SWITCH_CH 'W'
-#define LASER_CH 'L'
 
 void init_grid(const int terminal_rows, const int terminal_columns);
 void init_level(const int level, const int terminal_rows, const int terminal_columns);
