@@ -38,6 +38,7 @@ void init_level(const int level) {
             }
         }
     }
+    resizeterm(rows, columns);
 }
 
 void print_grid() {

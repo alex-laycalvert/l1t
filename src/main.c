@@ -15,10 +15,6 @@ int main(int argc, char **argv) {
     keypad(stdscr, true);
     curs_set(0);
 
-    int rows, columns;
-    resizeterm(TERMINAL_ROWS, TERMINAL_COLUMNS);
-    getmaxyx(stdscr, rows, columns);
-
     if (!has_colors()) {
         endwin();
         err_exit("your terminal does not support colors");
@@ -29,6 +25,6 @@ int main(int argc, char **argv) {
 
     int level = 0;
     do {
-        init_level(level, rows, columns);
+        init_level(level);
     } while (play());
 }
