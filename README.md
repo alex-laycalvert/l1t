@@ -13,9 +13,9 @@ playground for level making. Any items in that level are purely for testing
 and there is no way, right now, to "win" `Level 0`.
 
 - [ ] Colors
-- [ ] Lasers
-- [ ] Moveable Blocks
-- [ ] Mirrors
+- [x] Lasers
+- [x] Moveable Blocks
+- [x] Mirrors
 - [ ] Statues
 - [ ] Menu for picking levels
 - [ ] A concept of "winning"
