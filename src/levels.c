@@ -21,6 +21,7 @@ Node** read_level(const char *name) {
     while ((c = fgetc(level_file)) != EOF) {
         printf("%c", c);
     }
+    fclose(level_file);
     exit(0);
     Node **grid;
     return grid;
