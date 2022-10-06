@@ -16,9 +16,9 @@ and there is no way, right now, to "win" `Level 0`.
 - [x] Lasers
 - [x] Moveable Blocks
 - [x] Mirrors
-- [ ] Statues
+- [x] Statues
 - [ ] Menu for picking levels
-- [ ] A concept of "winning"
+- [x] A concept of "winning"
 - [ ] Keeping track of completed levels
 - [ ] Switches
 - [ ] Buttons
