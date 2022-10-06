@@ -14,33 +14,20 @@ int rows, columns;
 Node **grid;
 Node *player;
 
-void init_grid(const int terminal_rows, const int terminal_columns) {
-    rows = terminal_rows;
-    columns = terminal_columns;
-    grid = (Node **)malloc(rows * sizeof(Node *));
-    if (grid == NULL) {
-        err_exit("failed to allocate memory for grid");
-    }
-    for (int i = 0; i < rows; i++) {
-        grid[i] = (Node *)malloc(columns * sizeof(Node));
-        if (grid[i] == NULL) {
-            err_exit("failed to allocate memory for grid row");
-        }
-    }
-    is_grid_initialized = true;
-}
-
-void init_level(const int level, const int terminal_rows, const int terminal_columns) {
-    if (!is_grid_initialized) {
-        init_grid(terminal_rows, terminal_columns);
-    }
+void init_level(const int level) {
     current_level = level;
+    size_t *file_dimensions;
     switch (level) {
         case 1:
-            init_level_001(rows, columns, grid);
+            /* init_level_001(rows, columns, grid); */
             break;
         default:
-            grid = read_level("src/levels/000.l1t");
+            /* init_level_000(rows, columns, grid); */
+            file_dimensions = get_file_dimensions("src/levels/000.l1t");
+            rows = file_dimensions[0];
+            columns = file_dimensions[1];
+            grid = generate_level_grid("src/levels/000.l1t");
+            is_grid_initialized = true;
             break;
     }
     for (int r = 0; r < rows; r++) {

@@ -7,106 +7,161 @@
 #include "utils.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <strings.h>
 
 #include <ncurses.h>
 #include <stdlib.h>
 
-Node** read_level(const char *name) {
+size_t * get_file_dimensions(const char *name) {
+    size_t *file_dimensions = (size_t *)malloc(2 * sizeof(size_t));
+    if (!file_dimensions) {
+        err_exit("failed to allocate memory for file dimensions");
+    }
+
     FILE *level_file = fopen(name, "r");
     if (!level_file) {
         err_exit("failed to open file");
     }
-    char c;
-    endwin();
-    while ((c = fgetc(level_file)) != EOF) {
-        printf("%c", c);
+    char char_grid[MAX_LEVEL_ROWS][MAX_LEVEL_COLUMNS];
+    char line_buf[MAX_LEVEL_COLUMNS];
+    size_t rows = 0;
+    size_t columns = 0;
+    size_t current_column = 0;
+
+    while (fgets(line_buf, MAX_LEVEL_COLUMNS, level_file) != NULL) {
+        strncpy(char_grid[rows], line_buf, MAX_LEVEL_COLUMNS);
+        if (rows <= 0) {
+            for (size_t i = 0; i < MAX_LEVEL_COLUMNS; i++) {
+                if (char_grid[rows][i] == '\n') {
+                    break; 
+                }
+                columns++;
+            }
+        }
+        rows++;
     }
     fclose(level_file);
-    exit(0);
-    Node **grid;
-    return grid;
+    file_dimensions[0] = rows;
+    file_dimensions[1] = columns;
+    return file_dimensions;
 }
 
-void init_walls(const int rows, const int columns, Node **grid) {
+Node ** generate_level_grid(const char *name) {
+    FILE *level_file = fopen(name, "r");
+    if (!level_file) {
+        err_exit("failed to open file");
+    }
+
+    Node **grid;
+    char char_grid[MAX_LEVEL_ROWS][MAX_LEVEL_COLUMNS];
+    char line_buf[MAX_LEVEL_COLUMNS];
+    int rows = 0;
+    int columns = 0;
+    int current_column = 0;
+
+    while (fgets(line_buf, MAX_LEVEL_COLUMNS, level_file) != NULL) {
+        strncpy(char_grid[rows], line_buf, MAX_LEVEL_COLUMNS);
+        if (rows <= 0) {
+            for (int i = 0; i < MAX_LEVEL_COLUMNS; i++) {
+                if (char_grid[rows][i] == '\n') {
+                    break; 
+                }
+                columns++;
+            }
+        }
+        rows++;
+    }
+    fclose(level_file);
+
+    grid = (Node **)malloc(rows * sizeof(Node *));
+    if (!grid) {
+        err_exit("failed to allocate memory for grid");
+    }
     for (int r = 0; r < rows; r++) {
+        grid[r] = (Node *)malloc(columns * sizeof(Node));
+        if (grid[r] == NULL) {
+            err_exit("failed to allocate memory for grid row");
+        }
         for (int c = 0; c < columns; c++) {
             Node node;
             node.row = r;
             node.column = c;
-            if (r == 0 || r == rows - 1 || c == 0 || c == columns - 1) {
-                node.type = WALL;
-                node.ch = WALL_CH;
-            } else {
-                node.type = EMPTY;
-                node.ch = EMPTY_CH;
+            node.dir = UP;
+            node.on = false;
+            switch (char_grid[r][c]) {
+                case 'I':
+                    node.type = WALL;
+                    node.ch = WALL_CH;
+                    break;
+                case 'X':
+                    node.type = PLAYER;
+                    node.ch = PLAYER_CH;
+                    break;
+                case '/':
+                    node.type = MIRROR_FORWARD;
+                    node.ch = MIRROR_FORWARD_CH;
+                    break;
+                case '\\':
+                    node.type = MIRROR_BACKWARD;
+                    node.ch = MIRROR_BACKWARD_CH;
+                    break;
+                case 'K':
+                    node.type = BLOCK;
+                    node.ch = BLOCK_CH;
+                    break;
+                case 'S':
+                    node.type = STATUE;
+                    node.ch = STATUE_CH;
+                    break;
+                case '1':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.on = true;
+                    break;
+                case '2':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.dir = DOWN;
+                    node.on = true;
+                    break;
+                case '3':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.dir = LEFT;
+                    node.on = true;
+                    break;
+                case '4':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.dir = RIGHT;
+                    node.on = true;
+                    break;
+                case '5':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    break;
+                case '6':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.dir = DOWN;
+                    break;
+                case '7':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.dir = LEFT;
+                    break;
+                case '8':
+                    node.type = LASER;
+                    node.ch = LASER_CH;
+                    node.dir = RIGHT;
+                    break;
+                default:
+                    node.type = EMPTY;
+                    node.ch = EMPTY_CH;
+                    break;
             }
             grid[r][c] = node;
         }
     }
-}
-
-void place_item(NodeType item, Direction dir, bool on, const int row, const int column, Node **grid) {
-    (&grid[row][column])->type = item;
-    (&grid[row][column])->dir = dir;
-    (&grid[row][column])->on = on;
-    switch (item) {
-        case EMPTY:
-            (&grid[row][column])->ch = EMPTY_CH;
-            break;
-        case PLAYER:
-            (&grid[row][column])->ch = PLAYER_CH;
-            break;
-        case WALL:
-            (&grid[row][column])->ch = WALL_CH; break;
-        case MIRROR_FORWARD:
-            (&grid[row][column])->ch = MIRROR_FORWARD_CH;
-            break;
-        case MIRROR_BACKWARD:
-            (&grid[row][column])->ch = MIRROR_BACKWARD_CH;
-            break;
-        case BLOCK:
-            (&grid[row][column])->ch = BLOCK_CH;
-            break;
-        case STATUE:
-            (&grid[row][column])->ch = STATUE_CH;
-            break;
-        case TOGGLE_BLOCK:
-            (&grid[row][column])->ch = TOGGLE_BLOCK_CH;
-            break;
-        case BUTTON:
-            (&grid[row][column])->ch = BUTTON_CH;
-            break;
-        case SWITCH:
-            (&grid[row][column])->ch = SWITCH_CH;
-            break;
-        case LASER:
-            (&grid[row][column])->ch = LASER_CH;
-            break;
-        default:
-            break;
-    }
-}
-
-/*
- * Level 000: Lonely
- * Description: A playground/testing area for development of new features.
- */
-void init_level_000(const int rows, const int columns, Node **grid) {
-    init_walls(rows, columns, grid);
-    place_item(PLAYER, UP, false, rows / 2, columns / 2, grid);
-    place_item(BLOCK, UP, false, rows / 4, columns / 2, grid);
-    place_item(LASER, DOWN, true, rows / 4, 3 * columns / 4, grid);
-    /* place_item(LASER, RIGHT, true, 3 * rows / 4, 7 * columns / 8, grid); */
-    place_item(STATUE, UP, false, rows / 4, columns / 4, grid);
-    place_item(MIRROR_FORWARD, UP, false, rows / 6, columns / 6, grid);
-    place_item(MIRROR_BACKWARD, UP, false, 5 * rows / 6, columns / 6, grid);
-}
-
-/*
- * Level 001: The Basics
- * Description: The first official level of the game. Get used to game mechanics.
- */
-void init_level_001(const int rows, const int columns, Node **grid) {
-    init_walls(rows, columns, grid);
-    place_item(PLAYER, UP, false, rows / 2, columns / 2, grid);
+    return grid;
 }

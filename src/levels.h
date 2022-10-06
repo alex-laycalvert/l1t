@@ -4,14 +4,15 @@
 #ifndef LEVELS_H_
 #define LEVELS_H_
 
+#define MAX_LEVEL_ROWS 70
+#define MAX_LEVEL_COLUMNS 180
+
 #include "node.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
-Node** read_level(const char *name);
-void init_walls(const int rows, const int columns, Node **grid);
-void place_item(NodeType item, Direction dir, bool on, const int row, const int column, Node **grid);
-void init_level_000(const int rows, const int columns, Node **grid);
-void init_level_001(const int rows, const int columns, Node **grid);
+size_t * get_file_dimensions(const char *name);
+Node ** generate_level_grid(const char *name);
 
 #endif // LEVELS_H_
 

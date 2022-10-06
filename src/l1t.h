@@ -18,8 +18,7 @@
 #define MOVE_LEFT_KEY 'h'
 #define MOVE_RIGHT_KEY 'l'
 
-void init_grid(const int terminal_rows, const int terminal_columns);
-void init_level(const int level, const int terminal_rows, const int terminal_columns);
+void init_level(const int level);
 void print_grid();
 void clear_grid();
 void destroy_grid();
