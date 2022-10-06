@@ -26,6 +26,7 @@ bool initialize_colors() {
     init_pair(REVERSE_STATUE_OFF_COLOR_PAIR, COLOR_DIMMED_MAGENTA, COLOR_DIMMED_MAGENTA);
     init_pair(TOGGLE_BLOCK_COLOR_PAIR, COLOR_BLUE, COLOR_BLUE);
     init_pair(LASER_COLOR_PAIR, COLOR_RED, COLOR_RED);
+    init_pair(LASER_BEAM_COLOR_PAIR, COLOR_RED, -1);
 
     return true;
 }

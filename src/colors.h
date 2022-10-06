@@ -22,6 +22,7 @@ typedef enum L1T_COLOR_PAIRS {
     REVERSE_STATUE_OFF_COLOR_PAIR,
     TOGGLE_BLOCK_COLOR_PAIR,
     LASER_COLOR_PAIR,
+    LASER_BEAM_COLOR_PAIR,
 } L1tColorPairs;
 
 bool initialize_colors();

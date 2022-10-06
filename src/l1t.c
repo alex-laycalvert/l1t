@@ -4,6 +4,7 @@
 #include "l1t.h"
 #include "levels.h"
 #include "utils.h"
+#include "colors.h"
 #include <stdlib.h>
 #include <ncurses.h>
 #include <stdbool.h>
@@ -91,6 +92,7 @@ void print_laser(const int row, const int column, const Direction dir) {
     }
     int current_row = row + row_offset;
     int current_column = column + column_offset;
+    attron(COLOR_PAIR(LASER_BEAM_COLOR_PAIR));
     while (
         grid[current_row][current_column].type == EMPTY ||
         grid[current_row][current_column].type == MIRROR_FORWARD ||
@@ -172,6 +174,7 @@ void print_laser(const int row, const int column, const Direction dir) {
     if (grid[current_row - row_offset][current_column - column_offset].type == EMPTY) {
         mvprintw(current_row - row_offset, current_column - column_offset, "%c", laser_dir_ch);
     }
+    attroff(COLOR_PAIR(LASER_BEAM_COLOR_PAIR));
     if (grid[current_row][current_column].type == STATUE) {
         (&grid[current_row][current_column])->on = true;
     }
