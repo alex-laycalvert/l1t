@@ -27,4 +27,7 @@ int main(int argc, char **argv) {
     do {
         init_level(level);
     } while (play());
+
+    endwin();
+    exit(EXIT_SUCCESS);
 }
