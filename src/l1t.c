@@ -65,6 +65,13 @@ void print_grid() {
             }
         }
     }
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < columns; c++) {
+            if (grid[r][c].type == LASER && grid[r][c].on) {
+                print_laser(r, c, grid[r][c].dir);
+            }
+        }
+    }
 }
 
 void print_laser(const int row, const int column, const Direction dir) {
@@ -72,41 +79,47 @@ void print_laser(const int row, const int column, const Direction dir) {
         err_exit("grid is not initialized");
     }
     Direction current_dir = dir;
-    int row_offset = 0;
-    int column_offset = 0;
+    int row_offset, column_offset;
     char laser_dir_ch = ' ';
     char laser_line_ch = ' ';
-
     switch (current_dir) {
         case UP:
             row_offset = -1;
+            column_offset = 0;
             laser_dir_ch = UP_LASER_CH;
             laser_line_ch = VERTICAL_LINE_CH;
             break;
         case DOWN:
             row_offset = 1;
+            column_offset = 0;
             laser_dir_ch = DOWN_LASER_CH;
             laser_line_ch = VERTICAL_LINE_CH;
             break;
         case LEFT:
+            row_offset = 0;
             column_offset = -1;
             laser_dir_ch = LEFT_LASER_CH;
             laser_line_ch = HORIZONTAL_LINE_CH;
             break;
         case RIGHT:
+            row_offset = 0;
             column_offset = 1;
             laser_dir_ch = RIGHT_LASER_CH;
             laser_line_ch = HORIZONTAL_LINE_CH;
             break;
     }
-
     int current_row = row + row_offset;
     int current_column = column + column_offset;
-
-    while (grid[current_row][current_column].type == EMPTY) {
-        mvprintw(current_row, current_column, "%c", laser_line_ch);
-        current_row += row_offset;
-        current_column += column_offset;
+    while (
+        grid[current_row][current_column].type == EMPTY ||
+        grid[current_row][current_column].type == MIRROR_FORWARD ||
+        grid[current_row][current_column].type == MIRROR_BACKWARD
+    ) {
+        if (grid[current_row][current_column].type == EMPTY) {
+            mvprintw(current_row, current_column, "%c", laser_line_ch);
+            current_row += row_offset;
+            current_column += column_offset;
+        }
         if (grid[current_row][current_column].type == MIRROR_FORWARD) {
             switch (current_dir) {
                 case UP:
