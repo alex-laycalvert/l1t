@@ -98,13 +98,21 @@ void print_node(const int row, const int column, const Node *node) {
             );
             break;
         case LASER:
-            attron(COLOR_PAIR(LASER_COLOR_PAIR));
+            if (node->on) {
+                attron(COLOR_PAIR(LASER_ON_COLOR_PAIR));
+            } else {
+                attron(COLOR_PAIR(LASER_OFF_COLOR_PAIR));
+            }
             mvprintw(
                 row + TERMINAL_ROW_OFFSET,
                 column + TERMINAL_COLUMN_OFFSET,
                 "%c", node->ch
             );
-            attroff(COLOR_PAIR(LASER_COLOR_PAIR));
+            if (node->on) {
+                attroff(COLOR_PAIR(LASER_ON_COLOR_PAIR));
+            } else {
+                attroff(COLOR_PAIR(LASER_OFF_COLOR_PAIR));
+            }
             break;
         default:
             break;

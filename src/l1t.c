@@ -178,6 +178,9 @@ void print_laser(const int row, const int column, const Direction dir) {
     if (grid[current_row][current_column].type == STATUE) {
         (&grid[current_row][current_column])->on = true;
     }
+    if (grid[current_row][current_column].type == LASER) {
+        (&grid[current_row][current_column])->on = false;
+    }
 }
 
 void clear_grid() {
@@ -314,6 +317,24 @@ void move_player(Direction dir) {
     }
 }
 
+void perform_player_interaction() {
+    for (int r = player->row - 1; r < player->row + 1; r++) {
+        for (int c = player->column - 1; c < player->column + 1; c++) {
+            if (r == player->row && c == player->column) {
+                continue;
+            }
+            Node *grid_item = &grid[r][c];
+            switch (grid_item->type) {
+                case LASER:
+                    grid_item->on = !grid_item->on;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 bool check_win() {
     for (int i = 0; i < num_statues; i++) {
         if (!statues[i]->on) {
@@ -339,6 +360,9 @@ bool play() {
                 break;
             case RESTART_KEY:
                 restart_level();
+                break;
+            case INTERACT_KEY:
+                perform_player_interaction();
                 break;
             case MOVE_UP_KEY:
                 move_player(UP);
