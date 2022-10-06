@@ -4,11 +4,12 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <ncurses.h>
+#include <string.h>
 
 void err_exit(const char *message) {
-    fprintf(stderr, "Error: %s\n", message);
     if (stdscr != NULL) {
         endwin();
     }
+    fprintf(stderr, "Error: %s\n", message);
     exit(EXIT_FAILURE);
 }

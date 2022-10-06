@@ -7,6 +7,7 @@
 #include "node.h"
 #include <stdbool.h>
 
+Node** read_level(const char *name);
 void init_walls(const int rows, const int columns, Node **grid);
 void place_item(NodeType item, Direction dir, bool on, const int row, const int column, Node **grid);
 void init_level_000(const int rows, const int columns, Node **grid);

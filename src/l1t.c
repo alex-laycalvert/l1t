@@ -40,7 +40,7 @@ void init_level(const int level, const int terminal_rows, const int terminal_col
             init_level_001(rows, columns, grid);
             break;
         default:
-            init_level_000(rows, columns, grid);
+            grid = read_level("src/levels/000.l1t");
             break;
     }
     for (int r = 0; r < rows; r++) {

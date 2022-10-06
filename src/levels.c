@@ -4,7 +4,27 @@
 #include "levels.h"
 #include "l1t.h"
 #include "node.h"
+#include "utils.h"
 #include <stdbool.h>
+#include <stdio.h>
+
+#include <ncurses.h>
+#include <stdlib.h>
+
+Node** read_level(const char *name) {
+    FILE *level_file = fopen(name, "r");
+    if (!level_file) {
+        err_exit("failed to open file");
+    }
+    char c;
+    endwin();
+    while ((c = fgetc(level_file)) != EOF) {
+        printf("%c", c);
+    }
+    exit(0);
+    Node **grid;
+    return grid;
+}
 
 void init_walls(const int rows, const int columns, Node **grid) {
     for (int r = 0; r < rows; r++) {
