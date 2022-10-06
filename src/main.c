@@ -2,6 +2,7 @@
 // https://github.com/alex-laycalvert/l1t
 
 #include "l1t.h"
+#include "colors.h"
 #include "utils.h"
 #include <stdlib.h>
 #include <ncurses.h>
@@ -15,13 +16,9 @@ int main(int argc, char **argv) {
     keypad(stdscr, true);
     curs_set(0);
 
-    if (!has_colors()) {
-        endwin();
+    if (!initialize_colors()) {
         err_exit("your terminal does not support colors");
     }
-
-    start_color();
-    use_default_colors();
 
     int level = 0;
     do {

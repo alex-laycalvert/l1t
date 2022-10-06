@@ -4,11 +4,11 @@
 #ifndef L1T_H_
 #define L1T_H_
 
-#define TERMINAL_ROW_OFFSET 0
-#define TERMINAL_COLUMN_OFFSET 0
-
 #include "node.h"
 #include <stdbool.h>
+
+#define TERMINAL_ROW_OFFSET 0
+#define TERMINAL_COLUMN_OFFSET 0
 
 #define QUIT_KEY 'q'
 #define MOVE_UP_KEY 'k'
