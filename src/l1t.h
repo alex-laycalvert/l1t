@@ -11,6 +11,7 @@
 #define TERMINAL_COLUMN_OFFSET 0
 
 #define QUIT_KEY 'q'
+#define RESTART_KEY 'r'
 #define MOVE_UP_KEY 'k'
 #define MOVE_DOWN_KEY 'j'
 #define MOVE_LEFT_KEY 'h'

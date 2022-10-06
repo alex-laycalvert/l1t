@@ -16,7 +16,7 @@ Node *player;
 
 void init_level(const int level) {
     current_level = level;
-    size_t *file_dimensions;
+    FileDimensions file_dimensions;
     switch (level) {
         case 1:
             /* init_level_001(rows, columns, grid); */
@@ -24,8 +24,8 @@ void init_level(const int level) {
         default:
             /* init_level_000(rows, columns, grid); */
             file_dimensions = get_file_dimensions("src/levels/000.l1t");
-            rows = file_dimensions[0];
-            columns = file_dimensions[1];
+            rows = file_dimensions.rows;
+            columns = file_dimensions.columns;
             grid = generate_level_grid("src/levels/000.l1t");
             is_grid_initialized = true;
             break;
@@ -315,6 +315,10 @@ bool play() {
         switch (input) {
             case QUIT_KEY:
                 playing = false;
+                break;
+            case RESTART_KEY:
+                destroy_grid();
+                init_level(current_level);
                 break;
             case MOVE_UP_KEY:
                 move_player(UP);

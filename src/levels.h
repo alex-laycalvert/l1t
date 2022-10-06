@@ -11,7 +11,12 @@
 #define MAX_LEVEL_ROWS 70
 #define MAX_LEVEL_COLUMNS 180
 
-size_t * get_file_dimensions(const char *name);
+typedef struct file_dimensions {
+    size_t rows;
+    size_t columns;
+} FileDimensions;
+
+FileDimensions get_file_dimensions(const char *name);
 Node ** generate_level_grid(const char *name);
 
 #endif // LEVELS_H_

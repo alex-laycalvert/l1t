@@ -7,17 +7,12 @@
 #include "utils.h"
 #include <stdbool.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 #include <ncurses.h>
 #include <stdlib.h>
 
-size_t * get_file_dimensions(const char *name) {
-    size_t *file_dimensions = (size_t *)malloc(2 * sizeof(size_t));
-    if (!file_dimensions) {
-        err_exit("failed to allocate memory for file dimensions");
-    }
-
+FileDimensions get_file_dimensions(const char *name) {
     FILE *level_file = fopen(name, "r");
     if (!level_file) {
         err_exit("failed to open file");
@@ -40,9 +35,10 @@ size_t * get_file_dimensions(const char *name) {
         rows++;
     }
     fclose(level_file);
-    file_dimensions[0] = rows;
-    file_dimensions[1] = columns;
-    return file_dimensions;
+    FileDimensions fd;
+    fd.rows = rows;
+    fd.columns = columns;
+    return fd;
 }
 
 Node ** generate_level_grid(const char *name) {
