@@ -32,3 +32,8 @@ Your level ***MUST*** be surrounded by a wall of `WALL`s as seen
 in any of the numbered level files. Your top left wall should be
 the first character of the first line and the surrounding walls
 should be a continuous square around your grid.
+
+You must also make sure your level has exactly 1 `PLAYER`, at least
+one `LASER`, and the same amount or less `STATUE`s as you have `LASER`s.
+
+This is to allow the level to actually be playable and completable.

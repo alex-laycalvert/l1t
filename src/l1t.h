@@ -4,8 +4,6 @@
 #ifndef L1T_H_
 #define L1T_H_
 
-#define TERMINAL_ROWS 40
-#define TERMINAL_COLUMNS 150
 #define TERMINAL_ROW_OFFSET 0
 #define TERMINAL_COLUMN_OFFSET 0
 
