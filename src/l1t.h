@@ -20,9 +20,12 @@
 void init_level(const int level);
 void print_grid();
 void clear_grid();
-void destroy_grid();
+void restart_level();
+void destroy_level();
 void move_player(Direction dir);
+void print_lasers();
 void print_laser(const int row, const int column, const Direction dir);
+bool check_win();
 bool play();
 
 #endif // L1T_H_

@@ -11,33 +11,26 @@
 bool is_grid_initialized = false;
 int current_level = -1;
 int rows, columns;
-Node **grid;
 Node *player;
+int num_statues;
+Node **statues;
+Node **grid;
 
 void init_level(const int level) {
     current_level = level;
-    FileDimensions file_dimensions;
+    LevelInfo info;
     switch (level) {
-        case 1:
-            /* init_level_001(rows, columns, grid); */
-            break;
         default:
-            /* init_level_000(rows, columns, grid); */
-            file_dimensions = get_file_dimensions("src/levels/000.l1t");
-            rows = file_dimensions.rows;
-            columns = file_dimensions.columns;
-            grid = generate_level_grid("src/levels/000.l1t");
-            is_grid_initialized = true;
+            info = generate_level("src/levels/000.l1t");
             break;
     }
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < columns; c++) {
-            if (grid[r][c].type == PLAYER) {
-                player = &grid[r][c];
-                break;
-            }
-        }
-    }
+    rows = info.rows;
+    columns = info.columns;
+    player = info.player; 
+    num_statues = info.num_statues;
+    statues = info.statues;
+    grid = info.grid;
+    is_grid_initialized = true;
     resizeterm(rows, columns);
 }
 
@@ -50,6 +43,10 @@ void print_grid() {
             print_node(r, c, &grid[r][c]);
         }
     }
+    print_lasers();
+}
+
+void print_lasers() {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
             if (grid[r][c].type == LASER && grid[r][c].on) {
@@ -176,6 +173,9 @@ void print_laser(const int row, const int column, const Direction dir) {
     if (grid[current_row - row_offset][current_column - column_offset].type == EMPTY) {
         mvprintw(current_row - row_offset, current_column - column_offset, "%c", laser_dir_ch);
     }
+    if (grid[current_row][current_column].type == STATUE) {
+        (&grid[current_row][current_column])->on = !(&grid[current_row][current_column])->on;
+    }
 }
 
 void clear_grid() {
@@ -189,9 +189,17 @@ void clear_grid() {
     }
 }
 
-void destroy_grid() {
+void restart_level() {
+    destroy_level();
+    init_level(current_level);
+}
+
+void destroy_level() {
     if (!is_grid_initialized) {
         return;
+    }
+    if (statues) {
+        free(statues);
     }
     for (int r = 0; r < rows; r++) {
         free(grid[r]);
@@ -304,21 +312,35 @@ void move_player(Direction dir) {
     }
 }
 
+bool check_win() {
+    for (int i = 0; i < num_statues; i++) {
+        if (!statues[i]->on) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool play() {
     if (!is_grid_initialized) {
         err_exit("grid is not initialized");
     }
     bool playing = true;
+    bool won = false;
     while (playing) {
         print_grid();
+        if (check_win()) {
+            won = true;
+            playing = false;
+            break;
+        }
         char input = getch();
         switch (input) {
             case QUIT_KEY:
                 playing = false;
                 break;
             case RESTART_KEY:
-                destroy_grid();
-                init_level(current_level);
+                restart_level();
                 break;
             case MOVE_UP_KEY:
                 move_player(UP);
@@ -336,5 +358,5 @@ bool play() {
                 break;
         }
     }
-    return playing;
+    return won;
 }

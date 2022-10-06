@@ -2,46 +2,14 @@
 // https://github.com/alex-laycalvert/l1t
 
 #include "levels.h"
-#include "l1t.h"
 #include "node.h"
 #include "utils.h"
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-
 #include <ncurses.h>
 #include <stdlib.h>
 
-FileDimensions get_file_dimensions(const char *name) {
-    FILE *level_file = fopen(name, "r");
-    if (!level_file) {
-        err_exit("failed to open file");
-    }
-    char char_grid[MAX_LEVEL_ROWS][MAX_LEVEL_COLUMNS];
-    char line_buf[MAX_LEVEL_COLUMNS];
-    size_t rows = 0;
-    size_t columns = 0;
-
-    while (fgets(line_buf, MAX_LEVEL_COLUMNS, level_file) != NULL) {
-        strncpy(char_grid[rows], line_buf, MAX_LEVEL_COLUMNS);
-        if (rows <= 0) {
-            for (size_t i = 0; i < MAX_LEVEL_COLUMNS; i++) {
-                if (char_grid[rows][i] == '\n') {
-                    break; 
-                }
-                columns++;
-            }
-        }
-        rows++;
-    }
-    fclose(level_file);
-    FileDimensions fd;
-    fd.rows = rows;
-    fd.columns = columns;
-    return fd;
-}
-
-Node ** generate_level_grid(const char *name) {
+LevelInfo generate_level(const char *name) {
     FILE *level_file = fopen(name, "r");
     if (!level_file) {
         err_exit("failed to open file");
@@ -71,9 +39,13 @@ Node ** generate_level_grid(const char *name) {
     if (!grid) {
         err_exit("failed to allocate memory for grid");
     }
+
+    int num_statues = 0;
+
     for (int r = 0; r < rows; r++) {
         grid[r] = (Node *)malloc(columns * sizeof(Node));
         if (grid[r] == NULL) {
+            free(grid);
             err_exit("failed to allocate memory for grid row");
         }
         for (int c = 0; c < columns; c++) {
@@ -106,6 +78,7 @@ Node ** generate_level_grid(const char *name) {
                 case 'S':
                     node.type = STATUE;
                     node.ch = STATUE_CH;
+                    num_statues++;
                     break;
                 case '1':
                     node.type = LASER;
@@ -157,5 +130,32 @@ Node ** generate_level_grid(const char *name) {
             grid[r][c] = node;
         }
     }
-    return grid;
+
+    Node *player;
+    Node **statues = (Node **)malloc(num_statues * sizeof(Node *));
+    int current_statue_index = 0;
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < columns; c++) {
+            switch (grid[r][c].type) {
+                case PLAYER:
+                    player = &grid[r][c];
+                    break;
+                case STATUE:
+                    statues[current_statue_index++] = &grid[r][c];
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    LevelInfo info;
+    info.rows = rows;
+    info.columns = columns;
+    info.player = player;
+    info.num_statues = num_statues;
+    info.statues = statues;
+    info.grid = grid;
+    return info;
 }

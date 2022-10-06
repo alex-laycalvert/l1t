@@ -11,13 +11,16 @@
 #define MAX_LEVEL_ROWS 70
 #define MAX_LEVEL_COLUMNS 180
 
-typedef struct file_dimensions {
-    size_t rows;
-    size_t columns;
-} FileDimensions;
+typedef struct level_info {
+    int rows;
+    int columns;
+    Node *player;
+    int num_statues;
+    Node **statues;
+    Node **grid;
+} LevelInfo;
 
-FileDimensions get_file_dimensions(const char *name);
-Node ** generate_level_grid(const char *name);
+LevelInfo generate_level(const char *name);
 
 #endif // LEVELS_H_
 

@@ -6,6 +6,7 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <ncurses.h>
+#include <stdbool.h>
 
 int main(int argc, char **argv) {
     (void) argc, (void) argv;
@@ -21,10 +22,22 @@ int main(int argc, char **argv) {
     }
 
     int level = 0;
+    bool keep_playing = true;
+    bool won = false;
     do {
         init_level(level);
-    } while (play());
+        won = play();
+        /* TODO */
+        // Display a menu to determine whether to keep playing
+        // or move onto the next level.
+        keep_playing = false;
+    } while (keep_playing);
 
     endwin();
+    if (won) {
+        printf("YOU WON! 😄\n");
+    } else {
+        printf("Sorry, you didn't win. 😥\n");
+    }
     exit(EXIT_SUCCESS);
 }
