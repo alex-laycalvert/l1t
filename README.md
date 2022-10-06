@@ -60,6 +60,24 @@ make dev
 
 ***WORK IN PROGRESS***
 
+You can exit the game by pressing `q`.
+
+### Moving Around
+
+You can move around using the standard Vim keybindings:
+
+- `h`: Left
+- `j`: Down
+- `k`: Up
+- `l`: Right
+
+### Moving Items
+
+Certain items can be moved around the map to interact with lasers.
+
+- `BLOCKS (K)`: Block laser beams
+- `MIRRORS (/, \)`: Redirect laser beams based on the type of mirror
+
 ## Contributing
 
 See the guidelines for contributing [here](CONTRIBUTING.md)
