@@ -43,7 +43,6 @@ void print_grid() {
             print_node(r, c, &grid[r][c]);
         }
     }
-    print_lasers();
 }
 
 void print_lasers() {
@@ -174,7 +173,7 @@ void print_laser(const int row, const int column, const Direction dir) {
         mvprintw(current_row - row_offset, current_column - column_offset, "%c", laser_dir_ch);
     }
     if (grid[current_row][current_column].type == STATUE) {
-        (&grid[current_row][current_column])->on = !(&grid[current_row][current_column])->on;
+        (&grid[current_row][current_column])->on = true;
     }
 }
 
@@ -329,11 +328,7 @@ bool play() {
     bool won = false;
     while (playing) {
         print_grid();
-        if (check_win()) {
-            won = true;
-            playing = false;
-            break;
-        }
+        print_lasers();
         char input = getch();
         switch (input) {
             case QUIT_KEY:
@@ -356,6 +351,12 @@ bool play() {
                 break;
             default:
                 break;
+        }
+        print_lasers();
+        if (check_win()) {
+            won = true;
+            playing = false;
+            break;
         }
     }
     return won;
