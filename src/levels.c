@@ -75,7 +75,10 @@ void init_level_000(const int rows, const int columns, Node **grid) {
     place_item(PLAYER, UP, false, rows / 2, columns / 2, grid);
     place_item(BLOCK, UP, false, rows / 4, columns / 2, grid);
     place_item(LASER, LEFT, true, rows / 4, 3 * columns / 4, grid);
+    place_item(LASER, UP, true, 3 * rows / 4, 7 * columns / 8, grid);
     place_item(STATUE, UP, false, rows / 4, columns / 4, grid);
+    place_item(MIRROR_FORWARD, UP, false, rows / 6, columns / 6, grid);
+    place_item(MIRROR_BACKWARD, UP, false, 5 * rows / 6, columns / 6, grid);
 }
 
 /*

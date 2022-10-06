@@ -71,60 +71,112 @@ void print_laser(const int row, const int column, const Direction dir) {
     if (!is_grid_initialized) {
         err_exit("grid is not initialized");
     }
-    int current_row, current_column;
-    switch (dir) {
+    Direction current_dir = dir;
+    int row_offset = 0;
+    int column_offset = 0;
+    char laser_dir_ch = ' ';
+    char laser_line_ch = ' ';
+
+    switch (current_dir) {
         case UP:
-            current_row = row - 1;
-            if (current_row <= 0) {
-                break;
-            }
-            while (grid[current_row][column].type == EMPTY) {
-                mvprintw(current_row, column, "|");
-                current_row -= 1;
-            }
-            if (grid[current_row + 1][column].type == EMPTY) {
-                mvprintw(current_row + 1, column, "^");
-            }
+            row_offset = -1;
+            laser_dir_ch = UP_LASER_CH;
+            laser_line_ch = VERTICAL_LINE_CH;
             break;
         case DOWN:
-            current_row = row + 1;
-            if (current_row >= rows - 1) {
-                break;
-            }
-            while (grid[current_row][column].type == EMPTY) {
-                mvprintw(current_row, column, "|");
-                current_row += 1;
-            }
-            if (grid[current_row - 1][column].type == EMPTY) {
-                mvprintw(current_row - 1, column, "v");
-            }
+            row_offset = 1;
+            laser_dir_ch = DOWN_LASER_CH;
+            laser_line_ch = VERTICAL_LINE_CH;
             break;
         case LEFT:
-            current_column = column - 1;
-            if (current_column <= 0) {
-                break;
-            }
-            while (grid[row][current_column].type == EMPTY) {
-                mvprintw(row, current_column, "-");
-                current_column -= 1;
-            }
-            if (grid[row][current_column + 1].type == EMPTY) {
-                mvprintw(row, current_column + 1, "<");
-            }
+            column_offset = -1;
+            laser_dir_ch = LEFT_LASER_CH;
+            laser_line_ch = HORIZONTAL_LINE_CH;
             break;
         case RIGHT:
-            current_column = column + 1;
-            if (current_column >= columns - 1) {
-                break;
-            }
-            while (grid[row][current_column].type == EMPTY) {
-                mvprintw(row, current_column, "-");
-                current_column += 1;
-            }
-            if (grid[row][current_column - 1].type == EMPTY) {
-                mvprintw(row, current_column - 1, ">");
-            }
+            column_offset = 1;
+            laser_dir_ch = RIGHT_LASER_CH;
+            laser_line_ch = HORIZONTAL_LINE_CH;
             break;
+    }
+
+    int current_row = row + row_offset;
+    int current_column = column + column_offset;
+
+    while (grid[current_row][current_column].type == EMPTY) {
+        mvprintw(current_row, current_column, "%c", laser_line_ch);
+        current_row += row_offset;
+        current_column += column_offset;
+        if (grid[current_row][current_column].type == MIRROR_FORWARD) {
+            switch (current_dir) {
+                case UP:
+                    current_dir = RIGHT;
+                    laser_dir_ch = RIGHT_LASER_CH;
+                    laser_line_ch = HORIZONTAL_LINE_CH;
+                    row_offset = 0;
+                    column_offset = 1;
+                    break;
+                case DOWN:
+                    current_dir = LEFT;
+                    laser_dir_ch = LEFT_LASER_CH;
+                    laser_line_ch = HORIZONTAL_LINE_CH;
+                    row_offset = 0;
+                    column_offset = -1;
+                    break;
+                case LEFT:
+                    current_dir = DOWN;
+                    laser_dir_ch = DOWN_LASER_CH;
+                    laser_line_ch = VERTICAL_LINE_CH;
+                    row_offset = 1;
+                    column_offset = 0;
+                    break;
+                case RIGHT:
+                    current_dir = UP;
+                    laser_dir_ch = UP_LASER_CH;
+                    laser_line_ch = VERTICAL_LINE_CH;
+                    row_offset = -1;
+                    column_offset = 0;
+                    break;
+            }
+            current_row += row_offset;
+            current_column += column_offset;
+        } else if (grid[current_row][current_column].type == MIRROR_BACKWARD) {
+            switch (current_dir) {
+                case UP:
+                    current_dir = LEFT;
+                    laser_dir_ch = LEFT_LASER_CH;
+                    laser_line_ch = HORIZONTAL_LINE_CH;
+                    row_offset = 0;
+                    column_offset = -1;
+                    break;
+                case DOWN:
+                    current_dir = RIGHT;
+                    laser_dir_ch = RIGHT_LASER_CH;
+                    laser_line_ch = HORIZONTAL_LINE_CH;
+                    row_offset = 0;
+                    column_offset = 1;
+                    break;
+                case LEFT:
+                    current_dir = UP;
+                    laser_dir_ch = UP_LASER_CH;
+                    laser_line_ch = VERTICAL_LINE_CH;
+                    row_offset = -1;
+                    column_offset = 0;
+                    break;
+                case RIGHT:
+                    current_dir = DOWN;
+                    laser_dir_ch = DOWN_LASER_CH;
+                    laser_line_ch = VERTICAL_LINE_CH;
+                    row_offset = 1;
+                    column_offset = 0;
+                    break;
+            }
+            current_row += row_offset;
+            current_column += column_offset;
+        }
+    }
+    if (grid[current_row - row_offset][current_column - column_offset].type == EMPTY) {
+        mvprintw(current_row - row_offset, current_column - column_offset, "%c", laser_dir_ch);
     }
 }
 
@@ -198,6 +250,50 @@ void move_player(Direction dir) {
             block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
             block_tmp->type = BLOCK;
             block_tmp->ch = BLOCK_CH;
+            tmp = &grid[player->row + row_offset][player->column + column_offset];
+            tmp->type = PLAYER;
+            tmp->ch = PLAYER_CH;
+            player->type = EMPTY;
+            player->ch = EMPTY_CH;
+            player = tmp;
+            break;
+        case MIRROR_FORWARD:
+            if (
+                player->row + row_offset * 2 < 0 ||
+                player->row + row_offset * 2 >= rows ||
+                player->column + column_offset * 2 < 0 ||
+                player->column + column_offset * 2 >= columns
+            ) {
+                break;
+            }
+            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
+                break;
+            }
+            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
+            block_tmp->type = MIRROR_FORWARD;
+            block_tmp->ch = MIRROR_FORWARD_CH;
+            tmp = &grid[player->row + row_offset][player->column + column_offset];
+            tmp->type = PLAYER;
+            tmp->ch = PLAYER_CH;
+            player->type = EMPTY;
+            player->ch = EMPTY_CH;
+            player = tmp;
+            break;
+        case MIRROR_BACKWARD:
+            if (
+                player->row + row_offset * 2 < 0 ||
+                player->row + row_offset * 2 >= rows ||
+                player->column + column_offset * 2 < 0 ||
+                player->column + column_offset * 2 >= columns
+            ) {
+                break;
+            }
+            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
+                break;
+            }
+            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
+            block_tmp->type = MIRROR_BACKWARD;
+            block_tmp->ch = MIRROR_BACKWARD_CH;
             tmp = &grid[player->row + row_offset][player->column + column_offset];
             tmp->type = PLAYER;
             tmp->ch = PLAYER_CH;

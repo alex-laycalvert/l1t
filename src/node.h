@@ -18,6 +18,13 @@
 #define SWITCH_CH 'W'
 #define LASER_CH 'L'
 
+#define VERTICAL_LINE_CH '|'
+#define HORIZONTAL_LINE_CH '-'
+#define UP_LASER_CH '^'
+#define DOWN_LASER_CH 'v'
+#define LEFT_LASER_CH '<'
+#define RIGHT_LASER_CH '>'
+
 typedef enum node_type {
     EMPTY,
     PLAYER,
