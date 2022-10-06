@@ -33,7 +33,7 @@ make dev
 ./build/l1t.dev
 ```
 
-The developmenet instance as all warnings turned on. PR's
+The development instance as all warnings turned on. PR's
 that compile with warnings will be asked to be modified
 so that no warnings/errors are generated. If, for some reason,
 the warnings ***must*** be present, the you most likely need
@@ -47,7 +47,7 @@ username as the name and add it to the `src/levels` directory
 in this repo.
 
 You can read about how to make your `.l1t` file and add
-items in the `levels` README [here](src/levels/README.md).
+items in the `levels` README [here](LEVELS.md).
 
 ### Submitting a PR
 
