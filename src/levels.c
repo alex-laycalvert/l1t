@@ -26,7 +26,6 @@ size_t * get_file_dimensions(const char *name) {
     char line_buf[MAX_LEVEL_COLUMNS];
     size_t rows = 0;
     size_t columns = 0;
-    size_t current_column = 0;
 
     while (fgets(line_buf, MAX_LEVEL_COLUMNS, level_file) != NULL) {
         strncpy(char_grid[rows], line_buf, MAX_LEVEL_COLUMNS);
@@ -57,7 +56,6 @@ Node ** generate_level_grid(const char *name) {
     char line_buf[MAX_LEVEL_COLUMNS];
     int rows = 0;
     int columns = 0;
-    int current_column = 0;
 
     while (fgets(line_buf, MAX_LEVEL_COLUMNS, level_file) != NULL) {
         strncpy(char_grid[rows], line_buf, MAX_LEVEL_COLUMNS);
