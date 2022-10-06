@@ -58,25 +58,51 @@ make dev
 
 ## Gameplay
 
-***WORK IN PROGRESS***
 
 You can exit the game by pressing `q`.
 
-### Moving Around
+***WORK IN PROGRESS***
 
-You can move around using the standard Vim keybindings:
+The goal of every level in `l1t` is to turn all
+of the statues on using the available laser beams.
 
-- `h`: Left
-- `j`: Down
-- `k`: Up
-- `l`: Right
+### The Player
 
-### Moving Items
+You can use the normal Vim keybindings to move around:
 
-Certain items can be moved around the map to interact with lasers.
+- `h`: LEFT
+- `j`: DOWN
+- `k`: UP
+- `l`: RIGHT
 
-- `BLOCKS (K)`: Block laser beams
-- `MIRRORS (/, \)`: Redirect laser beams based on the type of mirror
+You can also press `space` to interact with surrounding
+items.
+
+### Lasers
+
+Lasers are the red blocks with red laser beams shooting out
+of them and can be reflected off of mirrors.
+
+You can toggle a laser by interacting with it and a laser will
+turn off if a laser beam shoots into it. It can be turned back
+on by the player.
+
+Off lasers appear as a dimmed red.
+
+### Statues
+
+Statues are the dimmed yellow blocks when off and turn a bright
+yellow when turned on by a laser beam. Turn on all lasers in a
+level to win.
+
+### Other Items
+
+Some items on the grid can be moved around:
+
+- `MIRRORS`: Mirrors are the `/` and `\` items on the grid
+             and can be moved to redirect laser beams.
+- `BLOCKS`: Blocks are the black boxes on the grid and can
+            be used to block a laser beam.
 
 ## Contributing
 
