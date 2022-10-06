@@ -47,7 +47,7 @@ username as the name and add it to the `src/levels` directory
 in this repo.
 
 You can read about how to make your `.l1t` file and add
-items in the `levels` README [here](LEVELS.md).
+items [here](LEVELS.md).
 
 ### Submitting a PR
 
