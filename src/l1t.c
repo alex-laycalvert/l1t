@@ -48,9 +48,6 @@ void print_grid() {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
             print_node(r, c, &grid[r][c]);
-            if (grid[r][c].type == LASER && grid[r][c].on) {
-                print_laser(r, c, grid[r][c].dir);
-            }
         }
     }
     for (int r = 0; r < rows; r++) {

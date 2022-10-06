@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 typedef enum L1T_COLOR_PAIRS {
-    /* EMPTY_COLOR_PAIR,  */
+    EMPTY_COLOR_PAIR, 
     PLAYER_COLOR_PAIR, 
     WALL_COLOR_PAIR, 
     /* MIRROR_FORWARD_COLOR_PAIR, */
