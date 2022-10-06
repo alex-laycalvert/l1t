@@ -3,7 +3,28 @@
 A terminal game where you move lasers around a grid to light up statues.
 Light up all the statues in a level to complete the level.
 
-## WORK IN PROGRESS
+## Progress
+
+***NOTE***: This project is still in development and is not yet ready for
+full gameplay. Thank you for being patient with me.
+
+All current "gameplay" is done in `Level 0` right now which is the development
+playground for level making. Any items in that level are purely for testing
+and there is no way, right now, to "win" `Level 0`.
+
+- [ ] Colors
+- [ ] Lasers
+- [ ] Moveable Blocks
+- [ ] Mirrors
+- [ ] Statues
+- [ ] Menu for picking levels
+- [ ] A concept of "winning"
+- [ ] Keeping track of completed levels
+- [ ] Switches
+- [ ] Buttons
+- [ ] Toggle Blocks
+
+- [ ] An official `Level 1`
 
 ## Installation and Running
 
