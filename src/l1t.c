@@ -367,6 +367,11 @@ bool check_win() {
             return false;
         }
     }
+    for (int i = 0; i < num_reverse_statues; i++) {
+        if (!reverse_statues[i]->on) {
+            return false;
+        }
+    }
     return true;
 }
 
