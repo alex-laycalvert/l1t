@@ -15,6 +15,8 @@ int rows, columns;
 Node *player;
 int num_statues;
 Node **statues;
+int num_reverse_statues;
+Node **reverse_statues;
 Node **grid;
 
 void init_level(const int level) {
@@ -30,6 +32,8 @@ void init_level(const int level) {
     player = info.player; 
     num_statues = info.num_statues;
     statues = info.statues;
+    num_reverse_statues = info.num_reverse_statues;
+    reverse_statues = info.reverse_statues;
     grid = info.grid;
     is_grid_initialized = true;
     resizeterm(rows, columns);
@@ -178,6 +182,9 @@ void print_laser(const int row, const int column, const Direction dir) {
     if (grid[current_row][current_column].type == STATUE) {
         (&grid[current_row][current_column])->on = true;
     }
+    if (grid[current_row][current_column].type == REVERSE_STATUE) {
+        (&grid[current_row][current_column])->on = false;
+    }
     if (grid[current_row][current_column].type == LASER) {
         (&grid[current_row][current_column])->on = false;
     }
@@ -206,6 +213,9 @@ void destroy_level() {
     if (statues) {
         free(statues);
     }
+    if (reverse_statues) {
+        free(reverse_statues);
+    }
     for (int r = 0; r < rows; r++) {
         free(grid[r]);
     }
@@ -216,11 +226,15 @@ void reset_statues() {
     if (!is_grid_initialized) {
         err_exit("grid is not initialized");
     }
-    if (num_statues <= 0) {
-        return;
+    if (num_statues > 0) {
+        for (int i = 0; i < num_statues; i++) {
+            statues[i]->on = false;
+        }
     }
-    for (int i = 0; i < num_statues; i++) {
-        statues[i]->on = false;
+    if (num_reverse_statues > 0) {
+        for (int i = 0; i < num_reverse_statues; i++) {
+            reverse_statues[i]->on = true;
+        }
     }
 }
 

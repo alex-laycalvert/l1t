@@ -17,6 +17,8 @@ typedef struct level_info {
     Node *player;
     int num_statues;
     Node **statues;
+    int num_reverse_statues;
+    Node **reverse_statues;
     Node **grid;
 } LevelInfo;
 

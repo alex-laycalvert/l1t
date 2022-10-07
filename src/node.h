@@ -13,6 +13,7 @@
 #define MIRROR_BACKWARD_CH '\\'
 #define BLOCK_CH 'K'
 #define STATUE_CH 'S'
+#define REVERSE_STATUE_CH 'R'
 #define TOGGLE_BLOCK_CH 'T'
 #define BUTTON_CH 'B'
 #define SWITCH_CH 'W'
@@ -33,6 +34,7 @@ typedef enum node_type {
     MIRROR_BACKWARD,
     BLOCK,
     STATUE,
+    REVERSE_STATUE,
     TOGGLE_BLOCK,
     BUTTON,
     SWITCH,

@@ -41,6 +41,7 @@ LevelInfo generate_level(const char *name) {
     }
 
     int num_statues = 0;
+    int num_reverse_statues = 0;
 
     for (int r = 0; r < rows; r++) {
         grid[r] = (Node *)malloc(columns * sizeof(Node));
@@ -79,6 +80,11 @@ LevelInfo generate_level(const char *name) {
                     node.type = STATUE;
                     node.ch = STATUE_CH;
                     num_statues++;
+                    break;
+                case 'R':
+                    node.type = REVERSE_STATUE;
+                    node.ch = REVERSE_STATUE_CH;
+                    num_reverse_statues++;
                     break;
                 case '1':
                     node.type = LASER;
@@ -133,7 +139,9 @@ LevelInfo generate_level(const char *name) {
 
     Node *player;
     Node **statues = (Node **)malloc(num_statues * sizeof(Node *));
+    Node **reverse_statues = (Node **)malloc(num_statues * sizeof(Node *));
     int current_statue_index = 0;
+    int current_reverse_statue_index = 0;
 
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
@@ -143,6 +151,9 @@ LevelInfo generate_level(const char *name) {
                     break;
                 case STATUE:
                     statues[current_statue_index++] = &grid[r][c];
+                    break;
+                case REVERSE_STATUE:
+                    reverse_statues[current_reverse_statue_index++] = &grid[r][c];
                     break;
                 default:
                     break;
@@ -156,6 +167,8 @@ LevelInfo generate_level(const char *name) {
     info.player = player;
     info.num_statues = num_statues;
     info.statues = statues;
+    info.num_reverse_statues = num_reverse_statues;
+    info.reverse_statues = reverse_statues;
     info.grid = grid;
     return info;
 }

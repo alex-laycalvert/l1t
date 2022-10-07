@@ -57,6 +57,23 @@ void print_node(const int row, const int column, const Node *node) {
             );
             attroff(COLOR_PAIR(BLOCK_COLOR_PAIR));
             break;
+        case REVERSE_STATUE:
+            if (node->on) {
+                attron(COLOR_PAIR(REVERSE_STATUE_ON_COLOR_PAIR));
+            } else {
+                attron(COLOR_PAIR(REVERSE_STATUE_OFF_COLOR_PAIR));
+            }
+            mvprintw(
+                row + TERMINAL_ROW_OFFSET,
+                column + TERMINAL_COLUMN_OFFSET,
+                "%c", node->ch
+            );
+            if (node->on) {
+                attroff(COLOR_PAIR(REVERSE_STATUE_ON_COLOR_PAIR));
+            } else {
+                attroff(COLOR_PAIR(REVERSE_STATUE_OFF_COLOR_PAIR));
+            }
+            break;
         case STATUE:
             if (node->on) {
                 attron(COLOR_PAIR(STATUE_ON_COLOR_PAIR));
