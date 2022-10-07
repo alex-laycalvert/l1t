@@ -1,5 +1,7 @@
 # l1t
 
+![l1t-logo](https://user-images.githubusercontent.com/45835678/194675329-027fd0d9-e1ee-4149-980b-e2fc7099206e.png)
+
 A terminal game where you move lasers around a grid to light up statues.
 Light up all the statues in a level to complete the level.
 
