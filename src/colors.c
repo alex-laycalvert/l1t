@@ -28,6 +28,7 @@ bool initialize_colors() {
     init_pair(LASER_ON_COLOR_PAIR, COLOR_RED, COLOR_RED);
     init_pair(LASER_OFF_COLOR_PAIR, COLOR_DIMMED_RED, COLOR_DIMMED_RED);
     init_pair(LASER_BEAM_COLOR_PAIR, COLOR_RED, -1);
+    init_pair(LOGO_COLOR_PAIR, COLOR_GREEN, -1);
 
     return true;
 }

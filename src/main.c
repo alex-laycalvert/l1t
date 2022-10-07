@@ -4,6 +4,7 @@
 #include "l1t.h"
 #include "colors.h"
 #include "utils.h"
+#include "menus.h"
 #include <stdlib.h>
 #include <ncurses.h>
 #include <stdbool.h>
@@ -14,11 +15,26 @@ int main(int argc, char **argv) {
     initscr();
     noecho();
     raw();
-    keypad(stdscr, true);
+    cbreak();
     curs_set(0);
+    keypad(stdscr, true);
 
     if (!initialize_colors()) {
         err_exit("your terminal does not support colors");
+    }
+
+    int terminal_rows, terminal_columns;
+    getmaxyx(stdscr, terminal_rows, terminal_columns);
+
+    MenuOption menu_selection = main_menu(terminal_rows, terminal_columns);
+
+    if (menu_selection == QUIT_OPTION) {
+        endwin();
+        exit(EXIT_SUCCESS);
+    }
+
+    if (menu_selection == HELP_OPTION) {
+        /* TODO */
     }
 
     int level = 0;

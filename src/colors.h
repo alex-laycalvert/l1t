@@ -24,6 +24,7 @@ typedef enum L1T_COLOR_PAIRS {
     LASER_ON_COLOR_PAIR,
     LASER_OFF_COLOR_PAIR,
     LASER_BEAM_COLOR_PAIR,
+    LOGO_COLOR_PAIR,
 } L1tColorPairs;
 
 bool initialize_colors();
