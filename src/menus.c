@@ -28,12 +28,6 @@ MenuOption main_menu(const int rows, const int columns) {
         rows / 2 - MAIN_MENU_HEIGHT / 2,
         columns / 2 - MAIN_MENU_WIDTH / 2
     );
-    /* WINDOW *main_menu_sub_win = newwin( */
-    /*     num_options + 2, */
-    /*     MAIN_MENU_WIDTH - 2, */
-    /*     rows / 2 + MAIN_MENU_HEIGHT / 2 - (num_options + 2), */
-    /*     columns / 2 - MAIN_MENU_WIDTH / 2 */
-    /* ); */
     int menu_row_offset = 5;
     int menu_column_offset = MAIN_MENU_WIDTH / 2 - 10;
     WINDOW *main_menu_sub_win = derwin(
