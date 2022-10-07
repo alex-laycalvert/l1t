@@ -25,6 +25,7 @@ void print_laser(const int row, const int column, const Direction dir);
 void clear_grid();
 void restart_level();
 void destroy_level();
+void reset_statues();
 void move_player(Direction dir);
 void perform_player_interaction();
 bool check_win();
