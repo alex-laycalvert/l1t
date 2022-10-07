@@ -330,8 +330,8 @@ void move_player(Direction dir) {
 }
 
 void perform_player_interaction() {
-    for (int r = player->row - 1; r < player->row + 1; r++) {
-        for (int c = player->column - 1; c < player->column + 1; c++) {
+    for (int r = player->row - 1; r < player->row + 2; r++) {
+        for (int c = player->column - 1; c < player->column + 2; c++) {
             if (r == player->row && c == player->column) {
                 continue;
             }
