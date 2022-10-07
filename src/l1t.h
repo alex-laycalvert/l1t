@@ -7,9 +7,6 @@
 #include "node.h"
 #include <stdbool.h>
 
-#define TERMINAL_ROW_OFFSET 0
-#define TERMINAL_COLUMN_OFFSET 0
-
 #define QUIT_KEY 'q'
 #define RESTART_KEY 'r'
 #define INTERACT_KEY ' '
@@ -18,7 +15,7 @@
 #define MOVE_LEFT_KEY 'h'
 #define MOVE_RIGHT_KEY 'l'
 
-void init_level(const int level);
+void init_level(const int level, const int terminal_rows, const int terminal_columns);
 void print_grid();
 void print_lasers();
 void print_laser(const int row, const int column, const Direction dir);

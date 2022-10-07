@@ -11,7 +11,7 @@
 
 bool is_grid_initialized = false;
 int current_level = -1;
-int rows, columns;
+int rows, columns, terminal_rows, terminal_columns, terminal_row_offset, terminal_column_offset;
 Node *player;
 int num_statues;
 Node **statues;
@@ -19,7 +19,7 @@ int num_reverse_statues;
 Node **reverse_statues;
 Node **grid;
 
-void init_level(const int level) {
+void init_level(const int level, const int term_rows, const int term_columns) {
     current_level = level;
     LevelInfo info;
     switch (level) {
@@ -27,8 +27,12 @@ void init_level(const int level) {
             info = generate_level("src/levels/000.l1t");
             break;
     }
+    terminal_rows = term_rows;
+    terminal_columns = term_columns;
     rows = info.rows;
     columns = info.columns;
+    terminal_row_offset = terminal_rows / 2 - rows / 2;
+    terminal_column_offset = terminal_columns / 2 - columns / 2;
     player = info.player; 
     num_statues = info.num_statues;
     statues = info.statues;
@@ -45,7 +49,7 @@ void print_grid() {
     }
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-            print_node(r, c, &grid[r][c]);
+            print_node(r + terminal_row_offset, c + terminal_column_offset, &grid[r][c]);
         }
     }
 }
@@ -103,7 +107,11 @@ void print_laser(const int row, const int column, const Direction dir) {
         grid[current_row][current_column].type == MIRROR_BACKWARD
     ) {
         if (grid[current_row][current_column].type == EMPTY) {
-            mvprintw(current_row, current_column, "%c", laser_line_ch);
+            mvprintw(
+                current_row + terminal_row_offset,
+                current_column + terminal_column_offset,
+                "%c", laser_line_ch
+            );
             current_row += row_offset;
             current_column += column_offset;
         }
@@ -176,7 +184,11 @@ void print_laser(const int row, const int column, const Direction dir) {
         }
     }
     if (grid[current_row - row_offset][current_column - column_offset].type == EMPTY) {
-        mvprintw(current_row - row_offset, current_column - column_offset, "%c", laser_dir_ch);
+        mvprintw(
+            current_row - row_offset + terminal_row_offset,
+            current_column - column_offset + terminal_column_offset,
+            "%c", laser_dir_ch
+        );
     }
     attroff(COLOR_PAIR(LASER_BEAM_COLOR_PAIR));
     if (grid[current_row][current_column].type == STATUE) {
@@ -196,14 +208,14 @@ void clear_grid() {
     }
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-            mvprintw(r, c, " ");
+            mvprintw(r + terminal_row_offset, c + terminal_column_offset, " ");
         }
     }
 }
 
 void restart_level() {
     destroy_level();
-    init_level(current_level);
+    init_level(current_level, terminal_rows, terminal_columns);
 }
 
 void destroy_level() {

@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     bool keep_playing = true;
     bool won = false;
     do {
-        init_level(level);
+        init_level(level, terminal_rows, terminal_columns);
         won = play();
         /* TODO */
         // Display a menu to determine whether to keep playing

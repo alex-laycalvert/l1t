@@ -11,16 +11,16 @@ void print_node(const int row, const int column, const Node *node) {
     switch (node->type) {
         case EMPTY:
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             break;
         case PLAYER:
             attron(COLOR_PAIR(PLAYER_COLOR_PAIR));
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             attroff(COLOR_PAIR(PLAYER_COLOR_PAIR));
@@ -28,31 +28,31 @@ void print_node(const int row, const int column, const Node *node) {
         case WALL:
             attron(COLOR_PAIR(WALL_COLOR_PAIR));
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             attroff(COLOR_PAIR(WALL_COLOR_PAIR));
             break;
         case MIRROR_FORWARD:
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             break;
         case MIRROR_BACKWARD:
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             break;
         case BLOCK:
             attron(COLOR_PAIR(BLOCK_COLOR_PAIR));
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             attroff(COLOR_PAIR(BLOCK_COLOR_PAIR));
@@ -64,8 +64,8 @@ void print_node(const int row, const int column, const Node *node) {
                 attron(COLOR_PAIR(REVERSE_STATUE_OFF_COLOR_PAIR));
             }
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             if (node->on) {
@@ -81,8 +81,8 @@ void print_node(const int row, const int column, const Node *node) {
                 attron(COLOR_PAIR(STATUE_OFF_COLOR_PAIR));
             }
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             if (node->on) {
@@ -94,23 +94,23 @@ void print_node(const int row, const int column, const Node *node) {
         case TOGGLE_BLOCK:
             attron(COLOR_PAIR(TOGGLE_BLOCK_COLOR_PAIR));
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             attroff(COLOR_PAIR(TOGGLE_BLOCK_COLOR_PAIR));
             break;
         case BUTTON:
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             break;
         case SWITCH:
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             break;
@@ -121,8 +121,8 @@ void print_node(const int row, const int column, const Node *node) {
                 attron(COLOR_PAIR(LASER_OFF_COLOR_PAIR));
             }
             mvprintw(
-                row + TERMINAL_ROW_OFFSET,
-                column + TERMINAL_COLUMN_OFFSET,
+                row,
+                column,
                 "%c", node->ch
             );
             if (node->on) {
