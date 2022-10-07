@@ -31,6 +31,10 @@ and there is no way, right now, to "win" `Level 0`.
 
 ## Installation and Running
 
+***NOTE***: Right now this game is only able to run on Linux. I am
+working on fixing some compiling bugs on macOS while I
+add more levels.
+
 Follow the steps below to install `l1t`:
 
 - Close this repository
