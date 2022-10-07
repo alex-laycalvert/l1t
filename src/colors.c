@@ -13,9 +13,12 @@ bool initialize_colors() {
     start_color();
     use_default_colors();
 
-    init_color(COLOR_DIMMED_YELLOW, 250, 250, 0);
-    init_color(COLOR_DIMMED_MAGENTA, 179, 179, 24);
-    init_color(COLOR_DIMMED_RED, 250, 0, 0);
+    init_color(COLOR_YELLOW, 1000, 1000, 450);
+    init_color(COLOR_DIMMED_YELLOW, 250, 250, 112);
+    init_color(COLOR_MAGENTA, 1000, 460, 770);
+    init_color(COLOR_DIMMED_MAGENTA, 250, 115, 192);
+    init_color(COLOR_RED, 1000, 275, 275);
+    init_color(COLOR_DIMMED_RED, 250, 68, 68);
 
     init_pair(PLAYER_COLOR_PAIR, COLOR_GREEN, COLOR_GREEN);
     init_pair(WALL_COLOR_PAIR, COLOR_WHITE, COLOR_WHITE);
