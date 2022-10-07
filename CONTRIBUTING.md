@@ -36,7 +36,7 @@ make dev
 The development instance as all warnings turned on. PR's
 that compile with warnings will be asked to be modified
 so that no warnings/errors are generated. If, for some reason,
-the warnings ***must*** be present, the you most likely need
+the warnings ***must*** be present, then you most likely need
 to attempt the feature or fix you are trying to make a
 different way.
 
