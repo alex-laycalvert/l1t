@@ -22,6 +22,7 @@ and there is no way, right now, to "win" `Level 0`.
 - [ ] Menu for picking levels
 - [x] A concept of "winning"
 - [ ] Keeping track of completed levels
+- [x] Main Menu
 - [ ] Switches
 - [ ] Buttons
 - [ ] Toggle Blocks
