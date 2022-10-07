@@ -212,6 +212,18 @@ void destroy_level() {
     free(grid);
 }
 
+void reset_statues() {
+    if (!is_grid_initialized) {
+        err_exit("grid is not initialized");
+    }
+    if (num_statues <= 0) {
+        return;
+    }
+    for (int i = 0; i < num_statues; i++) {
+        statues[i]->on = false;
+    }
+}
+
 void move_player(Direction dir) {
     if (!is_grid_initialized) {
         err_exit("grid is not initialized");
@@ -352,6 +364,7 @@ bool play() {
     bool won = false;
     while (playing) {
         print_grid();
+        reset_statues();
         print_lasers();
         char input = getch();
         switch (input) {
@@ -379,6 +392,7 @@ bool play() {
             default:
                 break;
         }
+        reset_statues();
         print_lasers();
         if (check_win()) {
             won = true;
