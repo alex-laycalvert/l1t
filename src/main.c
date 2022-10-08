@@ -66,6 +66,8 @@ int main(int argc, char **argv) {
         }
     } while (keep_playing);
     endwin();
-    printf("You've completed all of the levels, stay tuned for more.\n");
+    if (level > 1) {
+        printf("You've completed all of the levels, stay tuned for more.\n");
+    }
     exit(EXIT_SUCCESS);
 }
