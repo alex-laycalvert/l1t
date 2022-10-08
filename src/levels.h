@@ -22,6 +22,7 @@ typedef struct level_info {
     Node **grid;
 } LevelInfo;
 
+void copy_level_files(char *source_path, char *target_path);
 LevelInfo generate_level(const char *name);
 
 #endif // LEVELS_H_

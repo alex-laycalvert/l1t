@@ -13,6 +13,7 @@ bool initialize_colors() {
     start_color();
     use_default_colors();
 
+    init_color(COLOR_GREEN, 0, 1000, 0);
     init_color(COLOR_YELLOW, 1000, 1000, 450);
     init_color(COLOR_DIMMED_YELLOW, 250, 250, 112);
     init_color(COLOR_MAGENTA, 1000, 460, 770);

@@ -19,6 +19,7 @@ characters:
 - `\`: `MIRROR_BACKWARD`
 - `K`: `BLOCK`
 - `S`: `STATUE`
+- `R`: `REVERSE_STATUE`
 - `1`: `LASER` `UP` `ON`
 - `2`: `LASER` `DOWN` `ON`
 - `3`: `LASER` `LEFT` `ON`
