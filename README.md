@@ -14,13 +14,14 @@ Number of Levels: `1`
 
 ## Installation and Running
 
-***NOTE***: Right now this game is only able to run on Linux. I am
-working on fixing some compiling bugs on macOS while I
-add more levels.
-
 Follow the steps below to install `l1t`:
 
-- Close this repository
+<details>
+<summary>
+### Linux
+</summary>
+
+- Clone this repository
 
 ```bash
 git clone https://github.com/alex-laycalvert/l1t
@@ -38,6 +39,44 @@ make
 ```bash
 ./build/l1t
 ```
+
+- For development (optional):
+
+```bash
+make dev
+./build/l1t.dev
+```
+</details>
+
+<details>
+<summary>
+### macOS
+</summary>
+
+For macOS users, you will need to make sure that the proper
+`ncurses` library is installed on your machine. You can install
+[Homebrew](https://brew.sh/) by following the steps on their
+website then run `brew install ncurses`.
+
+- Clone this repository
+
+```bash
+git clone https://github.com/alex-laycalvert/l1t
+cd ./l1t
+```
+
+- Build the project:
+
+```bash
+make
+```
+
+- Run the game:
+
+```bash
+./build/l1t
+```
+</details>
 
 - For development (optional):
 
