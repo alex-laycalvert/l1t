@@ -8,6 +8,7 @@
 #include "colors.h"
 #include <stdlib.h>
 #include <ncurses.h>
+#include <string.h>
 #include <stdbool.h>
 
 Configuration config;
@@ -29,6 +30,9 @@ void init_level(const int level, const int term_rows, const int term_columns) {
     current_level = level;
     LevelInfo info;
     switch (level) {
+        case 1:
+            info = generate_level("src/levels/001.l1t");
+            break;
         default:
             info = generate_level("src/levels/000.l1t");
             break;
@@ -48,12 +52,6 @@ void init_level(const int level, const int term_rows, const int term_columns) {
     is_grid_initialized = true;
     clear();
     resizeterm(terminal_rows, terminal_columns);
-    /* destroy_level(); */
-    /* endwin(); */
-    /* printf("ROWS: %d COLUMNS: %d\n", rows, columns); */
-    /* printf("TROWS: %d TCOLUMNS: %d\n", terminal_rows, terminal_columns); */
-    /* printf("TROWSO: %d TCOLUMNSO: %d\n", terminal_row_offset, terminal_column_offset); */
-    /* exit(0); */
 }
 
 void print_border() {
@@ -243,7 +241,6 @@ void clear_grid() {
 void restart_level() {
     destroy_level();
     init_level(current_level, terminal_rows, terminal_columns);
-    print_border();
 }
 
 void destroy_level() {
@@ -450,6 +447,7 @@ bool play() {
         }
         if (input == config.restart_key) {
             restart_level();
+            print_border();
         }
         if (input == config.quit_key) {
             playing = false;

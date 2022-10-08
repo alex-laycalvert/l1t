@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
     char *home_dir = getenv("HOME");
     char config_file[LINE_BUFFER_SIZE];
     bzero(config_file, LINE_BUFFER_SIZE);
-    strncat(config_file, home_dir, LINE_BUFFER_SIZE);
-    strncat(config_file, L1T_CONFIG_FILE, strlen(L1T_CONFIG_FILE)); 
+    strcat(config_file, home_dir);
+    strcat(config_file, L1T_CONFIG_FILE); 
     Configuration config = read_configuration(config_file);
     init_config(config);
 

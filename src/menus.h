@@ -22,22 +22,13 @@ typedef struct {
     MenuOption value;
 } MenuDisplayOption;
 
+MenuOption main_menu(const int rows, const int columns, const Configuration config);
 void print_logo(WINDOW *window);
 void print_in_middle(
     WINDOW *window,
     const int start_x,
     const int start_y,
     const int width, 
-    const char *string,
-    const chtype color
-);
-
-MenuOption main_menu(const int rows, const int columns, const Configuration config);
-void print_in_middle(
-    WINDOW *window,
-    const int start_x,
-    const int start_y,
-    int width, 
     const char *string,
     const chtype color
 );
