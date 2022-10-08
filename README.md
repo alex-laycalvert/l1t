@@ -10,7 +10,7 @@ the level.
 
 ***NOTE***: This project is still in development.
 
-Number of Levels: `1`
+Number of Levels: `3`
 
 ## Installation and Running
 

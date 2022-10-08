@@ -1,6 +1,10 @@
 # l1t Configuration
 
-You can configure your `l1t` setup in the `$HOME/.config/l1t.conf` file.
+You can configure your `l1t` setup in the `$HOME/.config/l1t/l1t.conf` file.
+
+Levels for `l1t` are stored in `$HOME/.config/l1t/levels/`. Altering the `.l1t`
+files in this directory will alter the levels played in the game. Do so at
+your own risk.
 
 You can set values to configuration options like this:
 
