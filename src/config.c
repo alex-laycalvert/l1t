@@ -21,8 +21,11 @@ Configuration read_configuration(char *filename) {
     bzero(line_buf, LINE_BUFFER_SIZE);
     char *key, *value;
     while (fgets(line_buf, LINE_BUFFER_SIZE, config_file) != NULL) {
-        key = strtok(line_buf, "=");
-        value = strtok(NULL, "=");
+        key = strtok(line_buf, "= ");
+        if (key[0] == '#') {
+            continue;
+        }
+        value = strtok(NULL, "=# ");
         if (!key || !value) {
             err_exit("failed to parse configuration file");
         }

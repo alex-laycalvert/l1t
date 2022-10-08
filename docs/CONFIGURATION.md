@@ -24,3 +24,13 @@ Example: `MoveUpKey=w`
 
 Capitalization matters for values. Currently there is no way to set arrow keys
 to keybindings.
+
+## Comments
+
+Comments are denoted with a `#`
+
+```conf
+# This is a cool single line comment
+Key=Value # This is a cool inline comment
+...
+```
