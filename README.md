@@ -18,7 +18,7 @@ Follow the steps below to install `l1t`:
 
 <details>
 <summary>
-### Linux
+<h3>Linux</h3>
 </summary>
 
 - Clone this repository
@@ -50,7 +50,7 @@ make dev
 
 <details>
 <summary>
-### macOS
+<h3>macOS</h3>
 </summary>
 
 For macOS users, you will need to make sure that the proper
