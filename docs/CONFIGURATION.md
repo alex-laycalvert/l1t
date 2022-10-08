@@ -12,7 +12,6 @@ Example: `MoveUpKey=w`
 
 ## Valid keys
 
-+-----------------------------------------------------------------------------+
 | Key              | Default | Description                                    |
 |------------------|---------|------------------------------------------------|
 | `MoveUpKey`      | `k`     | Key press to move the player up                |
@@ -22,7 +21,6 @@ Example: `MoveUpKey=w`
 | `InteractionKey` | `space` | Key press to interact with surrounding objects |
 | `RestartKey`     | `r`     | Key press to restart the level                 |
 | `QuitKey`        | `q`     | Key press to quit the game                     |
-+-----------------------------------------------------------------------------+
 
 Capitalization matters for values. Currently there is no way to set arrow keys
 to keybindings.
