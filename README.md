@@ -14,7 +14,7 @@ Number of Levels: `1`
 
 ## Installation and Running
 
-Follow the steps below to install `l1t`:
+Follow the steps below to install `l1t` for your OS:
 
 <details>
 <summary>
