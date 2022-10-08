@@ -5,6 +5,7 @@
 #define L1T_H_
 
 #include "node.h"
+#include "config.h"
 #include <stdbool.h>
 
 #define QUIT_KEY 'q'
@@ -15,6 +16,7 @@
 #define MOVE_LEFT_KEY 'h'
 #define MOVE_RIGHT_KEY 'l'
 
+void init_config(const Configuration config);
 void init_level(const int level, const int terminal_rows, const int terminal_columns);
 void print_border();
 void print_grid();
