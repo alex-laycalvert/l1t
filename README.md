@@ -2,8 +2,9 @@
 
 ![l1t-logo](https://user-images.githubusercontent.com/45835678/194675329-027fd0d9-e1ee-4149-980b-e2fc7099206e.png)
 
-A terminal game where you move lasers around a grid to light up statues.
-Light up all the statues in a level to complete the level.
+A terminal game where you position mirros in a grid to light
+up statues. Light up all the statues in a grid to complete
+the level.
 
 ## Progress
 
@@ -102,12 +103,15 @@ Statues are the dimmed yellow blocks when off and turn a bright
 yellow when turned on by a laser beam. Turn on all lasers in a
 level to win.
 
+### Mirrors
+
+Mirros are the `/` and `\` characters that reflect laser beams.
+Mirrors can have their direction toggled but cannot be moved.
+
 ### Other Items
 
 Some items on the grid can be moved around:
 
-- `MIRRORS`: Mirrors are the `/` and `\` items on the grid
-             and can be moved to redirect laser beams.
 - `BLOCKS`: Blocks are the black boxes on the grid and can
             be used to block a laser beam.
 

@@ -102,7 +102,7 @@ MenuOption next_level_menu(const int rows, const int columns, const Configuratio
     WINDOW *next_level_menu_win = newwin(
         NEXT_LEVEL_MENU_HEIGHT,
         NEXT_LEVEL_MENU_WIDTH,
-        rows / 2 - NEXT_LEVEL_MENU_HEIGHT / 2,
+        rows / 2 - NEXT_LEVEL_MENU_HEIGHT,
         columns / 2 - NEXT_LEVEL_MENU_WIDTH / 2
     );
     int menu_column_offset = 7;

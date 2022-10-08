@@ -49,6 +49,9 @@ int main(int argc, char **argv) {
     bool keep_playing = true;
     bool won = false;
     do {
+        if (level > 1) {
+            break;
+        }
         init_level(level, terminal_rows, terminal_columns);
         won = play();
         if (!won) {
@@ -63,5 +66,6 @@ int main(int argc, char **argv) {
         }
     } while (keep_playing);
     endwin();
+    printf("You've completed all of the levels, stay tuned for more.\n");
     exit(EXIT_SUCCESS);
 }
