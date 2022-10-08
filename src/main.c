@@ -5,12 +5,22 @@
 #include "colors.h"
 #include "utils.h"
 #include "menus.h"
+#include "config.h"
 #include <stdlib.h>
 #include <ncurses.h>
 #include <stdbool.h>
+#include <string.h>
 
 int main(int argc, char **argv) {
     (void) argc, (void) argv;
+
+    char *home_dir = getenv("HOME");
+    char config_file[LINE_BUFFER_SIZE];
+    bzero(config_file, LINE_BUFFER_SIZE);
+    strncat(config_file, home_dir, LINE_BUFFER_SIZE);
+    strncat(config_file, L1T_CONFIG_FILE, strlen(L1T_CONFIG_FILE)); 
+    Configuration config = read_configuration(config_file);
+    init_config(config);
 
     initscr();
     noecho();
@@ -26,7 +36,7 @@ int main(int argc, char **argv) {
     int terminal_rows, terminal_columns;
     getmaxyx(stdscr, terminal_rows, terminal_columns);
 
-    MenuOption menu_selection = main_menu(terminal_rows, terminal_columns);
+    MenuOption menu_selection = main_menu(terminal_rows, terminal_columns, config);
 
     if (menu_selection == QUIT_OPTION) {
         endwin();

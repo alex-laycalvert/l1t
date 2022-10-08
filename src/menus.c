@@ -4,11 +4,12 @@
 #include "menus.h"
 #include "colors.h"
 #include "l1t.h"
+#include "config.h"
 #include <menu.h>
 #include <string.h>
 #include <stdlib.h>
 
-MenuOption main_menu(const int rows, const int columns) {
+MenuOption main_menu(const int rows, const int columns, const Configuration config) {
     const int num_options = 4;
     MenuDisplayOption menu_options[] = {
         { "     Play     ", PLAY_OPTION },
@@ -52,21 +53,19 @@ MenuOption main_menu(const int rows, const int columns) {
 	post_menu(main_menu);
 	wrefresh(main_menu_win);
     int c;
-	while((c = getch()) != ENTER_KEY && c != QUIT_KEY) {
-        switch(c) {
-			case MOVE_UP_KEY:
-				menu_driver(main_menu, REQ_UP_ITEM);
-				break;
-            case MOVE_DOWN_KEY:
-				menu_driver(main_menu, REQ_DOWN_ITEM);
-				break;
-			case KEY_UP:
-				menu_driver(main_menu, REQ_UP_ITEM);
-				break;
-            case KEY_DOWN:
-				menu_driver(main_menu, REQ_DOWN_ITEM);
-				break;
-		}
+	while((c = getch()) != ENTER_KEY && c != config.quit_key) {
+        if (c == config.move_up_key) {
+            menu_driver(main_menu, REQ_UP_ITEM);
+        }
+        if (c == config.move_down_key) {
+            menu_driver(main_menu, REQ_DOWN_ITEM);
+        }
+        if (c == KEY_UP) {
+            menu_driver(main_menu, REQ_UP_ITEM);
+        }
+        if (c == KEY_DOWN) {
+            menu_driver(main_menu, REQ_DOWN_ITEM);
+        }
         wrefresh(main_menu_win);
     }
 

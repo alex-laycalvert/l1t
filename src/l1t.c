@@ -4,11 +4,13 @@
 #include "l1t.h"
 #include "levels.h"
 #include "utils.h"
+#include "config.h"
 #include "colors.h"
 #include <stdlib.h>
 #include <ncurses.h>
 #include <stdbool.h>
 
+Configuration config;
 bool is_grid_initialized = false;
 int current_level = -1;
 int rows, columns, terminal_rows, terminal_columns, terminal_row_offset, terminal_column_offset;
@@ -18,6 +20,10 @@ Node **statues;
 int num_reverse_statues;
 Node **reverse_statues;
 Node **grid;
+
+void init_config(const Configuration user_config) {
+    config = user_config;
+}
 
 void init_level(const int level, const int term_rows, const int term_columns) {
     current_level = level;
@@ -237,6 +243,7 @@ void clear_grid() {
 void restart_level() {
     destroy_level();
     init_level(current_level, terminal_rows, terminal_columns);
+    print_border();
 }
 
 void destroy_level() {
@@ -425,31 +432,27 @@ bool play() {
         print_grid();
         reset_statues();
         print_lasers();
-        char input = getch();
-        switch (input) {
-            case QUIT_KEY:
-                playing = false;
-                break;
-            case RESTART_KEY:
-                restart_level();
-                break;
-            case INTERACT_KEY:
-                perform_player_interaction();
-                break;
-            case MOVE_UP_KEY:
-                move_player(UP);
-                break;
-            case MOVE_DOWN_KEY:
-                move_player(DOWN);
-                break;
-            case MOVE_LEFT_KEY:
-                move_player(LEFT);
-                break;
-            case MOVE_RIGHT_KEY:
-                move_player(RIGHT);
-                break;
-            default:
-                break;
+        int input = getch();
+        if (input == config.move_up_key) {
+            move_player(UP);
+        }
+        if (input == config.move_down_key) {
+            move_player(DOWN);
+        }
+        if (input == config.move_left_key) {
+            move_player(LEFT);
+        }
+        if (input == config.move_right_key) {
+            move_player(RIGHT);
+        }
+        if (input == config.interaction_key) {
+            perform_player_interaction();
+        }
+        if (input == config.restart_key) {
+            restart_level();
+        }
+        if (input == config.quit_key) {
+            playing = false;
         }
         reset_statues();
         print_lasers();

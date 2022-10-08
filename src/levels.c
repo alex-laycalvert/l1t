@@ -12,7 +12,7 @@
 LevelInfo generate_level(const char *name) {
     FILE *level_file = fopen(name, "r");
     if (!level_file) {
-        err_exit("failed to open file");
+        err_exit("failed to open level file");
     }
 
     Node **grid;

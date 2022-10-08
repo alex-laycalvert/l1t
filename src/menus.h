@@ -4,6 +4,7 @@
 #ifndef MENUS_H_
 #define MENUS_H_
 
+#include "config.h"
 #include <menu.h>
 
 #define MAIN_MENU_WIDTH 34
@@ -31,7 +32,7 @@ void print_in_middle(
     const chtype color
 );
 
-MenuOption main_menu(const int rows, const int columns);
+MenuOption main_menu(const int rows, const int columns, const Configuration config);
 void print_in_middle(
     WINDOW *window,
     const int start_x,
