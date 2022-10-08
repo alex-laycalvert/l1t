@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
         /* TODO */
     }
 
-    int level = 0;
+    int level = 1;
     bool keep_playing = true;
     bool won = false;
     do {

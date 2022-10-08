@@ -60,10 +60,26 @@ void print_border() {
     mvhline(terminal_row_offset + rows - 1, terminal_column_offset + 1, 0, columns - 2);
     mvvline(terminal_row_offset + 1, terminal_column_offset, 0, rows - 2);
     mvvline(terminal_row_offset + 1, terminal_column_offset + columns - 1, 0, rows - 2);
-    mvaddch(terminal_row_offset, terminal_column_offset, ACS_ULCORNER);
-    mvaddch(terminal_row_offset, terminal_column_offset + columns - 1, ACS_URCORNER);
+    mvaddch(terminal_row_offset, terminal_column_offset, ACS_LTEE);
+    mvaddch(terminal_row_offset, terminal_column_offset + columns - 1, ACS_RTEE);
     mvaddch(terminal_row_offset + rows - 1, terminal_column_offset, ACS_LLCORNER);
     mvaddch(terminal_row_offset + rows - 1, terminal_column_offset + columns - 1, ACS_LRCORNER);
+    mvhline(terminal_row_offset - 2, terminal_column_offset + 1, 0, columns - 2);
+    mvaddch(terminal_row_offset - 1, terminal_column_offset, ACS_VLINE);
+    mvaddch(terminal_row_offset - 1, terminal_column_offset + columns - 1, ACS_VLINE);
+    mvaddch(terminal_row_offset - 2, terminal_column_offset, ACS_ULCORNER);
+    mvaddch(terminal_row_offset - 2, terminal_column_offset + columns - 1, ACS_URCORNER);
+
+    char *info = "";
+    switch (current_level) {
+        case 1:
+            info = "Level 001: The Basics";
+            break;
+        default:
+            info = "Level 000: Lonely";
+            break;
+    }
+    mvprintw(terminal_row_offset - 1, terminal_columns / 2 - strlen(info) / 2, "%s", info);
 }
 
 void print_grid() {
