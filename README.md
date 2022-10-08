@@ -18,7 +18,7 @@ Follow the steps below to install `l1t`:
 
 <details>
 <summary>
-### Linux
+<h3>Linux</h3>
 </summary>
 
 - Clone this repository
@@ -47,10 +47,9 @@ make dev
 ./build/l1t.dev
 ```
 </details>
-
 <details>
 <summary>
-### macOS
+<h3>macOS</h3>
 </summary>
 
 For macOS users, you will need to make sure that the proper
@@ -76,7 +75,6 @@ make
 ```bash
 ./build/l1t
 ```
-</details>
 
 - For development (optional):
 
@@ -84,6 +82,7 @@ make
 make dev
 ./build/l1t.dev
 ```
+</details>
 
 ## Gameplay
 
