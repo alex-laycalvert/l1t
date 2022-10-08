@@ -16,6 +16,7 @@
 #define MOVE_RIGHT_KEY 'l'
 
 void init_level(const int level, const int terminal_rows, const int terminal_columns);
+void print_border();
 void print_grid();
 void print_lasers();
 void print_laser(const int row, const int column, const Direction dir);

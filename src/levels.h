@@ -8,8 +8,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define MAX_LEVEL_ROWS 70
-#define MAX_LEVEL_COLUMNS 180
+#define MAX_LEVEL_ROWS 200
+#define MAX_LEVEL_COLUMNS 500
 
 typedef struct level_info {
     int rows;

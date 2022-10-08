@@ -40,21 +40,42 @@ void init_level(const int level, const int term_rows, const int term_columns) {
     reverse_statues = info.reverse_statues;
     grid = info.grid;
     is_grid_initialized = true;
-    resizeterm(rows, columns);
+    clear();
+    resizeterm(terminal_rows, terminal_columns);
+    /* destroy_level(); */
+    /* endwin(); */
+    /* printf("ROWS: %d COLUMNS: %d\n", rows, columns); */
+    /* printf("TROWS: %d TCOLUMNS: %d\n", terminal_rows, terminal_columns); */
+    /* printf("TROWSO: %d TCOLUMNSO: %d\n", terminal_row_offset, terminal_column_offset); */
+    /* exit(0); */
+}
+
+void print_border() {
+    mvhline(terminal_row_offset, terminal_column_offset + 1, 0, columns - 2);
+    mvhline(terminal_row_offset + rows - 1, terminal_column_offset + 1, 0, columns - 2);
+    mvvline(terminal_row_offset + 1, terminal_column_offset, 0, rows - 2);
+    mvvline(terminal_row_offset + 1, terminal_column_offset + columns - 1, 0, rows - 2);
+    mvaddch(terminal_row_offset, terminal_column_offset, ACS_ULCORNER);
+    mvaddch(terminal_row_offset, terminal_column_offset + columns - 1, ACS_URCORNER);
+    mvaddch(terminal_row_offset + rows - 1, terminal_column_offset, ACS_LLCORNER);
+    mvaddch(terminal_row_offset + rows - 1, terminal_column_offset + columns - 1, ACS_LRCORNER);
 }
 
 void print_grid() {
     if (!is_grid_initialized) {
         err_exit("grid is not initialized");
     }
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < columns; c++) {
+    for (int r = 1; r < rows - 1; r++) {
+        for (int c = 1; c < columns - 1; c++) {
             print_node(r + terminal_row_offset, c + terminal_column_offset, &grid[r][c]);
         }
     }
 }
 
 void print_lasers() {
+    if (!is_grid_initialized) {
+        err_exit("grid is not initialized");
+    }
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
             if (grid[r][c].type == LASER && grid[r][c].on) {
@@ -356,6 +377,9 @@ void move_player(Direction dir) {
 }
 
 void perform_player_interaction() {
+    if (!is_grid_initialized) {
+        err_exit("grid is not initialized");
+    }
     for (int r = player->row - 1; r < player->row + 2; r++) {
         for (int c = player->column - 1; c < player->column + 2; c++) {
             if (r == player->row && c == player->column) {
@@ -374,6 +398,9 @@ void perform_player_interaction() {
 }
 
 bool check_win() {
+    if (!is_grid_initialized) {
+        err_exit("grid is not initialized");
+    }
     for (int i = 0; i < num_statues; i++) {
         if (!statues[i]->on) {
             return false;
@@ -393,6 +420,7 @@ bool play() {
     }
     bool playing = true;
     bool won = false;
+    print_border();
     while (playing) {
         print_grid();
         reset_statues();
