@@ -8,6 +8,11 @@
 #include "config.h"
 #include <stdbool.h>
 
+#define L1T_CONFIG_PATH "/.config/l1t/"
+#define L1T_LEVELS_DIR "/.config/l1t/levels/"
+#define L1T_CONFIG_FILE "/.config/l1t/l1t.conf"
+#define MAX_LEVELS 3
+
 #define QUIT_KEY 'q'
 #define RESTART_KEY 'r'
 #define INTERACT_KEY ' '
@@ -17,7 +22,7 @@
 #define MOVE_RIGHT_KEY 'l'
 
 void init_config(const Configuration config);
-void init_level(const int level, const int terminal_rows, const int terminal_columns);
+void init_level(const char *level_file, const char *level_info, const int terminal_rows, const int terminal_columns);
 void print_border();
 void print_grid();
 void print_lasers();

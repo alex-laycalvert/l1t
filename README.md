@@ -111,11 +111,9 @@ items.
 Lasers are the red blocks with red laser beams shooting out
 of them and can be reflected off of mirrors.
 
-You can toggle a laser by interacting with it and a laser will
-turn off if a laser beam shoots into it. It can be turned back
-on by the player.
-
-Off lasers appear as a dimmed red.
+Shooting a laser beam into a laser will turn that laser off
+and it cannot be turned back on. Off lasers appear as a
+dimmed red.
 
 ### Statues
 

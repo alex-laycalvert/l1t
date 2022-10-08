@@ -4,8 +4,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define LINE_BUFFER_SIZE 256
-#define L1T_CONFIG_FILE "/.config/l1t.conf"
+#define LINE_BUFFER_SIZE 512
 
 #define MOVE_UP_KEY_CONFIG "MoveUpKey"
 #define MOVE_DOWN_KEY_CONFIG "MoveDownKey"

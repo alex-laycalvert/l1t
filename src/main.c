@@ -9,17 +9,17 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <stdbool.h>
-#include <string.h>
 
 int main(int argc, char **argv) {
     (void) argc, (void) argv;
 
     char *home_dir = getenv("HOME");
-    char config_file[LINE_BUFFER_SIZE];
-    bzero(config_file, LINE_BUFFER_SIZE);
-    strcat(config_file, home_dir);
-    strcat(config_file, L1T_CONFIG_FILE); 
-    Configuration config = read_configuration(config_file); init_config(config);
+    char config_path[LINE_BUFFER_SIZE / 2] = { 0 };
+    char levels_path[LINE_BUFFER_SIZE / 2] = { 0 };
+    sprintf(config_path, "%s%s", home_dir, L1T_CONFIG_FILE);
+    sprintf(levels_path, "%s%s", home_dir, L1T_LEVELS_DIR);
+    Configuration config = read_configuration(config_path);
+    init_config(config);
     initscr();
     noecho();
     raw();
@@ -46,13 +46,17 @@ int main(int argc, char **argv) {
     }
 
     int level = 1;
+    char current_level[LINE_BUFFER_SIZE];
+    char current_level_name[LINE_BUFFER_SIZE];
     bool keep_playing = true;
     bool won = false;
     do {
-        if (level > 1) {
+        if (level > MAX_LEVELS) {
             break;
         }
-        init_level(level, terminal_rows, terminal_columns);
+        sprintf(current_level, "%s%d.l1t", levels_path, level);
+        sprintf(current_level_name, "Level: %d", level);
+        init_level(current_level, current_level_name, terminal_rows, terminal_columns);
         won = play();
         if (!won) {
             keep_playing = false;
@@ -66,7 +70,7 @@ int main(int argc, char **argv) {
         }
     } while (keep_playing);
     endwin();
-    if (level > 1) {
+    if (level > MAX_LEVELS) {
         printf("You've completed all of the levels, stay tuned for more.\n");
     }
     exit(EXIT_SUCCESS);

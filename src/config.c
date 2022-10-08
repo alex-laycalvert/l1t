@@ -17,8 +17,7 @@ Configuration read_configuration(char *filename) {
         fclose(config_file);
         return config;
     }
-    char line_buf[LINE_BUFFER_SIZE];
-    bzero(line_buf, LINE_BUFFER_SIZE);
+    char line_buf[LINE_BUFFER_SIZE] = { 0 };
     char *key, *value;
     while (fgets(line_buf, LINE_BUFFER_SIZE, config_file) != NULL) {
         key = strtok(line_buf, "= ");
