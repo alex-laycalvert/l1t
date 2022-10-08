@@ -18,6 +18,7 @@ LevelInfo generate_level(const char *name) {
     Node **grid;
     char char_grid[MAX_LEVEL_ROWS][MAX_LEVEL_COLUMNS];
     char line_buf[MAX_LEVEL_COLUMNS];
+    bzero(line_buf, MAX_LEVEL_COLUMNS);
     int rows = 0;
     int columns = 0;
 

@@ -17,11 +17,9 @@ int main(int argc, char **argv) {
     char *home_dir = getenv("HOME");
     char config_file[LINE_BUFFER_SIZE];
     bzero(config_file, LINE_BUFFER_SIZE);
-    strncat(config_file, home_dir, LINE_BUFFER_SIZE);
-    strncat(config_file, L1T_CONFIG_FILE, strlen(L1T_CONFIG_FILE)); 
-    Configuration config = read_configuration(config_file);
-    init_config(config);
-
+    strcat(config_file, home_dir);
+    strcat(config_file, L1T_CONFIG_FILE); 
+    Configuration config = read_configuration(config_file); init_config(config);
     initscr();
     noecho();
     raw();
@@ -47,23 +45,27 @@ int main(int argc, char **argv) {
         /* TODO */
     }
 
-    int level = 0;
+    int level = 1;
     bool keep_playing = true;
     bool won = false;
     do {
+        if (level > 1) {
+            break;
+        }
         init_level(level, terminal_rows, terminal_columns);
         won = play();
-        /* TODO */
-        // Display a menu to determine whether to keep playing
-        // or move onto the next level.
-        keep_playing = false;
+        if (!won) {
+            keep_playing = false;
+        } else {
+            menu_selection = next_level_menu(terminal_rows, terminal_columns, config);
+            if (menu_selection == QUIT_OPTION) {
+                keep_playing = false;
+            } else {
+                level++;
+            }
+        }
     } while (keep_playing);
-
     endwin();
-    if (won) {
-        printf("YOU WON! 😄\n");
-    } else {
-        printf("Sorry, you didn't win. 😥\n");
-    }
+    printf("You've completed all of the levels, stay tuned for more.\n");
     exit(EXIT_SUCCESS);
 }
