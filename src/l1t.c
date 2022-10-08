@@ -76,7 +76,7 @@ void print_border() {
             info = "Level 001: The Basics";
             break;
         default:
-            info = "Level 000: Lonely";
+            info = "Level 000: Lonely (Development Playground)";
             break;
     }
     mvprintw(terminal_row_offset - 1, terminal_columns / 2 - strlen(info) / 2, "%s", info);
@@ -349,49 +349,51 @@ void move_player(Direction dir) {
             player = tmp;
             break;
         case MIRROR_FORWARD:
-            if (
-                player->row + row_offset * 2 < 0 ||
-                player->row + row_offset * 2 >= rows ||
-                player->column + column_offset * 2 < 0 ||
-                player->column + column_offset * 2 >= columns
-            ) {
-                break;
-            }
-            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
-                break;
-            }
-            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
-            block_tmp->type = MIRROR_FORWARD;
-            block_tmp->ch = MIRROR_FORWARD_CH;
-            tmp = &grid[player->row + row_offset][player->column + column_offset];
-            tmp->type = PLAYER;
-            tmp->ch = PLAYER_CH;
-            player->type = EMPTY;
-            player->ch = EMPTY_CH;
-            player = tmp;
             break;
+            /* if ( */
+            /*     player->row + row_offset * 2 < 0 || */
+            /*     player->row + row_offset * 2 >= rows || */
+            /*     player->column + column_offset * 2 < 0 || */
+            /*     player->column + column_offset * 2 >= columns */
+            /* ) { */
+            /*     break; */
+            /* } */
+            /* if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) { */
+            /*     break; */
+            /* } */
+            /* block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2]; */
+            /* block_tmp->type = MIRROR_FORWARD; */
+            /* block_tmp->ch = MIRROR_FORWARD_CH; */
+            /* tmp = &grid[player->row + row_offset][player->column + column_offset]; */
+            /* tmp->type = PLAYER; */
+            /* tmp->ch = PLAYER_CH; */
+            /* player->type = EMPTY; */
+            /* player->ch = EMPTY_CH; */
+            /* player = tmp; */
+            /* break; */
         case MIRROR_BACKWARD:
-            if (
-                player->row + row_offset * 2 < 0 ||
-                player->row + row_offset * 2 >= rows ||
-                player->column + column_offset * 2 < 0 ||
-                player->column + column_offset * 2 >= columns
-            ) {
-                break;
-            }
-            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
-                break;
-            }
-            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
-            block_tmp->type = MIRROR_BACKWARD;
-            block_tmp->ch = MIRROR_BACKWARD_CH;
-            tmp = &grid[player->row + row_offset][player->column + column_offset];
-            tmp->type = PLAYER;
-            tmp->ch = PLAYER_CH;
-            player->type = EMPTY;
-            player->ch = EMPTY_CH;
-            player = tmp;
             break;
+            /* if ( */
+            /*     player->row + row_offset * 2 < 0 || */
+            /*     player->row + row_offset * 2 >= rows || */
+            /*     player->column + column_offset * 2 < 0 || */
+            /*     player->column + column_offset * 2 >= columns */
+            /* ) { */
+            /*     break; */
+            /* } */
+            /* if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) { */
+            /*     break; */
+            /* } */
+            /* block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2]; */
+            /* block_tmp->type = MIRROR_BACKWARD; */
+            /* block_tmp->ch = MIRROR_BACKWARD_CH; */
+            /* tmp = &grid[player->row + row_offset][player->column + column_offset]; */
+            /* tmp->type = PLAYER; */
+            /* tmp->ch = PLAYER_CH; */
+            /* player->type = EMPTY; */
+            /* player->ch = EMPTY_CH; */
+            /* player = tmp; */
+            /* break; */
         default:
             break;
     }
@@ -408,6 +410,14 @@ void perform_player_interaction() {
             }
             Node *grid_item = &grid[r][c];
             switch (grid_item->type) {
+                case MIRROR_FORWARD:
+                    grid_item->type = MIRROR_BACKWARD;
+                    grid_item->ch = MIRROR_BACKWARD_CH;
+                    break;
+                case MIRROR_BACKWARD:
+                    grid_item->type = MIRROR_FORWARD;
+                    grid_item->ch = MIRROR_FORWARD_CH;
+                    break;
                 case LASER:
                     grid_item->on = !grid_item->on;
                     break;
