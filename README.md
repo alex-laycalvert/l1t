@@ -111,6 +111,10 @@ Some items on the grid can be moved around:
 - `BLOCKS`: Blocks are the black boxes on the grid and can
             be used to block a laser beam.
 
+### Configuration
+
+See the options for configurations [here](docs/CONFIGURATION.md).
+
 ## Contributing
 
-See the guidelines for contributing [here](CONTRIBUTING.md)
+See the guidelines for contributing [here](docs/CONTRIBUTING.md).
