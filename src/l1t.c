@@ -27,6 +27,7 @@ void init_config(const Configuration user_config) {
 }
 
 void init_level(const int level, const int term_rows, const int term_columns) {
+    destroy_level();
     current_level = level;
     LevelInfo info;
     switch (level) {
@@ -457,7 +458,8 @@ bool play() {
         if (check_win()) {
             won = true;
             playing = false;
-            break;
+            print_grid();
+            print_lasers();
         }
     }
     return won;

@@ -9,6 +9,8 @@
 
 #define MAIN_MENU_WIDTH 34
 #define MAIN_MENU_HEIGHT 22
+#define NEXT_LEVEL_MENU_WIDTH 24
+#define NEXT_LEVEL_MENU_HEIGHT 7
 #define ENTER_KEY '\n'
 
 typedef enum {
@@ -23,6 +25,7 @@ typedef struct {
 } MenuDisplayOption;
 
 MenuOption main_menu(const int rows, const int columns, const Configuration config);
+MenuOption next_level_menu(const int rows, const int columns, const Configuration config);
 void print_logo(WINDOW *window);
 void print_in_middle(
     WINDOW *window,

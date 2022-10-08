@@ -19,9 +19,7 @@ int main(int argc, char **argv) {
     bzero(config_file, LINE_BUFFER_SIZE);
     strcat(config_file, home_dir);
     strcat(config_file, L1T_CONFIG_FILE); 
-    Configuration config = read_configuration(config_file);
-    init_config(config);
-
+    Configuration config = read_configuration(config_file); init_config(config);
     initscr();
     noecho();
     raw();
@@ -53,17 +51,17 @@ int main(int argc, char **argv) {
     do {
         init_level(level, terminal_rows, terminal_columns);
         won = play();
-        /* TODO */
-        // Display a menu to determine whether to keep playing
-        // or move onto the next level.
-        keep_playing = false;
+        if (!won) {
+            keep_playing = false;
+        } else {
+            menu_selection = next_level_menu(terminal_rows, terminal_columns, config);
+            if (menu_selection == QUIT_OPTION) {
+                keep_playing = false;
+            } else {
+                level++;
+            }
+        }
     } while (keep_playing);
-
     endwin();
-    if (won) {
-        printf("YOU WON! 😄\n");
-    } else {
-        printf("Sorry, you didn't win. 😥\n");
-    }
     exit(EXIT_SUCCESS);
 }

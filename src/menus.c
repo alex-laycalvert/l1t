@@ -54,16 +54,10 @@ MenuOption main_menu(const int rows, const int columns, const Configuration conf
 	wrefresh(main_menu_win);
     int c;
 	while((c = getch()) != ENTER_KEY && c != config.quit_key) {
-        if (c == config.move_up_key) {
+        if (c == config.move_left_key || c == config.move_up_key || c == KEY_UP || c == KEY_LEFT) {
             menu_driver(main_menu, REQ_UP_ITEM);
         }
-        if (c == config.move_down_key) {
-            menu_driver(main_menu, REQ_DOWN_ITEM);
-        }
-        if (c == KEY_UP) {
-            menu_driver(main_menu, REQ_UP_ITEM);
-        }
-        if (c == KEY_DOWN) {
+        if (c == config.move_right_key || c == config.move_down_key || c == KEY_DOWN || c == KEY_LEFT) {
             menu_driver(main_menu, REQ_DOWN_ITEM);
         }
         wrefresh(main_menu_win);
@@ -80,6 +74,78 @@ MenuOption main_menu(const int rows, const int columns, const Configuration conf
 
     unpost_menu(main_menu);
     free_menu(main_menu);
+    for(int i = 0; i < num_options; ++i) {
+        free_item(menu_items[i]);
+    }
+    free(menu_items);
+
+    if (c == QUIT_KEY) {
+        return QUIT_OPTION;
+    }
+
+    return menu_options[selected_item_index].value;
+}
+
+MenuOption next_level_menu(const int rows, const int columns, const Configuration config) {
+    const int num_options = 3;
+    MenuDisplayOption menu_options[] = {
+        { " YES ", PLAY_OPTION },
+        { " NO", QUIT_OPTION },
+        { (char *)NULL, QUIT_OPTION }
+    };
+    ITEM **menu_items = (ITEM **)calloc(num_options, sizeof(ITEM *));
+    for(int i = 0; i < num_options; ++i) {
+        menu_items[i] = new_item(menu_options[i].label, NULL);
+    }
+
+	MENU *next_level_menu = new_menu((ITEM **)menu_items);
+    WINDOW *next_level_menu_win = newwin(
+        NEXT_LEVEL_MENU_HEIGHT,
+        NEXT_LEVEL_MENU_WIDTH,
+        rows / 2 - NEXT_LEVEL_MENU_HEIGHT / 2,
+        columns / 2 - NEXT_LEVEL_MENU_WIDTH / 2
+    );
+    int menu_column_offset = 7;
+    WINDOW *next_level_menu_sub_win = derwin(
+        next_level_menu_win,
+        2, NEXT_LEVEL_MENU_WIDTH - menu_column_offset,
+        4, menu_column_offset
+    );
+    keypad(next_level_menu_win, TRUE);
+     
+    set_menu_win(next_level_menu, next_level_menu_win);
+    set_menu_sub(next_level_menu, next_level_menu_sub_win);
+    set_menu_mark(next_level_menu, "");
+    set_menu_format(next_level_menu, 1, 2);
+
+    box(next_level_menu_win, 0, 0);
+    mvwprintw(next_level_menu_win, 2, 2, "YOU WON! Next Level?");
+	refresh();
+        
+	post_menu(next_level_menu);
+	wrefresh(next_level_menu_win);
+    int c;
+	while((c = getch()) != ENTER_KEY && c != config.quit_key) {
+        if (c == config.move_left_key || c == config.move_up_key || c == KEY_UP || c == KEY_LEFT) {
+            menu_driver(next_level_menu, REQ_LEFT_ITEM);
+        }
+        if (c == config.move_right_key || c == config.move_down_key || c == KEY_DOWN || c == KEY_LEFT) {
+            menu_driver(next_level_menu, REQ_RIGHT_ITEM);
+        }
+        wrefresh(next_level_menu_win);
+    }
+
+	/* Unpost and free all the memory taken up */
+	endwin();
+
+    ITEM *selected_item = current_item(next_level_menu);
+    if (!selected_item) {
+        return QUIT_OPTION;
+    }
+    int selected_item_index = item_index(selected_item);
+
+    unpost_menu(next_level_menu);
+    free_menu(next_level_menu);
     for(int i = 0; i < num_options; ++i) {
         free_item(menu_items[i]);
     }
