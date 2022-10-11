@@ -14,6 +14,10 @@ Number of Levels: `3`
 
 ## Installation and Running
 
+***NOTE***: Right now, this program will run best on the `kitty` terminal,
+            I am working on figuring out the color situations on other
+            terminals.
+
 Follow the steps below to install `l1t` for your OS:
 
 <details>
