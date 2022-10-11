@@ -2,42 +2,26 @@
 
 ![l1t-logo](https://user-images.githubusercontent.com/45835678/194675329-027fd0d9-e1ee-4149-980b-e2fc7099206e.png)
 
-A terminal game where you move lasers around a grid to light up statues.
-Light up all the statues in a level to complete the level.
+A terminal game where you position mirrors in a grid to light
+up statues. Light up all the statues in a grid to complete
+the level.
 
 ## Progress
 
-***NOTE***: This project is still in development and is not yet ready for
-full gameplay. Thank you for being patient with me.
+***NOTE***: This project is still in development.
 
-All current "gameplay" is done in `Level 0` right now which is the development
-playground for level making. Any items in that level are purely for testing
-and there is no way, right now, to "win" `Level 0`.
-
-- [ ] Colors
-- [x] Lasers
-- [x] Moveable Blocks
-- [x] Mirrors
-- [x] Statues
-- [ ] Menu for picking levels
-- [x] A concept of "winning"
-- [ ] Keeping track of completed levels
-- [x] Main Menu
-- [ ] Switches
-- [ ] Buttons
-- [ ] Toggle Blocks
-
-- [ ] An official `Level 1`
+Number of Levels: `3`
 
 ## Installation and Running
 
-***NOTE***: Right now this game is only able to run on Linux. I am
-working on fixing some compiling bugs on macOS while I
-add more levels.
+Follow the steps below to install `l1t` for your OS:
 
-Follow the steps below to install `l1t`:
+<details>
+<summary>
+<h3>Linux</h3>
+</summary>
 
-- Close this repository
+- Clone this repository
 
 ```bash
 git clone https://github.com/alex-laycalvert/l1t
@@ -62,6 +46,43 @@ make
 make dev
 ./build/l1t.dev
 ```
+</details>
+<details>
+<summary>
+<h3>macOS</h3>
+</summary>
+
+For macOS users, you will need to make sure that the proper
+`ncurses` library is installed on your machine. You can install
+[Homebrew](https://brew.sh/) by following the steps on their
+website then run `brew install ncurses`.
+
+- Clone this repository
+
+```bash
+git clone https://github.com/alex-laycalvert/l1t
+cd ./l1t
+```
+
+- Build the project:
+
+```bash
+make
+```
+
+- Run the game:
+
+```bash
+./build/l1t
+```
+
+- For development (optional):
+
+```bash
+make dev
+./build/l1t.dev
+```
+</details>
 
 ## Gameplay
 
@@ -90,11 +111,9 @@ items.
 Lasers are the red blocks with red laser beams shooting out
 of them and can be reflected off of mirrors.
 
-You can toggle a laser by interacting with it and a laser will
-turn off if a laser beam shoots into it. It can be turned back
-on by the player.
-
-Off lasers appear as a dimmed red.
+Shooting a laser beam into a laser will turn that laser off
+and it cannot be turned back on. Off lasers appear as a
+dimmed red.
 
 ### Statues
 
@@ -102,12 +121,15 @@ Statues are the dimmed yellow blocks when off and turn a bright
 yellow when turned on by a laser beam. Turn on all lasers in a
 level to win.
 
+### Mirrors
+
+Mirros are the `/` and `\` characters that reflect laser beams.
+Mirrors can have their direction toggled but cannot be moved.
+
 ### Other Items
 
 Some items on the grid can be moved around:
 
-- `MIRRORS`: Mirrors are the `/` and `\` items on the grid
-             and can be moved to redirect laser beams.
 - `BLOCKS`: Blocks are the black boxes on the grid and can
             be used to block a laser beam.
 

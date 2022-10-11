@@ -12,12 +12,13 @@
 LevelInfo generate_level(const char *name) {
     FILE *level_file = fopen(name, "r");
     if (!level_file) {
+        printf("Level File: %s\n", name);
         err_exit("failed to open level file");
     }
 
     Node **grid;
     char char_grid[MAX_LEVEL_ROWS][MAX_LEVEL_COLUMNS];
-    char line_buf[MAX_LEVEL_COLUMNS];
+    char line_buf[MAX_LEVEL_COLUMNS] = { 0 };
     int rows = 0;
     int columns = 0;
 
@@ -143,7 +144,7 @@ LevelInfo generate_level(const char *name) {
 
     Node *player;
     Node **statues = (Node **)malloc(num_statues * sizeof(Node *));
-    Node **reverse_statues = (Node **)malloc(num_statues * sizeof(Node *));
+    Node **reverse_statues = (Node **)malloc(num_reverse_statues * sizeof(Node *));
     int current_statue_index = 0;
     int current_reverse_statue_index = 0;
 

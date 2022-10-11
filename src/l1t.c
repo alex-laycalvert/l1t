@@ -8,11 +8,13 @@
 #include "colors.h"
 #include <stdlib.h>
 #include <ncurses.h>
+#include <string.h>
 #include <stdbool.h>
 
 Configuration config;
+char file[LINE_BUFFER_SIZE] = { 0 };
+char name[LINE_BUFFER_SIZE] = { 0 };
 bool is_grid_initialized = false;
-int current_level = -1;
 int rows, columns, terminal_rows, terminal_columns, terminal_row_offset, terminal_column_offset;
 Node *player;
 int num_statues;
@@ -25,14 +27,12 @@ void init_config(const Configuration user_config) {
     config = user_config;
 }
 
-void init_level(const int level, const int term_rows, const int term_columns) {
-    current_level = level;
+void init_level(const char *level_file, const char *level_name, const int term_rows, const int term_columns) {
+    destroy_level();
     LevelInfo info;
-    switch (level) {
-        default:
-            info = generate_level("src/levels/000.l1t");
-            break;
-    }
+    sprintf(file, "%s", level_file);
+    sprintf(name, "%s", level_name);
+    info = generate_level(file);
     terminal_rows = term_rows;
     terminal_columns = term_columns;
     rows = info.rows;
@@ -48,12 +48,6 @@ void init_level(const int level, const int term_rows, const int term_columns) {
     is_grid_initialized = true;
     clear();
     resizeterm(terminal_rows, terminal_columns);
-    /* destroy_level(); */
-    /* endwin(); */
-    /* printf("ROWS: %d COLUMNS: %d\n", rows, columns); */
-    /* printf("TROWS: %d TCOLUMNS: %d\n", terminal_rows, terminal_columns); */
-    /* printf("TROWSO: %d TCOLUMNSO: %d\n", terminal_row_offset, terminal_column_offset); */
-    /* exit(0); */
 }
 
 void print_border() {
@@ -61,10 +55,16 @@ void print_border() {
     mvhline(terminal_row_offset + rows - 1, terminal_column_offset + 1, 0, columns - 2);
     mvvline(terminal_row_offset + 1, terminal_column_offset, 0, rows - 2);
     mvvline(terminal_row_offset + 1, terminal_column_offset + columns - 1, 0, rows - 2);
-    mvaddch(terminal_row_offset, terminal_column_offset, ACS_ULCORNER);
-    mvaddch(terminal_row_offset, terminal_column_offset + columns - 1, ACS_URCORNER);
+    mvaddch(terminal_row_offset, terminal_column_offset, ACS_LTEE);
+    mvaddch(terminal_row_offset, terminal_column_offset + columns - 1, ACS_RTEE);
     mvaddch(terminal_row_offset + rows - 1, terminal_column_offset, ACS_LLCORNER);
     mvaddch(terminal_row_offset + rows - 1, terminal_column_offset + columns - 1, ACS_LRCORNER);
+    mvhline(terminal_row_offset - 2, terminal_column_offset + 1, 0, columns - 2);
+    mvaddch(terminal_row_offset - 1, terminal_column_offset, ACS_VLINE);
+    mvaddch(terminal_row_offset - 1, terminal_column_offset + columns - 1, ACS_VLINE);
+    mvaddch(terminal_row_offset - 2, terminal_column_offset, ACS_ULCORNER);
+    mvaddch(terminal_row_offset - 2, terminal_column_offset + columns - 1, ACS_URCORNER);
+    mvprintw(terminal_row_offset - 1, terminal_columns / 2 - strlen(name) / 2, "%s", name);
 }
 
 void print_grid() {
@@ -244,8 +244,7 @@ void clear_grid() {
 
 void restart_level() {
     destroy_level();
-    init_level(current_level, terminal_rows, terminal_columns);
-    print_border();
+    init_level(file, name, terminal_rows, terminal_columns);
 }
 
 void destroy_level() {
@@ -336,50 +335,6 @@ void move_player(Direction dir) {
             player->ch = EMPTY_CH;
             player = tmp;
             break;
-        case MIRROR_FORWARD:
-            if (
-                player->row + row_offset * 2 < 0 ||
-                player->row + row_offset * 2 >= rows ||
-                player->column + column_offset * 2 < 0 ||
-                player->column + column_offset * 2 >= columns
-            ) {
-                break;
-            }
-            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
-                break;
-            }
-            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
-            block_tmp->type = MIRROR_FORWARD;
-            block_tmp->ch = MIRROR_FORWARD_CH;
-            tmp = &grid[player->row + row_offset][player->column + column_offset];
-            tmp->type = PLAYER;
-            tmp->ch = PLAYER_CH;
-            player->type = EMPTY;
-            player->ch = EMPTY_CH;
-            player = tmp;
-            break;
-        case MIRROR_BACKWARD:
-            if (
-                player->row + row_offset * 2 < 0 ||
-                player->row + row_offset * 2 >= rows ||
-                player->column + column_offset * 2 < 0 ||
-                player->column + column_offset * 2 >= columns
-            ) {
-                break;
-            }
-            if (grid[player->row + row_offset * 2][player->column + column_offset * 2].type != EMPTY) {
-                break;
-            }
-            block_tmp = &grid[player->row + row_offset * 2][player->column + column_offset * 2];
-            block_tmp->type = MIRROR_BACKWARD;
-            block_tmp->ch = MIRROR_BACKWARD_CH;
-            tmp = &grid[player->row + row_offset][player->column + column_offset];
-            tmp->type = PLAYER;
-            tmp->ch = PLAYER_CH;
-            player->type = EMPTY;
-            player->ch = EMPTY_CH;
-            player = tmp;
-            break;
         default:
             break;
     }
@@ -396,8 +351,13 @@ void perform_player_interaction() {
             }
             Node *grid_item = &grid[r][c];
             switch (grid_item->type) {
-                case LASER:
-                    grid_item->on = !grid_item->on;
+                case MIRROR_FORWARD:
+                    grid_item->type = MIRROR_BACKWARD;
+                    grid_item->ch = MIRROR_BACKWARD_CH;
+                    break;
+                case MIRROR_BACKWARD:
+                    grid_item->type = MIRROR_FORWARD;
+                    grid_item->ch = MIRROR_FORWARD_CH;
                     break;
                 default:
                     break;
@@ -452,6 +412,7 @@ bool play() {
         }
         if (input == config.restart_key) {
             restart_level();
+            print_border();
         }
         if (input == config.quit_key) {
             playing = false;
@@ -461,7 +422,8 @@ bool play() {
         if (check_win()) {
             won = true;
             playing = false;
-            break;
+            print_grid();
+            print_lasers();
         }
     }
     return won;
