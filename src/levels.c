@@ -86,6 +86,10 @@ LevelInfo generate_level(const char *name) {
                     node.ch = REVERSE_STATUE_CH;
                     num_reverse_statues++;
                     break;
+                case 'Z':
+                    node.type = KILL;
+                    node.ch = KILL_CH;
+                    break;
                 case '1':
                     node.type = LASER;
                     node.ch = LASER_CH;

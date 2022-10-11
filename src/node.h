@@ -18,6 +18,7 @@
 #define BUTTON_CH 'B'
 #define SWITCH_CH 'W'
 #define LASER_CH 'L'
+#define KILL_CH 'Z'
 
 #define VERTICAL_LINE_CH '|'
 #define HORIZONTAL_LINE_CH '-'
@@ -39,6 +40,7 @@ typedef enum node_type {
     BUTTON,
     SWITCH,
     LASER,
+    KILL
 } NodeType;
 
 typedef enum direction { UP, DOWN, LEFT, RIGHT } Direction;

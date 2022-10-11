@@ -131,6 +131,12 @@ void print_node(const int row, const int column, const Node *node) {
                 attroff(COLOR_PAIR(LASER_OFF_COLOR_PAIR));
             }
             break;
+        case KILL:
+            mvprintw(
+                row,
+                column,
+                "%c", node->ch
+            );
         default:
             break;
     }
