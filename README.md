@@ -127,8 +127,13 @@ level to win.
 
 ### Mirrors
 
-Mirros are the `/` and `\` characters that reflect laser beams.
+Mirrors are the `/` and `\` characters that reflect laser beams.
 Mirrors can have their direction toggled but cannot be moved.
+
+### Zappers
+
+Beware! Zappers are the `Z` characters that **cannot be hit by lasers**.
+If a laser hits a zapper, it is game over!
 
 ### Other Items
 
