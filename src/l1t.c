@@ -209,7 +209,9 @@ void print_laser(const int row, const int column, const Direction dir) {
             current_row += row_offset;
             current_column += column_offset;
         } else if (grid[current_row][current_column].type == KILL) {
-            err_exit("GAME OVER - You got zapped!");
+            endwin();
+            printf("GAME OVER! You got Zapped\n");
+            exit(0);
         }
     }
     if (grid[current_row - row_offset][current_column - column_offset].type == EMPTY) {
