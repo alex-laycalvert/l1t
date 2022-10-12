@@ -132,11 +132,13 @@ void print_node(const int row, const int column, const Node *node) {
             }
             break;
         case KILL:
+            attron(COLOR_PAIR(KILL_COLOR_PAIR));
             mvprintw(
                 row,
                 column,
                 "%c", node->ch
             );
+            attroff(COLOR_PAIR(KILL_COLOR_PAIR));
         default:
             break;
     }
