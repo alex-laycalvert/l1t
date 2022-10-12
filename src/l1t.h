@@ -11,7 +11,7 @@
 #define L1T_CONFIG_PATH "/.config/l1t/"
 #define L1T_LEVELS_DIR "/.config/l1t/levels/"
 #define L1T_CONFIG_FILE "/.config/l1t/l1t.conf"
-#define MAX_LEVELS 3
+#define MAX_LEVELS 4
 
 #define QUIT_KEY 'q'
 #define RESTART_KEY 'r'
