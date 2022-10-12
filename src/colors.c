@@ -33,7 +33,7 @@ bool initialize_colors() {
     init_pair(LASER_OFF_COLOR_PAIR, COLOR_DIMMED_RED, COLOR_DIMMED_RED);
     init_pair(LASER_BEAM_COLOR_PAIR, COLOR_RED, -1);
     init_pair(LOGO_COLOR_PAIR, COLOR_GREEN, -1);
-    init_pair(KILL_COLOR_PAIR, COLOR_WHITE, COLOR_WHITE);
+    init_pair(KILL_COLOR_PAIR, COLOR_YELLOW, COLOR_BLACK);
 
     return true;
 }
