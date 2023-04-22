@@ -4,11 +4,16 @@ use crossterm::{
     event::{read, Event, KeyCode},
     execute,
     style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor, Stylize},
-    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
+    terminal::{Clear, ClearType},
     ExecutableCommand,
 };
 use std::fs;
 use std::io::Stdout;
+
+pub enum LevelLossReason {
+    Zapper,
+    Quit,
+}
 
 pub struct Level {
     pub name: String,
@@ -21,6 +26,11 @@ pub struct Level {
     pub term_cols: u16,
     pub row_offset: u16,
     pub col_offset: u16,
+}
+
+pub struct LevelResult {
+    pub has_won: bool,
+    pub reason_for_loss: Option<LevelLossReason>,
 }
 
 impl Level {
@@ -148,7 +158,7 @@ impl Level {
                         SetForegroundColor(Color::White),
                         SetBackgroundColor(Color::White),
                         cursor::MoveTo(c, r),
-                        Print('I'),
+                        Print('I'.bold()),
                         ResetColor
                     )
                     .ok();
@@ -220,9 +230,9 @@ impl Level {
                     SetForegroundColor(Color::Rgb { r: 255, g: 0, b: 0 }),
                     cursor::MoveTo(pos.1 + self.col_offset, pos.0 + self.row_offset),
                     Print(if i == n.looking_at.len() - 1 {
-                        pos.3
+                        pos.3.bold()
                     } else {
-                        pos.2
+                        pos.2.bold()
                     }),
                     SetForegroundColor(Color::Reset),
                 )
@@ -320,7 +330,9 @@ impl Level {
     fn player_action(&mut self) {
         for (_, &i) in self.get_nodes_surrounding_player().iter().enumerate() {
             match self.nodes[i].node_type {
-                NodeType::Button | NodeType::Statue => continue,
+                NodeType::Button | NodeType::Statue | NodeType::Zapper | NodeType::ToggleBlock => {
+                    continue
+                }
                 NodeType::Mirror(_) => {
                     if matches!(self.nodes[i].dir, Direction::LEFT) {
                         self.nodes[i].dir = Direction::RIGHT;
@@ -419,21 +431,23 @@ impl Level {
         })
     }
 
-    pub fn play(&mut self, stdout: &mut Stdout) -> Result<bool, &str> {
-        enable_raw_mode().ok();
-        stdout.execute(cursor::Hide).ok();
-        let mut has_won = false;
+    pub fn play(&mut self, stdout: &mut Stdout) -> Result<LevelResult, &str> {
         loop {
             self.reset_statues();
             self.set_lasers_looking_at();
 
             if self.all_statues_lit() {
-                has_won = true;
-                break;
+                return Ok(LevelResult {
+                    has_won: true,
+                    reason_for_loss: None,
+                });
             }
 
             if self.any_zappers_lit() {
-                break;
+                return Ok(LevelResult {
+                    has_won: false,
+                    reason_for_loss: Some(LevelLossReason::Zapper),
+                });
             }
 
             self.draw(stdout);
@@ -450,15 +464,17 @@ impl Level {
                         //KeyCode::Left => self.change_player_direction(Direction::LEFT),
                         //KeyCode::Right => self.change_player_direction(Direction::RIGHT),
                         //KeyCode::Tab => self.toggle_portal(),
-                        KeyCode::Char('q') => break,
+                        KeyCode::Char('q') => {
+                            return Ok(LevelResult {
+                                has_won: false,
+                                reason_for_loss: Some(LevelLossReason::Quit),
+                            })
+                        }
                         _ => (),
                     }
                 }
                 _ => (),
             }
         }
-        stdout.execute(cursor::Show).ok();
-        disable_raw_mode().ok();
-        Ok(has_won)
     }
 }
