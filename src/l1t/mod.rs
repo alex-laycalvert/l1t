@@ -5,7 +5,7 @@ pub mod node;
 
 use crossterm::{
     cursor,
-    terminal::{disable_raw_mode, enable_raw_mode},
+    terminal::{disable_raw_mode, enable_raw_mode, Clear},
     ExecutableCommand,
 };
 use level::*;
@@ -27,12 +27,36 @@ impl L1t {
         term_rows: u16,
         term_cols: u16,
     ) -> Result<bool, &str> {
+        enable_raw_mode().ok();
+        stdout.execute(cursor::Hide).ok();
+        stdout
+            .execute(Clear(crossterm::terminal::ClearType::All))
+            .ok();
+        let selection = Menu::draw(
+            stdout,
+            MenuType::MainSelection(
+                vec![
+                    "             /-------L       ".to_string(),
+                    "    ___      |__      _      ".to_string(),
+                    "   |_  |  <--/  |    | \\_    ".to_string(),
+                    "     | |     `| |    | __|   ".to_string(),
+                    "     | |      | |    | |     ".to_string(),
+                    "     | |_    _|_|_   | |_    ".to_string(),
+                    "   --\\___\\  |_____| --\\__|   ".to_string(),
+                    "     |                |      ".to_string(),
+                    "     v                v      ".to_string(),
+                    "     S                       ".to_string(),
+                ],
+                vec!["PLAY".to_string(), "HELP".to_string(), "QUIT".to_string()],
+            ),
+            term_rows,
+            term_cols,
+        )
+        .unwrap_or(0);
         let mut level = match Level::new(filename, term_rows, term_cols) {
             Ok(l) => l,
             Err(e) => return Err(e),
         };
-        enable_raw_mode().ok();
-        stdout.execute(cursor::Hide).ok();
         let result = level.play(stdout);
         match result {
             Ok(result) => {

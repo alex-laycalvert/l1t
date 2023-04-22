@@ -39,6 +39,65 @@ impl Menu {
         term_cols: u16,
     ) -> Option<usize> {
         match menu_type {
+            MenuType::MainSelection(logo, options) => {
+                if logo.len() == 0 || options.len() == 0 {
+                    return None;
+                }
+                let mut current_selection: usize = 0;
+                let start_row = (term_rows - logo.len() as u16 - options.len() as u16 - 5) / 2;
+                let end_row = (term_rows + logo.len() as u16 + options.len() as u16 + 3) / 2;
+                let start_col = (term_cols - logo[0].len().max(options[0].len()) as u16 - 4) / 2;
+                let end_col = (term_cols + logo[0].len().max(options[0].len()) as u16 + 2) / 2;
+                for r in start_row..(end_row + 1) {
+                    for c in start_col..(end_col + 1) {
+                        if r == start_row || r == end_row {
+                            execute!(stdout, cursor::MoveTo(c, r), Print("─".bold()),).ok();
+                        } else if c == start_col || c == end_col {
+                            execute!(stdout, cursor::MoveTo(c, r), Print("│".bold()),).ok();
+                        } else {
+                            execute!(stdout, cursor::MoveTo(c, r), Print(" "),).ok();
+                        }
+                    }
+                }
+                execute!(
+                    stdout,
+                    cursor::MoveTo(start_col, start_row),
+                    Print("┌".bold()),
+                    cursor::MoveTo(end_col, start_row),
+                    Print("┐".bold()),
+                    cursor::MoveTo(start_col, end_row),
+                    Print("└".bold()),
+                    cursor::MoveTo(end_col, end_row),
+                    Print("┘".bold())
+                )
+                .ok();
+                for i in 0..logo.len() {
+                    execute!(
+                        stdout,
+                        cursor::MoveTo(start_col + 2, start_row + 2 + i as u16),
+                        Print(logo[i].clone().bold())
+                    )
+                    .ok();
+                }
+                for i in 0..options.len() {
+                    execute!(
+                        stdout,
+                        cursor::MoveTo(
+                            (term_cols - options[i].len() as u16) / 2,
+                            start_row + logo.len() as u16 + 3 + i as u16
+                        ),
+                        Print(options[i].clone().bold())
+                    )
+                    .ok();
+                }
+                match read().unwrap() {
+                    Event::Key(event) => match event.code {
+                        _ => (),
+                    },
+                    _ => (),
+                }
+                return Some(current_selection);
+            }
             MenuType::Message(message) => {
                 execute!(
                     stdout,
@@ -75,14 +134,14 @@ impl Menu {
                     ),
                     Print("│".bold()),
                     cursor::MoveTo(
-                        (term_cols + message.len() as u16 + 1) / 2,
+                        (term_cols + message.len() as u16) / 2 + 1,
                         term_rows / 2 - 1
                     ),
                     Print("│".bold()),
-                    cursor::MoveTo((term_cols + message.len() as u16 + 1) / 2, term_rows / 2),
+                    cursor::MoveTo((term_cols + message.len() as u16) / 2 + 1, term_rows / 2),
                     Print("│".bold()),
                     cursor::MoveTo(
-                        (term_cols + message.len() as u16 + 1) / 2,
+                        (term_cols + message.len() as u16) / 2 + 1,
                         term_rows / 2 + 1
                     ),
                     Print("│".bold()),
