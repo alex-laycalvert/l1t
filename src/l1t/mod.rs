@@ -1,5 +1,6 @@
 pub mod direction;
 pub mod level;
+pub mod menu;
 pub mod node;
 
 use crossterm::{
@@ -8,6 +9,7 @@ use crossterm::{
     ExecutableCommand,
 };
 use level::*;
+use menu::*;
 use std::io::Stdout;
 
 /// Represents a level of `ascii-portal`.
@@ -42,7 +44,12 @@ impl L1t {
                             println!("Uh oh, you lit a zapper!");
                         }
                         LevelLossReason::Quit => {
-                            println!("See you later!");
+                            Menu::draw(
+                                stdout,
+                                MenuType::Message("Hello, World!".to_string()),
+                                term_rows,
+                                term_cols,
+                            );
                         }
                     }
                 } else {
