@@ -122,7 +122,7 @@ impl Level {
                             },
                         ));
                         if let Some(i) =
-                            self.get_node_index_at((current_row as u16, current_col as u16))
+                            self.node_index_at((current_row as u16, current_col as u16))
                         {
                             match &self.nodes[i].node_type {
                                 NodeType::Mirror(m) => {
@@ -145,7 +145,7 @@ impl Level {
                                         if let NodeType::Laser(_) = &self.nodes[i].node_type {
                                             self.nodes[i].turn_off();
                                         } else {
-                                            self.nodes[i].toggle()
+                                            self.nodes[i].turn_on()
                                         }
                                     }
                                     break;
@@ -160,7 +160,7 @@ impl Level {
         }
     }
 
-    fn get_surrounding_nodes(&self, pos: (u16, u16)) -> Vec<usize> {
+    fn surrounding_nodes(&self, pos: (u16, u16)) -> Vec<usize> {
         let mut nodes: Vec<usize> = vec![];
         for i in 0..self.nodes.len() {
             let n = &self.nodes[i];
@@ -178,8 +178,8 @@ impl Level {
             Some(i) => i,
             None => return,
         };
-        let surrounding_nodes = &self
-            .get_surrounding_nodes((self.nodes[player_index].row, self.nodes[player_index].col));
+        let surrounding_nodes =
+            &self.surrounding_nodes((self.nodes[player_index].row, self.nodes[player_index].col));
         for &i in surrounding_nodes.iter() {
             if !self.nodes[i].is_player_toggleable()
                 || matches!(self.nodes[i].node_type, NodeType::Button(_))
@@ -190,7 +190,7 @@ impl Level {
         }
     }
 
-    fn get_node_index_at(&self, pos: (u16, u16)) -> Option<usize> {
+    fn node_index_at(&self, pos: (u16, u16)) -> Option<usize> {
         self.nodes
             .iter()
             .position(|n| n.row == pos.0 && n.col == pos.1)
@@ -209,7 +209,7 @@ impl Level {
         if !self.is_valid_pos(new_pos) {
             return;
         }
-        if let Some(i) = self.get_node_index_at(new_pos) {
+        if let Some(i) = self.node_index_at(new_pos) {
             if !self.nodes[i].is_moveable() {
                 return;
             }
@@ -217,7 +217,7 @@ impl Level {
             if !self.is_valid_pos(new_pos) {
                 return;
             }
-            if self.get_node_index_at(new_pos) != None {
+            if self.node_index_at(new_pos) != None {
                 return;
             }
             self.nodes[i].move_in_dir(dir);
@@ -225,13 +225,23 @@ impl Level {
         self.nodes[player_index].move_in_dir(dir);
     }
 
-    fn get_play_state(&self) -> PlayState {
+    fn reset_statues(&mut self) {
+        for i in 0..self.nodes.len() {
+            if let NodeType::Statue(_) = &self.nodes[i].node_type {
+                self.nodes[i].turn_off();
+            }
+        }
+    }
+
+    fn play_state(&self) -> PlayState {
         let mut all_statues_lit = true;
         for i in 0..self.nodes.len() {
             match &self.nodes[i].node_type {
                 NodeType::Statue(s) => {
-                    if !s.lit {
-                        all_statues_lit = false;
+                    if s.reversed {
+                        all_statues_lit = all_statues_lit && !s.lit;
+                    } else {
+                        all_statues_lit = all_statues_lit && s.lit;
                     }
                 }
                 NodeType::Zapper(z) => {
@@ -310,9 +320,10 @@ impl Level {
 
     pub fn play(&mut self) -> Result<LevelResult, &str> {
         loop {
+            self.reset_statues();
             self.set_lasers_shooting_at();
             self.draw().ok();
-            let state = self.get_play_state();
+            let state = self.play_state();
             if !state.is_playing {
                 return Ok(LevelResult {
                     has_won: state.has_won,

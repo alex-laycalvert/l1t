@@ -117,7 +117,7 @@ impl Node {
                 node_type: NodeType::Mirror(Mirror {
                     dir: Direction::FORWARD,
                 }),
-                moveable: true,
+                moveable: false,
             },
             '\\' => Node {
                 row,
@@ -125,7 +125,7 @@ impl Node {
                 node_type: NodeType::Mirror(Mirror {
                     dir: Direction::BACKWARD,
                 }),
-                moveable: true,
+                moveable: false,
             },
             '?' => Node {
                 row,
@@ -133,7 +133,7 @@ impl Node {
                 node_type: NodeType::Mirror(Mirror {
                     dir: Direction::FORWARD,
                 }),
-                moveable: false,
+                moveable: true,
             },
             '|' => Node {
                 row,
@@ -141,7 +141,7 @@ impl Node {
                 node_type: NodeType::Mirror(Mirror {
                     dir: Direction::BACKWARD,
                 }),
-                moveable: false,
+                moveable: true,
             },
             '1' => Node {
                 row,
@@ -312,14 +312,14 @@ impl Node {
             NodeType::Mirror(m) => execute!(
                 stdout,
                 SetForegroundColor(if self.moveable {
-                    Color::White
-                } else {
                     Color::Black
+                } else {
+                    Color::White
                 }),
                 SetBackgroundColor(if self.moveable {
-                    Color::Reset
-                } else {
                     Color::White
+                } else {
+                    Color::Reset
                 }),
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print(if matches!(m.dir, Direction::FORWARD) {
@@ -455,6 +455,18 @@ impl Node {
             NodeType::Statue(_) => true,
             NodeType::Zapper(_) => true,
             _ => false,
+        }
+    }
+
+    pub fn turn_on(&mut self) {
+        match &mut self.node_type {
+            NodeType::Laser(l) => l.on = true,
+            NodeType::Statue(s) => s.lit = true,
+            NodeType::Zapper(z) => z.lit = true,
+            NodeType::Button(b) => b.pressed = true,
+            NodeType::Switch(s) => s.on = true,
+            NodeType::ToggleBlock(t) => t.visible = true,
+            _ => (),
         }
     }
 
