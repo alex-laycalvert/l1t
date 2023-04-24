@@ -10,7 +10,7 @@ use crossterm::{
 };
 use level::*;
 //use menu::*;
-use std::io::Stdout;
+use std::{io::Stdout, thread, time};
 
 /// Represents a level of `ascii-portal`.
 pub struct L1t {}
@@ -58,6 +58,7 @@ impl L1t {
             Err(e) => return Err(e),
         };
         let result = level.play();
+        thread::sleep(time::Duration::from_millis(500));
         match result {
             Ok(result) => {
                 if result.has_won {

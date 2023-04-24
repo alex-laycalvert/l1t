@@ -315,6 +315,8 @@ impl Level {
 
     pub fn play(&mut self) -> Result<LevelResult, &str> {
         loop {
+            self.set_lasers_shooting_at();
+            self.draw().ok();
             let state = self.get_play_state();
             if !state.is_playing {
                 return Ok(LevelResult {
@@ -322,8 +324,6 @@ impl Level {
                     reason_for_loss: state.reason_for_loss,
                 });
             }
-            self.set_lasers_shooting_at();
-            self.draw().ok();
             match read().unwrap() {
                 Event::Key(event) => match event.code {
                     KeyCode::Char('w') => self.move_player(Direction::UP),

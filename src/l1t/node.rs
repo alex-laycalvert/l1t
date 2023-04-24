@@ -6,54 +6,34 @@ use crossterm::{
 };
 use std::io::stdout;
 
-#[derive(Clone, Debug)]
 pub struct Player;
-
-#[derive(Clone, Debug)]
 pub struct Block;
-
-#[derive(Clone, Debug)]
 pub struct Wall;
-
-#[derive(Clone, Debug)]
 pub struct Switch {
     pub on: bool,
 }
-
-#[derive(Clone, Debug)]
 pub struct ToggleBlock {
     pub visible: bool,
 }
-
-#[derive(Clone, Debug)]
 pub struct Button {
     pub pressed: bool,
 }
-
-#[derive(Clone, Debug)]
 pub struct Mirror {
     pub dir: Direction,
 }
-
-#[derive(Clone, Debug)]
 pub struct Laser {
     pub on: bool,
     pub dir: Direction,
     pub shooting_at: Vec<(u16, u16, char, char)>,
 }
-
-#[derive(Clone, Debug)]
 pub struct Statue {
     pub lit: bool,
     pub reversed: bool,
 }
-
-#[derive(Clone, Debug)]
 pub struct Zapper {
     pub lit: bool,
 }
 
-#[derive(Clone, Debug)]
 pub enum NodeType {
     Player(Player),
     Block(Block),
@@ -67,7 +47,6 @@ pub enum NodeType {
     Zapper(Zapper),
 }
 
-#[derive(Clone, Debug)]
 pub struct Node {
     pub node_type: NodeType,
     pub row: u16,
@@ -371,10 +350,10 @@ impl Node {
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print("S".bold()),
             ),
-            NodeType::Zapper(_) => execute!(
+            NodeType::Zapper(z) => execute!(
                 stdout,
-                SetForegroundColor(Color::Yellow),
-                SetBackgroundColor(Color::Black),
+                SetForegroundColor(if z.lit { Color::Black } else { Color::Yellow }),
+                SetBackgroundColor(if z.lit { Color::Yellow } else { Color::Black }),
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print("Z".bold()),
             ),
