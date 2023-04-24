@@ -8,15 +8,15 @@ the level.
 
 ## Progress
 
-***NOTE***: This project is still in development.
+**_NOTE_**: This project is still in development.
 
 Number of Levels: `3`
 
 ## Installation and Running
 
-***NOTE***: Right now, this program will run best on the `kitty` terminal,
-            I am working on figuring out the color situations on other
-            terminals.
+**_NOTE_**: Right now, this program will run best on the `kitty` terminal,
+I am working on figuring out the color situations on other
+terminals.
 
 Follow the steps below to install `l1t` for your OS:
 
@@ -25,31 +25,32 @@ Follow the steps below to install `l1t` for your OS:
 <h3>Linux</h3>
 </summary>
 
-- Clone this repository
+-   Clone this repository
 
 ```bash
 git clone https://github.com/alex-laycalvert/l1t
 cd ./l1t
 ```
 
-- Build the project:
+-   Build the project:
 
 ```bash
 make
 ```
 
-- Run the game:
+-   Run the game:
 
 ```bash
 ./build/l1t
 ```
 
-- For development (optional):
+-   For development (optional):
 
 ```bash
 make dev
 ./build/l1t.dev
 ```
+
 </details>
 <details>
 <summary>
@@ -61,39 +62,39 @@ For macOS users, you will need to make sure that the proper
 [Homebrew](https://brew.sh/) by following the steps on their
 website then run `brew install ncurses`.
 
-- Clone this repository
+-   Clone this repository
 
 ```bash
 git clone https://github.com/alex-laycalvert/l1t
 cd ./l1t
 ```
 
-- Build the project:
+-   Build the project:
 
 ```bash
 make
 ```
 
-- Run the game:
+-   Run the game:
 
 ```bash
 ./build/l1t
 ```
 
-- For development (optional):
+-   For development (optional):
 
 ```bash
 make dev
 ./build/l1t.dev
 ```
+
 </details>
 
 ## Gameplay
 
-
 You can exit the game by pressing `q`.
 
-***WORK IN PROGRESS***
+**_WORK IN PROGRESS_**
 
 The goal of every level in `l1t` is to turn all
 of the statues on using the available laser beams.
@@ -102,10 +103,10 @@ of the statues on using the available laser beams.
 
 You can use the normal Vim keybindings to move around:
 
-- `h`: LEFT
-- `j`: DOWN
-- `k`: UP
-- `l`: RIGHT
+-   `h`: LEFT
+-   `j`: DOWN
+-   `k`: UP
+-   `l`: RIGHT
 
 You can also press `space` to interact with surrounding
 items.
@@ -139,8 +140,8 @@ If a laser hits a zapper, it is game over!
 
 Some items on the grid can be moved around:
 
-- `BLOCKS`: Blocks are the black boxes on the grid and can
-            be used to block a laser beam.
+-   `BLOCKS`: Blocks are the black boxes on the grid and can
+    be used to block a laser beam.
 
 ## Configuration
 

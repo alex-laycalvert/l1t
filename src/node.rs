@@ -127,6 +127,22 @@ impl Node {
                 }),
                 moveable: true,
             },
+            '?' => Node {
+                row,
+                col,
+                node_type: NodeType::Mirror(Mirror {
+                    dir: Direction::FORWARD,
+                }),
+                moveable: false,
+            },
+            '|' => Node {
+                row,
+                col,
+                node_type: NodeType::Mirror(Mirror {
+                    dir: Direction::BACKWARD,
+                }),
+                moveable: false,
+            },
             '1' => Node {
                 row,
                 col,
@@ -295,8 +311,16 @@ impl Node {
             ),
             NodeType::Mirror(m) => execute!(
                 stdout,
-                SetForegroundColor(Color::White),
-                SetBackgroundColor(Color::Reset),
+                SetForegroundColor(if self.moveable {
+                    Color::White
+                } else {
+                    Color::Black
+                }),
+                SetBackgroundColor(if self.moveable {
+                    Color::Reset
+                } else {
+                    Color::White
+                }),
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print(if matches!(m.dir, Direction::FORWARD) {
                     "/".bold()
@@ -319,37 +343,61 @@ impl Node {
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print("L".bold()),
             ),
-            NodeType::Statue(s) => execute!(
-                stdout,
-                SetForegroundColor(if s.lit {
-                    Color::Rgb {
-                        r: 255,
-                        g: 255,
-                        b: 0,
-                    }
+            NodeType::Statue(s) => {
+                if s.reversed {
+                    execute!(
+                        stdout,
+                        SetForegroundColor(Color::Black),
+                        SetBackgroundColor(if s.lit {
+                            Color::Rgb {
+                                r: 100,
+                                g: 100,
+                                b: 0,
+                            }
+                        } else {
+                            Color::Rgb {
+                                r: 255,
+                                g: 255,
+                                b: 0,
+                            }
+                        }),
+                        MoveTo(self.col + offset.1, self.row + offset.0),
+                        Print("R".bold()),
+                    )
                 } else {
-                    Color::Rgb {
-                        r: 100,
-                        g: 100,
-                        b: 0,
-                    }
-                }),
-                SetBackgroundColor(if s.lit {
-                    Color::Rgb {
-                        r: 255,
-                        g: 255,
-                        b: 0,
-                    }
-                } else {
-                    Color::Rgb {
-                        r: 100,
-                        g: 100,
-                        b: 0,
-                    }
-                }),
-                MoveTo(self.col + offset.1, self.row + offset.0),
-                Print("S".bold()),
-            ),
+                    execute!(
+                        stdout,
+                        SetForegroundColor(if s.lit {
+                            Color::Rgb {
+                                r: 255,
+                                g: 255,
+                                b: 0,
+                            }
+                        } else {
+                            Color::Rgb {
+                                r: 100,
+                                g: 100,
+                                b: 0,
+                            }
+                        }),
+                        SetBackgroundColor(if s.lit {
+                            Color::Rgb {
+                                r: 255,
+                                g: 255,
+                                b: 0,
+                            }
+                        } else {
+                            Color::Rgb {
+                                r: 100,
+                                g: 100,
+                                b: 0,
+                            }
+                        }),
+                        MoveTo(self.col + offset.1, self.row + offset.0),
+                        Print("S".bold()),
+                    )
+                }
+            }
             NodeType::Zapper(z) => execute!(
                 stdout,
                 SetForegroundColor(if z.lit { Color::Black } else { Color::Yellow }),

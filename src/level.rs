@@ -326,11 +326,22 @@ impl Level {
             }
             match read().unwrap() {
                 Event::Key(event) => match event.code {
-                    KeyCode::Char('w') => self.move_player(Direction::UP),
-                    KeyCode::Char('s') => self.move_player(Direction::DOWN),
-                    KeyCode::Char('a') => self.move_player(Direction::LEFT),
-                    KeyCode::Char('d') => self.move_player(Direction::RIGHT),
+                    KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
+                        self.move_player(Direction::UP)
+                    }
+                    KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => {
+                        self.move_player(Direction::DOWN)
+                    }
+                    KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => {
+                        self.move_player(Direction::LEFT)
+                    }
+                    KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => {
+                        self.move_player(Direction::RIGHT)
+                    }
                     KeyCode::Char(' ') => self.player_action(),
+                    KeyCode::Char('H') => {
+                        Menu::draw(MenuType::HelpMenu, self.term_rows, self.term_cols);
+                    }
                     KeyCode::Char('q') => {
                         if let Some(s) = Menu::draw(
                             MenuType::YesNoSelection("Are you sure you want to quit?".to_string()),
