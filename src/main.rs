@@ -1,6 +1,6 @@
 use crossterm::{
     cursor,
-    terminal::{disable_raw_mode, enable_raw_mode, size, Clear},
+    terminal::{disable_raw_mode, enable_raw_mode, Clear},
     ExecutableCommand,
 };
 use l1t::level::*;
@@ -10,9 +10,8 @@ use std::{thread, time};
 
 fn main() {
     let mut stdout = stdout();
-    let (cols, rows) = size().unwrap_or((0, 0));
     let filename = String::from("test_level.l1t");
-    let mut level = match Level::new(filename, rows, cols) {
+    let mut level = match Level::new(filename) {
         Ok(l) => l,
         Err(e) => {
             eprintln!("{e}");
@@ -24,7 +23,7 @@ fn main() {
         .ok();
     enable_raw_mode().ok();
     stdout.execute(cursor::Hide).ok();
-    let selection = Menu::draw(MenuType::MainSelection, rows, cols).unwrap_or(Selection::Play);
+    let selection = Menu::draw(MenuType::MainSelection).unwrap_or(Selection::Play);
     match selection {
         Selection::Play => {
             let result = level.play();
@@ -32,16 +31,14 @@ fn main() {
                 Ok(result) => {
                     if result.has_won {
                         thread::sleep(time::Duration::from_millis(250));
-                        Menu::draw(MenuType::Message("YAY, You Won!".to_string()), rows, cols);
+                        Menu::draw(MenuType::Message("YAY, You Won!".to_string()));
                     } else if let Some(r) = result.reason_for_loss {
                         match r {
                             LevelLossReason::Zapper => {
                                 thread::sleep(time::Duration::from_millis(250));
-                                Menu::draw(
-                                    MenuType::Message("Uh oh, you lit a zapper!".to_string()),
-                                    rows,
-                                    cols,
-                                );
+                                Menu::draw(MenuType::Message(
+                                    "Uh oh, you lit a zapper!".to_string(),
+                                ));
                             }
                             _ => (),
                         }

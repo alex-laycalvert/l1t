@@ -4,7 +4,7 @@ use crossterm::{
     event::{read, Event, KeyCode},
     execute,
     style::{Color, Print, SetBackgroundColor, SetForegroundColor, Stylize},
-    terminal::{Clear, ClearType},
+    terminal::{size, Clear, ClearType},
     ExecutableCommand,
 };
 use std::fs;
@@ -22,10 +22,6 @@ pub struct Level {
     pub nodes: Vec<Node>,
     pub rows: u16,
     pub cols: u16,
-    pub term_rows: u16,
-    pub term_cols: u16,
-    pub row_offset: u16,
-    pub col_offset: u16,
     pub player_index: Option<usize>,
 }
 
@@ -41,14 +37,14 @@ struct PlayState {
 }
 
 impl Level {
-    fn draw_walls(&self) -> crossterm::Result<()> {
+    fn draw_walls(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
         let mut stdout = stdout();
-        for r in self.row_offset..(self.rows + self.row_offset) {
-            for c in self.col_offset..(self.cols + self.col_offset) {
-                if r == self.row_offset
-                    || r == self.rows + self.row_offset - 1
-                    || c == self.col_offset
-                    || c == self.cols + self.col_offset - 1
+        for r in row_offset..(self.rows + row_offset) {
+            for c in col_offset..(self.cols + col_offset) {
+                if r == row_offset
+                    || r == self.rows + row_offset - 1
+                    || c == col_offset
+                    || c == self.cols + col_offset - 1
                 {
                     execute!(
                         stdout,
@@ -67,16 +63,16 @@ impl Level {
         )
     }
 
-    fn draw_nodes(&self) -> crossterm::Result<()> {
+    fn draw_nodes(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
         for i in 0..self.nodes.len() {
-            self.nodes[i].draw((self.row_offset, self.col_offset))?;
+            self.nodes[i].draw((row_offset, col_offset))?;
         }
         Ok(())
     }
 
-    fn draw_node_overlays(&self) -> crossterm::Result<()> {
+    fn draw_node_overlays(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
         for i in 0..self.nodes.len() {
-            self.nodes[i].draw_overlay((self.row_offset, self.col_offset))?;
+            self.nodes[i].draw_overlay((row_offset, col_offset))?;
         }
         Ok(())
     }
@@ -84,9 +80,12 @@ impl Level {
     fn draw(&self) -> crossterm::Result<()> {
         let mut stdout = stdout();
         stdout.execute(Clear(ClearType::All))?;
-        self.draw_walls()?;
-        self.draw_node_overlays()?;
-        self.draw_nodes()?;
+        let (term_cols, term_rows) = size().unwrap_or((0, 0));
+        let row_offset = (term_rows - self.rows) / 2;
+        let col_offset = (term_cols - self.cols) / 2;
+        self.draw_walls(row_offset, col_offset)?;
+        self.draw_node_overlays(row_offset, col_offset)?;
+        self.draw_nodes(row_offset, col_offset)?;
         Ok(())
     }
 
@@ -261,7 +260,7 @@ impl Level {
         }
     }
 
-    pub fn new(filename: String, term_rows: u16, term_cols: u16) -> Result<Level, &'static str> {
+    pub fn new(filename: String) -> Result<Level, &'static str> {
         let file_content = fs::read_to_string(filename).unwrap_or("".to_string());
         if file_content.trim().len() == 0 {
             return Err("Empty level file.");
@@ -305,11 +304,7 @@ impl Level {
             nodes,
             rows: rows - 3,
             cols,
-            term_rows,
-            term_cols,
             player_index,
-            row_offset: (term_rows - rows - 3) / 2,
-            col_offset: (term_cols - cols) / 2,
         })
     }
 
@@ -340,14 +335,12 @@ impl Level {
                     }
                     KeyCode::Char(' ') => self.player_action(),
                     KeyCode::Char('H') => {
-                        Menu::draw(MenuType::HelpMenu, self.term_rows, self.term_cols);
+                        Menu::draw(MenuType::HelpMenu);
                     }
                     KeyCode::Char('q') => {
-                        if let Some(s) = Menu::draw(
-                            MenuType::YesNoSelection("Are you sure you want to quit?".to_string()),
-                            self.term_rows,
-                            self.term_cols,
-                        ) {
+                        if let Some(s) = Menu::draw(MenuType::YesNoSelection(
+                            "Are you sure you want to quit?".to_string(),
+                        )) {
                             match s {
                                 Selection::Yes => {
                                     return Ok(LevelResult {

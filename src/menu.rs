@@ -6,7 +6,7 @@ use crossterm::{
         Attribute, Color, Print, ResetColor, SetAttribute, SetBackgroundColor, SetForegroundColor,
         StyledContent, Stylize,
     },
-    terminal::{Clear, ClearType},
+    terminal::{size, Clear, ClearType},
 };
 use std::io::stdout;
 
@@ -20,7 +20,7 @@ pub enum Selection {
 }
 
 pub enum MenuType {
-    /// Dialog box with a single message. Press `Enter` to close.
+    /// Dialog box with a single message. Press `Enter` or `q` to close.
     Message(String),
 
     /// Dialog box that displays the message `String` and will
@@ -35,6 +35,9 @@ pub enum MenuType {
     /// Same as `Message` but displays the entire help menu for
     /// the application.
     HelpMenu,
+
+    /// Same as `Message` but displays more content and can be scrolled in.
+    ScrollableMenu(Vec<Vec<StyledContent<&'static str>>>),
 
     /// Prints out the `Main Menu` of the application with the logo
     /// and selections for `Play`, `Help`, and `Quit`.
@@ -82,21 +85,22 @@ impl Menu {
         )
     }
 
-    pub fn draw(menu_type: MenuType, term_rows: u16, term_cols: u16) -> Option<Selection> {
+    pub fn draw(menu_type: MenuType) -> Option<Selection> {
         match menu_type {
             MenuType::MainSelection => {
                 let options: Vec<Selection> =
                     vec![Selection::Play, Selection::Help, Selection::Quit];
                 let row_padding = 2;
                 let col_padding = 3;
-                let start_row: u16 =
-                    (term_rows - options.len() as u16 * 2 - 10 - row_padding) / 2 - row_padding;
-                let start_col: u16 = (term_cols - 23) / 2 - col_padding;
-                let end_row: u16 =
-                    (term_rows + options.len() as u16 + 10 + row_padding) / 2 + row_padding;
-                let end_col: u16 = (term_cols + 23) / 2 + col_padding;
                 let mut current_selection = 0;
                 loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let start_row: u16 =
+                        (term_rows - options.len() as u16 * 2 - 10 - row_padding) / 2 - row_padding;
+                    let start_col: u16 = (term_cols - 23) / 2 - col_padding;
+                    let end_row: u16 =
+                        (term_rows + options.len() as u16 + 10 + row_padding) / 2 + row_padding;
+                    let end_col: u16 = (term_cols + 23) / 2 + col_padding;
                     execute!(stdout(), Clear(ClearType::All)).ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
                     execute!(
@@ -189,7 +193,7 @@ impl Menu {
                         Event::Key(event) => match event.code {
                             KeyCode::Enter => {
                                 if matches!(options[current_selection], Selection::Help) {
-                                    Menu::draw(MenuType::HelpMenu, term_rows, term_cols);
+                                    Menu::draw(MenuType::HelpMenu);
                                 } else {
                                     break;
                                 }
@@ -215,18 +219,19 @@ impl Menu {
             MenuType::Message(message) => {
                 let row_padding = 1;
                 let col_padding = 3;
-                let start_row: u16 = term_rows / 2 - row_padding - 1;
-                let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
-                let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
-                let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
-                Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
-                execute!(
-                    stdout(),
-                    MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
-                    Print(message.clone()),
-                )
-                .ok();
                 loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let start_row: u16 = term_rows / 2 - row_padding - 1;
+                    let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
+                    let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
+                    let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
+                    Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
+                    execute!(
+                        stdout(),
+                        MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
+                        Print(message.clone()),
+                    )
+                    .ok();
                     match read().unwrap() {
                         Event::Key(event) => match event.code {
                             KeyCode::Enter => break,
@@ -239,19 +244,20 @@ impl Menu {
             MenuType::YesNoSelection(message) => {
                 let row_padding = 1;
                 let col_padding = 3;
-                let start_row: u16 = term_rows / 2 - row_padding - 1;
-                let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
-                let end_row: u16 = (term_rows + row_padding) / 2 + row_padding + 2;
-                let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
-                Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
-                execute!(
-                    stdout(),
-                    MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
-                    Print(message.clone()),
-                )
-                .ok();
                 let mut current_selection = Selection::No;
                 loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let start_row: u16 = term_rows / 2 - row_padding - 1;
+                    let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
+                    let end_row: u16 = (term_rows + row_padding) / 2 + row_padding + 2;
+                    let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
+                    Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
+                    execute!(
+                        stdout(),
+                        MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
+                        Print(message.clone()),
+                    )
+                    .ok();
                     execute!(
                         stdout(),
                         MoveTo(term_cols / 2 - 6, end_row - row_padding - 1),
@@ -303,7 +309,7 @@ impl Menu {
                 }
             }
             MenuType::HelpMenu => loop {
-                let help: Vec<Vec<StyledContent<&str>>> = vec![
+                return Menu::draw(MenuType::ScrollableMenu(vec![
                     vec![
                         "l1t".bold().green(),
                         " - A terminal strategy game about moving".stylize(),
@@ -471,25 +477,29 @@ impl Menu {
                     ],
                     vec!["            blocks on/off. Player must be".stylize()],
                     vec!["            next to button to press.".stylize()],
-                ];
+                ]));
+            },
+            MenuType::ScrollableMenu(content) => {
                 let row_padding = 1;
                 let col_padding = 2;
-                let lines: usize = (term_rows - row_padding * 4) as usize - 2;
-                let start_row = (term_rows - lines as u16) / 2 - row_padding;
-                let end_row = (term_rows + lines as u16) / 2 + row_padding;
-                let start_col = (term_cols - 50) / 2 - col_padding;
-                let end_col = (term_cols + 50) / 2 + col_padding;
                 let mut start_index: usize = 0;
                 let scroll_message = "  USE ARROW KEYS OR W, S TO SCROLL  ";
                 loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let lines: usize = (term_rows - row_padding * 2) as usize - 3;
+                    let start_row = (term_rows - lines as u16) / 2 - row_padding;
+                    let end_row = (term_rows + lines as u16) / 2 + row_padding;
+                    let start_col = (term_cols - 50) / 2 - col_padding;
+                    let end_col = (term_cols + 50) / 2 + col_padding;
                     execute!(
                         stdout(),
+                        Clear(ClearType::All),
                         MoveTo((term_cols - scroll_message.len() as u16) / 2, start_row - 1),
                         Print(scroll_message.on_white().black().bold())
                     )
                     .ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
-                    for i in start_index..(start_index + lines) {
+                    for i in start_index..(start_index + lines).min(content.len()) {
                         execute!(
                             stdout(),
                             MoveTo(
@@ -498,7 +508,7 @@ impl Menu {
                             )
                         )
                         .ok();
-                        for piece in help[i].iter() {
+                        for piece in content[i].iter() {
                             execute!(stdout(), Print(piece)).ok();
                         }
                     }
@@ -511,21 +521,20 @@ impl Menu {
                                 start_index -= 1;
                             }
                             KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => {
-                                if start_index + lines == help.len() {
+                                if start_index + lines >= content.len() {
                                     continue;
                                 }
                                 start_index += 1;
                             }
                             KeyCode::Char('g') => start_index = 0,
-                            KeyCode::Char('G') => start_index = help.len() - lines,
+                            KeyCode::Char('G') => start_index = content.len() - lines,
                             KeyCode::Enter | KeyCode::Char('q') => break,
                             _ => (),
                         },
                         _ => (),
                     }
                 }
-                return None;
-            },
+            }
             _ => (),
         }
         None
