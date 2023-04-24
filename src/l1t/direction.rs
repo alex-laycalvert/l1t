@@ -9,4 +9,6 @@ impl Direction {
     pub const DOWN: Self = Self(1, 0);
     pub const LEFT: Self = Self(0, -1);
     pub const RIGHT: Self = Self(0, 1);
+    pub const FORWARD: Self = Self(0, 1);
+    pub const BACKWARD: Self = Self(0, -1);
 }

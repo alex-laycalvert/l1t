@@ -1,6 +1,6 @@
 pub mod direction;
 pub mod level;
-pub mod menu;
+//pub mod menu;
 pub mod node;
 
 use crossterm::{
@@ -9,7 +9,7 @@ use crossterm::{
     ExecutableCommand,
 };
 use level::*;
-use menu::*;
+//use menu::*;
 use std::io::Stdout;
 
 /// Represents a level of `ascii-portal`.
@@ -32,32 +32,32 @@ impl L1t {
         stdout
             .execute(Clear(crossterm::terminal::ClearType::All))
             .ok();
-        let selection = Menu::draw(
-            stdout,
-            MenuType::MainSelection(
-                vec![
-                    "             /-------L       ".to_string(),
-                    "    ___      |__      _      ".to_string(),
-                    "   |_  |  <--/  |    | \\_    ".to_string(),
-                    "     | |     `| |    | __|   ".to_string(),
-                    "     | |      | |    | |     ".to_string(),
-                    "     | |_    _|_|_   | |_    ".to_string(),
-                    "   --\\___\\  |_____| --\\__|   ".to_string(),
-                    "     |                |      ".to_string(),
-                    "     v                v      ".to_string(),
-                    "     S                       ".to_string(),
-                ],
-                vec!["PLAY".to_string(), "HELP".to_string(), "QUIT".to_string()],
-            ),
-            term_rows,
-            term_cols,
-        )
-        .unwrap_or(0);
+        //let selection = Menu::draw(
+        //    stdout,
+        //    MenuType::MainSelection(
+        //        vec![
+        //            "             /-------L       ".to_string(),
+        //            "    ___      |__      _      ".to_string(),
+        //            "   |_  |  <--/  |    | \\_    ".to_string(),
+        //            "     | |     `| |    | __|   ".to_string(),
+        //            "     | |      | |    | |     ".to_string(),
+        //            "     | |_    _|_|_   | |_    ".to_string(),
+        //            "   --\\___\\  |_____| --\\__|   ".to_string(),
+        //            "     |                |      ".to_string(),
+        //            "     v                v      ".to_string(),
+        //            "     S                       ".to_string(),
+        //        ],
+        //        vec!["PLAY".to_string(), "HELP".to_string(), "QUIT".to_string()],
+        //    ),
+        //    term_rows,
+        //    term_cols,
+        //)
+        //.unwrap_or(0);
         let mut level = match Level::new(filename, term_rows, term_cols) {
             Ok(l) => l,
             Err(e) => return Err(e),
         };
-        let result = level.play(stdout);
+        let result = level.play();
         match result {
             Ok(result) => {
                 if result.has_won {
@@ -68,12 +68,12 @@ impl L1t {
                             println!("Uh oh, you lit a zapper!");
                         }
                         LevelLossReason::Quit => {
-                            Menu::draw(
-                                stdout,
-                                MenuType::Message("Hello, World!".to_string()),
-                                term_rows,
-                                term_cols,
-                            );
+                            //Menu::draw(
+                            //    stdout,
+                            //    MenuType::Message("Hello, World!".to_string()),
+                            //    term_rows,
+                            //    term_cols,
+                            //);
                         }
                     }
                 } else {
