@@ -28,29 +28,22 @@ fn main() {
     match selection {
         Selection::Play => {
             let result = level.play();
-            thread::sleep(time::Duration::from_millis(500));
-            stdout.execute(cursor::Show).ok();
-            disable_raw_mode().ok();
-            stdout
-                .execute(Clear(crossterm::terminal::ClearType::All))
-                .ok();
             match result {
                 Ok(result) => {
                     if result.has_won {
-                        println!("YAY, You Won!");
+                        thread::sleep(time::Duration::from_millis(250));
+                        Menu::draw(MenuType::Message("YAY, You Won!".to_string()), rows, cols);
                     } else if let Some(r) = result.reason_for_loss {
                         match r {
                             LevelLossReason::Zapper => {
-                                println!("Uh oh, you lit a zapper!");
+                                thread::sleep(time::Duration::from_millis(250));
+                                Menu::draw(
+                                    MenuType::Message("Uh oh, you lit a zapper!".to_string()),
+                                    rows,
+                                    cols,
+                                );
                             }
-                            LevelLossReason::Quit => {
-                                //Menu::draw(
-                                //    stdout,
-                                //    MenuType::Message("Hello, World!".to_string()),
-                                //    term_rows,
-                                //    term_cols,
-                                //);
-                            }
+                            _ => (),
                         }
                     } else {
                         println!("See you later!");
@@ -60,19 +53,15 @@ fn main() {
             }
         }
         Selection::Help => {
-            stdout.execute(cursor::Show).ok();
-            disable_raw_mode().ok();
-            stdout
-                .execute(Clear(crossterm::terminal::ClearType::All))
-                .ok();
             println!("Coming soon...");
         }
-        Selection::Quit => {
-            stdout.execute(cursor::Show).ok();
-            disable_raw_mode().ok();
-            stdout
-                .execute(Clear(crossterm::terminal::ClearType::All))
-                .ok();
-        }
+        Selection::Quit => {}
+        _ => (),
     }
+    stdout.execute(cursor::Show).ok();
+    disable_raw_mode().ok();
+    stdout.execute(cursor::MoveTo(0, 0)).ok();
+    stdout
+        .execute(Clear(crossterm::terminal::ClearType::All))
+        .ok();
 }

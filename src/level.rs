@@ -1,4 +1,4 @@
-use crate::{direction::Direction, node::*};
+use crate::{direction::Direction, menu::*, node::*};
 use crossterm::{
     cursor,
     event::{read, Event, KeyCode},
@@ -332,10 +332,21 @@ impl Level {
                     KeyCode::Char('d') => self.move_player(Direction::RIGHT),
                     KeyCode::Char(' ') => self.player_action(),
                     KeyCode::Char('q') => {
-                        return Ok(LevelResult {
-                            has_won: false,
-                            reason_for_loss: Some(LevelLossReason::Quit),
-                        })
+                        if let Some(s) = Menu::draw(
+                            MenuType::YesNoSelection("Are you sure you want to quit?".to_string()),
+                            self.term_rows,
+                            self.term_cols,
+                        ) {
+                            match s {
+                                Selection::Yes => {
+                                    return Ok(LevelResult {
+                                        has_won: false,
+                                        reason_for_loss: Some(LevelLossReason::Quit),
+                                    })
+                                }
+                                _ => (),
+                            }
+                        }
                     }
                     _ => (),
                 },

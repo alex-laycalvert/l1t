@@ -14,11 +14,12 @@ pub enum Selection {
     Play,
     Help,
     Quit,
+    Yes,
+    No,
 }
 
-/// A thinkg
 pub enum MenuType {
-    /// Dialog box with a single message. Any key will close.
+    /// Dialog box with a single message. Press `Enter` to close.
     Message(String),
 
     /// Dialog box that displays the message `String` and will
@@ -30,6 +31,13 @@ pub enum MenuType {
     /// `Yes` or `No`.
     YesNoSelection(String),
 
+    /// Same as `Message` but displays the entire help menu for
+    /// the application.
+    HelpMenu,
+
+    /// Prints out the `Main Menu` of the application with the logo
+    /// and selections for `Play`, `Help`, and `Quit`.
+    /// The `Help` option will open up the `HelpMenu` and not return as selection.
     MainSelection,
 }
 
@@ -138,6 +146,7 @@ impl Menu {
                             Selection::Play => "P L A Y",
                             Selection::Help => "H E L P",
                             Selection::Quit => "Q U I T",
+                            _ => "",
                         };
                         execute!(
                             stdout(),
@@ -155,7 +164,9 @@ impl Menu {
                                 (term_cols - option.len() as u16) / 2 - 8,
                                 start_row + row_padding * 2 + i as u16 * 2 + 10,
                             ),
-                            Print(format!("{:^23}", option))
+                            SetAttribute(Attribute::Bold),
+                            Print(format!("{:^23}", option)),
+                            ResetColor,
                         )
                         .ok();
                     }
@@ -180,73 +191,129 @@ impl Menu {
                 return Some(options[current_selection]);
             }
             MenuType::Message(message) => {
+                let row_padding = 1;
+                let col_padding = 3;
+                let start_row: u16 = term_rows / 2 - row_padding - 1;
+                let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
+                let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
+                let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
+                for r in start_row..=end_row {
+                    for c in start_col..=end_col {
+                        if r == start_row || r == end_row {
+                            execute!(stdout(), cursor::MoveTo(c, r), Print("─"),).ok();
+                        } else if c == start_col || c == end_col {
+                            execute!(stdout(), cursor::MoveTo(c, r), Print("│"),).ok();
+                        } else {
+                            execute!(stdout(), cursor::MoveTo(c, r), Print(" "),).ok();
+                        }
+                    }
+                }
                 execute!(
                     stdout(),
-                    cursor::MoveTo(
-                        (term_cols - message.len() as u16) / 2 - 2,
-                        term_rows / 2 - 2
-                    ),
+                    cursor::MoveTo(start_col, start_row),
                     Print("┌"),
-                    cursor::MoveTo(
-                        (term_cols + message.len() as u16) / 2 + 1,
-                        term_rows / 2 - 2
-                    ),
+                    cursor::MoveTo(end_col, start_row),
                     Print("┐"),
-                    cursor::MoveTo(
-                        (term_cols - message.len() as u16) / 2 - 2,
-                        term_rows / 2 + 2
-                    ),
+                    cursor::MoveTo(start_col, end_row),
                     Print("└"),
-                    cursor::MoveTo(
-                        (term_cols + message.len() as u16) / 2 + 1,
-                        term_rows / 2 + 2
-                    ),
+                    cursor::MoveTo(end_col, end_row),
                     Print("┘"),
-                    cursor::MoveTo(
-                        (term_cols - message.len() as u16) / 2 - 2,
-                        term_rows / 2 - 1
-                    ),
-                    Print("│"),
-                    cursor::MoveTo((term_cols - message.len() as u16) / 2 - 2, term_rows / 2),
-                    Print("│"),
-                    cursor::MoveTo(
-                        (term_cols - message.len() as u16) / 2 - 2,
-                        term_rows / 2 + 1
-                    ),
-                    Print("│"),
-                    cursor::MoveTo(
-                        (term_cols + message.len() as u16) / 2 + 1,
-                        term_rows / 2 - 1
-                    ),
-                    Print("│"),
-                    cursor::MoveTo((term_cols + message.len() as u16) / 2 + 1, term_rows / 2),
-                    Print("│"),
-                    cursor::MoveTo(
-                        (term_cols + message.len() as u16) / 2 + 1,
-                        term_rows / 2 + 1
-                    ),
-                    Print("│"),
                     cursor::MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
                     Print(message.clone()),
                 )
                 .ok();
-                for c in ((term_cols - message.len() as u16) / 2 - 1)
-                    ..((term_cols + message.len() as u16) / 2 + 1)
-                {
+                loop {
+                    match read().unwrap() {
+                        Event::Key(event) => match event.code {
+                            KeyCode::Enter => break,
+                            _ => (),
+                        },
+                        _ => (),
+                    }
+                }
+            }
+            MenuType::YesNoSelection(message) => {
+                let row_padding = 1;
+                let col_padding = 3;
+                let start_row: u16 = term_rows / 2 - row_padding - 1;
+                let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
+                let end_row: u16 = (term_rows + row_padding) / 2 + row_padding + 2;
+                let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
+                for r in start_row..=end_row {
+                    for c in start_col..=end_col {
+                        if r == start_row || r == end_row {
+                            execute!(stdout(), cursor::MoveTo(c, r), Print("─"),).ok();
+                        } else if c == start_col || c == end_col {
+                            execute!(stdout(), cursor::MoveTo(c, r), Print("│"),).ok();
+                        } else {
+                            execute!(stdout(), cursor::MoveTo(c, r), Print(" "),).ok();
+                        }
+                    }
+                }
+                execute!(
+                    stdout(),
+                    cursor::MoveTo(start_col, start_row),
+                    Print("┌"),
+                    cursor::MoveTo(end_col, start_row),
+                    Print("┐"),
+                    cursor::MoveTo(start_col, end_row),
+                    Print("└"),
+                    cursor::MoveTo(end_col, end_row),
+                    Print("┘"),
+                    cursor::MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
+                    Print(message.clone()),
+                )
+                .ok();
+                let mut current_selection = Selection::No;
+                loop {
                     execute!(
                         stdout(),
-                        cursor::MoveTo(c, term_rows / 2 - 2),
-                        Print("─"),
-                        cursor::MoveTo(c, term_rows / 2 + 2),
-                        Print("─"),
+                        MoveTo(term_cols / 2 - 6, end_row - row_padding - 1),
+                        SetForegroundColor(if matches!(current_selection, Selection::Yes) {
+                            Color::Black
+                        } else {
+                            Color::White
+                        }),
+                        SetBackgroundColor(if matches!(current_selection, Selection::Yes) {
+                            Color::White
+                        } else {
+                            Color::Reset
+                        }),
+                        Print(" YES ".bold()),
+                        MoveTo(term_cols / 2 + 1, end_row - row_padding - 1),
+                        SetForegroundColor(if matches!(current_selection, Selection::No) {
+                            Color::Black
+                        } else {
+                            Color::White
+                        }),
+                        SetBackgroundColor(if matches!(current_selection, Selection::No) {
+                            Color::White
+                        } else {
+                            Color::Reset
+                        }),
+                        Print(" NO ".bold())
                     )
                     .ok();
-                }
-                match read().unwrap() {
-                    Event::Key(event) => match event.code {
+                    match read().unwrap() {
+                        Event::Key(event) => match event.code {
+                            KeyCode::Left
+                            | KeyCode::Right
+                            | KeyCode::Char('a')
+                            | KeyCode::Char('d')
+                            | KeyCode::Char('h')
+                            | KeyCode::Char('l') => {
+                                if matches!(current_selection, Selection::No) {
+                                    current_selection = Selection::Yes
+                                } else {
+                                    current_selection = Selection::No
+                                }
+                            }
+                            KeyCode::Char('q') => return Some(Selection::No),
+                            KeyCode::Enter => return Some(current_selection),
+                            _ => (),
+                        },
                         _ => (),
-                    },
-                    _ => (),
+                    }
                 }
             }
             _ => (),
