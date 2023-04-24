@@ -44,6 +44,38 @@ pub enum MenuType {
 pub struct Menu;
 
 impl Menu {
+    fn draw_borders(
+        start_row: u16,
+        end_row: u16,
+        start_col: u16,
+        end_col: u16,
+        term_rows: u16,
+        term_cols: u16,
+    ) -> crossterm::Result<()> {
+        for r in start_row..=end_row {
+            for c in start_col..=end_col {
+                if r == start_row || r == end_row {
+                    execute!(stdout(), cursor::MoveTo(c, r), Print("─"),)?;
+                } else if c == start_col || c == end_col {
+                    execute!(stdout(), cursor::MoveTo(c, r), Print("│"),)?;
+                } else {
+                    execute!(stdout(), cursor::MoveTo(c, r), Print(" "),)?;
+                }
+            }
+        }
+        execute!(
+            stdout(),
+            cursor::MoveTo(start_col, start_row),
+            Print("┌"),
+            cursor::MoveTo(end_col, start_row),
+            Print("┐"),
+            cursor::MoveTo(start_col, end_row),
+            Print("└"),
+            cursor::MoveTo(end_col, end_row),
+            Print("┘"),
+        )
+    }
+
     pub fn draw(menu_type: MenuType, term_rows: u16, term_cols: u16) -> Option<Selection> {
         match menu_type {
             MenuType::MainSelection => {
@@ -58,48 +90,31 @@ impl Menu {
                 let row_padding = 2;
                 let col_padding = 3;
                 let start_row: u16 =
-                    (term_rows - options.len() as u16 * 2 - 9 - row_padding) / 2 - row_padding;
+                    (term_rows - options.len() as u16 * 2 - 10 - row_padding) / 2 - row_padding;
                 let start_col: u16 = (term_cols - 23) / 2 - col_padding;
                 let end_row: u16 =
                     (term_rows + options.len() as u16 + 10 + row_padding) / 2 + row_padding;
                 let end_col: u16 = (term_cols + 23) / 2 + col_padding;
-                for r in (start_row - 1)..=end_row {
-                    for c in (start_col - 1)..=end_col {
-                        if r == start_row - 1 || r == end_row {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print("─"),).ok();
-                        } else if c == start_col - 1 || c == end_col {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print("│"),).ok();
-                        } else {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print(" "),).ok();
-                        }
-                    }
-                }
+                Menu::draw_borders(start_row, end_row, start_col, end_col, term_rows, term_cols)
+                    .ok();
                 execute!(
                     stdout(),
-                    cursor::MoveTo(start_col - 1, start_row - 1),
-                    Print("┌"),
-                    cursor::MoveTo(end_col, start_row - 1),
-                    Print("┐"),
-                    cursor::MoveTo(start_col - 1, end_row),
-                    Print("└"),
-                    cursor::MoveTo(end_col, end_row),
-                    Print("┘"),
                     SetAttribute(Attribute::Bold),
-                    MoveTo(start_col + col_padding, start_row + row_padding),
+                    MoveTo(start_col + col_padding, start_row + row_padding + 1),
                     Print("          /"),
                     SetForegroundColor(RED),
                     Print("-------"),
                     SetBackgroundColor(RED),
                     Print("L"),
                     SetBackgroundColor(Color::Reset),
-                    MoveTo(start_col + col_padding, start_row + row_padding + 1),
+                    MoveTo(start_col + col_padding, start_row + row_padding + 2),
                     SetForegroundColor(Color::Green),
                     Print(" ___      "),
                     SetForegroundColor(RED),
                     Print("|"),
                     SetForegroundColor(Color::Green),
                     Print("__      _"),
-                    MoveTo(start_col + col_padding, start_row + row_padding + 2),
+                    MoveTo(start_col + col_padding, start_row + row_padding + 3),
                     Print("|_  |  "),
                     SetForegroundColor(RED),
                     Print("<--"),
@@ -107,13 +122,13 @@ impl Menu {
                     Print("/"),
                     SetForegroundColor(Color::Green),
                     Print("  |    | \\_"),
-                    MoveTo(start_col + col_padding, start_row + row_padding + 3),
-                    Print("  | |     `| |    | __|"),
                     MoveTo(start_col + col_padding, start_row + row_padding + 4),
-                    Print("  | |      | |    | |"),
+                    Print("  | |     `| |    | __|"),
                     MoveTo(start_col + col_padding, start_row + row_padding + 5),
-                    Print("  | |_    _|_|_   | |_ "),
+                    Print("  | |      | |    | |"),
                     MoveTo(start_col + col_padding, start_row + row_padding + 6),
+                    Print("  | |_    _|_|_   | |_ "),
+                    MoveTo(start_col + col_padding, start_row + row_padding + 7),
                     SetForegroundColor(RED),
                     Print("--"),
                     SetForegroundColor(Color::White),
@@ -126,12 +141,12 @@ impl Menu {
                     Print("\\"),
                     SetForegroundColor(Color::Green),
                     Print("__|"),
-                    MoveTo(start_col + col_padding, start_row + row_padding + 7),
+                    MoveTo(start_col + col_padding, start_row + row_padding + 8),
                     SetForegroundColor(RED),
                     Print("  |                v"),
-                    MoveTo(start_col + col_padding, start_row + row_padding + 8),
-                    Print("  v"),
                     MoveTo(start_col + col_padding, start_row + row_padding + 9),
+                    Print("  v"),
+                    MoveTo(start_col + col_padding, start_row + row_padding + 10),
                     Print("  "),
                     SetForegroundColor(YELLOW),
                     SetBackgroundColor(YELLOW),
@@ -197,27 +212,10 @@ impl Menu {
                 let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
                 let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
                 let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
-                for r in start_row..=end_row {
-                    for c in start_col..=end_col {
-                        if r == start_row || r == end_row {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print("─"),).ok();
-                        } else if c == start_col || c == end_col {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print("│"),).ok();
-                        } else {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print(" "),).ok();
-                        }
-                    }
-                }
+                Menu::draw_borders(start_row, end_row, start_col, end_col, term_rows, term_cols)
+                    .ok();
                 execute!(
                     stdout(),
-                    cursor::MoveTo(start_col, start_row),
-                    Print("┌"),
-                    cursor::MoveTo(end_col, start_row),
-                    Print("┐"),
-                    cursor::MoveTo(start_col, end_row),
-                    Print("└"),
-                    cursor::MoveTo(end_col, end_row),
-                    Print("┘"),
                     cursor::MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
                     Print(message.clone()),
                 )
@@ -239,27 +237,10 @@ impl Menu {
                 let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
                 let end_row: u16 = (term_rows + row_padding) / 2 + row_padding + 2;
                 let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
-                for r in start_row..=end_row {
-                    for c in start_col..=end_col {
-                        if r == start_row || r == end_row {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print("─"),).ok();
-                        } else if c == start_col || c == end_col {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print("│"),).ok();
-                        } else {
-                            execute!(stdout(), cursor::MoveTo(c, r), Print(" "),).ok();
-                        }
-                    }
-                }
+                Menu::draw_borders(start_row, end_row, start_col, end_col, term_rows, term_cols)
+                    .ok();
                 execute!(
                     stdout(),
-                    cursor::MoveTo(start_col, start_row),
-                    Print("┌"),
-                    cursor::MoveTo(end_col, start_row),
-                    Print("┐"),
-                    cursor::MoveTo(start_col, end_row),
-                    Print("└"),
-                    cursor::MoveTo(end_col, end_row),
-                    Print("┘"),
                     cursor::MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
                     Print(message.clone()),
                 )
