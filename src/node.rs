@@ -151,7 +151,7 @@ impl Node {
                     dir: Direction::UP,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '2' => Node {
                 row,
@@ -161,7 +161,7 @@ impl Node {
                     dir: Direction::DOWN,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '3' => Node {
                 row,
@@ -171,7 +171,7 @@ impl Node {
                     dir: Direction::LEFT,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '4' => Node {
                 row,
@@ -181,7 +181,7 @@ impl Node {
                     dir: Direction::RIGHT,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '5' => Node {
                 row,
@@ -191,7 +191,7 @@ impl Node {
                     dir: Direction::UP,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '6' => Node {
                 row,
@@ -201,7 +201,7 @@ impl Node {
                     dir: Direction::DOWN,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '7' => Node {
                 row,
@@ -211,7 +211,7 @@ impl Node {
                     dir: Direction::LEFT,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             '8' => Node {
                 row,
@@ -221,7 +221,7 @@ impl Node {
                     dir: Direction::RIGHT,
                     shooting_at: vec![],
                 }),
-                moveable: true,
+                moveable: false,
             },
             _ => Node {
                 row,
