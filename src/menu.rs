@@ -204,9 +204,6 @@ impl Menu {
                                         return Some(Selection::Play(i));
                                     }
                                 }
-                                Selection::Help => {
-                                    Menu::open(MenuType::HelpMenu);
-                                }
                                 _ => break,
                             },
                             KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('w') => {
@@ -546,10 +543,11 @@ impl Menu {
                 let row_padding = 1;
                 let col_padding = 3;
                 let highest_completed_level = match completed_levels.iter().max() {
-                    Some(n) => *n,
+                    Some(n) => *n.min(&(Level::NUM_CORE_LEVELS - 1)),
                     None => 0,
                 };
                 let mut current_selection = highest_completed_level;
+                let message = "  SELECT A LEVEL  ";
                 loop {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
                     let start_row: u16 = (term_rows
@@ -564,6 +562,13 @@ impl Menu {
                         + 1)
                         / 2;
                     let end_col: u16 = (term_cols + levels_per_row * 2) / 2 + col_padding;
+                    execute!(
+                        stdout(),
+                        Clear(ClearType::All),
+                        MoveTo((term_cols - message.len() as u16) / 2, start_row - 1),
+                        Print(message.on_white().black().bold())
+                    )
+                    .ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
                     for i in 0..Level::NUM_CORE_LEVELS {
                         let is_available = i <= highest_completed_level;

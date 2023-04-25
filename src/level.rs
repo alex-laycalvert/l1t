@@ -99,17 +99,15 @@ IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
         "Level 4
 alex-laycalvert
 What's That Special Block Over There?
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-I                                 I
-I                            Z  \\ I
-I                                 I
-I                                 I
-I    X           4           \\    I
-I                                 I
-I                                 I
-I                S           \\  \\ I
-I                                 I
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+IIIIIIIIIIIIIIIIIIIIIIIIIIII
+I                     Z  \\ I
+I                          I
+I                          I
+I    X    4           \\    I
+I                          I
+I                          I
+I         S           \\  \\ I
+IIIIIIIIIIIIIIIIIIIIIIIIIIII",
     ];
 
     fn draw_walls(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
