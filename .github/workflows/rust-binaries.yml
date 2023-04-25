@@ -1,4 +1,4 @@
-name: Rust
+name: Releases
 
 on:
   - push: ["main"]
