@@ -11,11 +11,20 @@ use human_sort::sort;
 use std::fs;
 use std::io::stdout;
 
+#[derive(Debug)]
 pub enum LevelLossReason {
     Zapper,
     Quit,
 }
 
+#[derive(Debug)]
+pub enum LevelSource {
+    File(String),
+    Url(String),
+    Core(usize),
+}
+
+#[derive(Debug)]
 pub struct Level {
     pub info: LevelInfo,
     pub nodes: Vec<Node>,
@@ -26,17 +35,19 @@ pub struct Level {
 
 #[derive(Debug)]
 pub struct LevelInfo {
-    pub file: String,
+    pub source: LevelSource,
     pub name: String,
     pub author: String,
     pub description: String,
 }
 
+#[derive(Debug)]
 pub struct LevelResult {
     pub has_won: bool,
     pub reason_for_loss: Option<LevelLossReason>,
 }
 
+#[derive(Debug)]
 struct PlayState {
     is_playing: bool,
     has_won: bool,
@@ -44,6 +55,63 @@ struct PlayState {
 }
 
 impl Level {
+    pub const NUM_CORE_LEVELS: usize = 4;
+    pub const CORE_LEVELS: [&str; Level::NUM_CORE_LEVELS] = [
+        "Level 1
+alex-laycalvert
+The First Level
+IIIIIIIIIIIIIIIIIIIIIIIIIII
+I                         I
+I \\                    \\  I
+I                         I
+I                   \\  /  I
+I                         I
+I 1         X          S  I
+I                         I
+I                   \\  \\  I
+IIIIIIIIIIIIIIIIIIIIIIIIIII",
+        "Level 2
+alex-laycalvert
+Reverse Statues
+IIIIIIIIIIIIIIIIIIIIIIII
+I                      I
+I                 R    I
+I                      I
+I           X          I
+I                      I
+I   4             /    I
+I   S             \\    I
+IIIIIIIIIIIIIIIIIIIIIIII",
+        "Level 3
+alex-laycalvert
+Using Your Surroundings
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+I                                 I
+I                R                I
+I                                 I
+I                                 I
+I     4          /   B    X       I
+I                                 I
+I                                 I
+I                R                I
+I                                 I
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+        "Level 4
+alex-laycalvert
+What's That Special Block Over There?
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+I                                 I
+I                            Z  \\ I
+I                                 I
+I                                 I
+I    X           4           \\    I
+I                                 I
+I                                 I
+I                S           \\  \\ I
+I                                 I
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+    ];
+
     fn draw_walls(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
         let mut stdout = stdout();
         for r in row_offset..(self.rows + row_offset) {
@@ -302,7 +370,7 @@ impl Level {
             };
             let lines: Vec<&str> = content.split('\n').collect();
             levels.push(LevelInfo {
-                file: f.to_string(),
+                source: LevelSource::File(f.to_string()),
                 name: lines[0].to_string(),
                 author: lines[1].to_string(),
                 description: lines[2].to_string(),
@@ -311,12 +379,8 @@ impl Level {
         Ok(levels)
     }
 
-    pub fn new(filename: String) -> Result<Level, &'static str> {
-        let file_content = fs::read_to_string(&filename).unwrap_or("".to_string());
-        if file_content.trim().len() == 0 {
-            return Err("Empty level file.");
-        }
-        let lines: Vec<&str> = file_content.trim().split('\n').collect();
+    fn from_string(content: String, source: LevelSource) -> Result<Level, &'static str> {
+        let lines: Vec<&str> = content.trim().split('\n').collect();
         let rows = lines.len() as u16;
         if rows < 6 {
             return Err("Level file must include a line for the `name`, `author`, `description`, and lines representing the level grid.");
@@ -350,7 +414,7 @@ impl Level {
         }
         Ok(Level {
             info: LevelInfo {
-                file: filename.to_string(),
+                source,
                 name,
                 author,
                 description,
@@ -360,6 +424,23 @@ impl Level {
             cols,
             player_index,
         })
+    }
+
+    pub fn file(filename: String) -> Result<Level, &'static str> {
+        let content = fs::read_to_string(&filename).unwrap_or("".to_string());
+        if content.trim().len() == 0 {
+            return Err("Empty level file.");
+        }
+        Level::from_string(content, LevelSource::File(filename.to_string()))
+    }
+
+    pub fn url(url: String) -> Result<Level, &'static str> {
+        todo!()
+    }
+
+    pub fn core(level: usize) -> Result<Level, &'static str> {
+        let content = Level::CORE_LEVELS[level];
+        Level::from_string(content.to_string(), LevelSource::Core(level))
     }
 
     pub fn play(&mut self) -> Result<LevelResult, &str> {
@@ -390,10 +471,10 @@ impl Level {
                     }
                     KeyCode::Char(' ') => self.player_action(),
                     KeyCode::Char('H') => {
-                        Menu::draw(MenuType::HelpMenu);
+                        Menu::open(MenuType::HelpMenu);
                     }
                     KeyCode::Char('q') => {
-                        if let Some(s) = Menu::draw(MenuType::YesNoSelection(
+                        if let Some(s) = Menu::open(MenuType::YesNoSelection(
                             "Are you sure you want to quit?".to_string(),
                         )) {
                             match s {

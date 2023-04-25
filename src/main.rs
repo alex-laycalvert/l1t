@@ -16,15 +16,8 @@ fn main() {
         None => return,
     };
     let home = home.to_str().unwrap_or("");
-    let _user_data = match UserData::read(home.to_string()) {
+    let mut user_data = match UserData::read(home.to_string()) {
         Ok(d) => d,
-        Err(e) => {
-            eprintln!("{e}");
-            return;
-        }
-    };
-    let levels = match Level::available_levels("levels".to_string()) {
-        Ok(l) => l,
         Err(e) => {
             eprintln!("{e}");
             return;
@@ -34,16 +27,18 @@ fn main() {
     let mut stdout = stdout();
     enable_raw_mode().ok();
     stdout.execute(cursor::Hide).ok();
-    let selection = Menu::draw(MenuType::MainSelection).unwrap_or(Selection::Play);
+    let selection = Menu::open(MenuType::MainSelection(
+        user_data.completed_core_levels.clone(),
+    ))
+    .unwrap_or(Selection::Play(1));
     match selection {
-        Selection::Play => {
-            let mut current_level = 1;
+        Selection::Play(level) => {
+            let mut current_level = level;
             loop {
-                if current_level > levels.len() {
+                if current_level >= Level::NUM_CORE_LEVELS {
                     current_level = 0
                 }
-                let filename = String::from(&levels[current_level].file);
-                let mut level = match Level::new(filename) {
+                let mut level = match Level::core(current_level) {
                     Ok(l) => l,
                     Err(e) => {
                         eprintln!("{e}");
@@ -55,13 +50,20 @@ fn main() {
                     Ok(result) => {
                         if result.has_won {
                             thread::sleep(time::Duration::from_millis(300));
-                            Menu::draw(MenuType::Message("YAY, You Won!".to_string()));
+                            Menu::open(MenuType::Message("YAY, You Won!".to_string()));
                             current_level += 1;
+                            match user_data.complete_core(current_level as usize) {
+                                Err(e) => {
+                                    eprintln!("{e}");
+                                    return;
+                                }
+                                _ => (),
+                            };
                         } else if let Some(r) = result.reason_for_loss {
                             match r {
                                 LevelLossReason::Zapper => {
                                     thread::sleep(time::Duration::from_millis(250));
-                                    Menu::draw(MenuType::Message(
+                                    Menu::open(MenuType::Message(
                                         "Uh oh, you lit a zapper!".to_string(),
                                     ));
                                 }

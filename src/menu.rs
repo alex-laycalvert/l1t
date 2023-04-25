@@ -1,4 +1,4 @@
-use crate::level::LevelInfo;
+use crate::level::Level;
 use crossterm::{
     cursor::MoveTo,
     event::{read, Event, KeyCode},
@@ -13,12 +13,12 @@ use std::io::stdout;
 
 #[derive(Clone)]
 pub enum Selection {
-    Play,
+    Play(usize),
     Help,
     Quit,
     Yes,
     No,
-    Item(String),
+    Item(usize),
 }
 
 pub enum MenuType {
@@ -44,9 +44,10 @@ pub enum MenuType {
     /// Prints out the `Main Menu` of the application with the logo
     /// and selections for `Play`, `Help`, and `Quit`.
     /// The `Help` option will open up the `HelpMenu` and not return as selection.
-    MainSelection,
+    MainSelection(Vec<usize>),
 
-    CoreLevelSelection(Vec<LevelInfo>),
+    ///
+    CoreLevelSelection(Vec<usize>),
 }
 
 const RED: Color = Color::Rgb { r: 255, g: 0, b: 0 };
@@ -89,11 +90,11 @@ impl Menu {
         )
     }
 
-    pub fn draw(menu_type: MenuType) -> Option<Selection> {
+    pub fn open(menu_type: MenuType) -> Option<Selection> {
         match menu_type {
-            MenuType::MainSelection => {
+            MenuType::MainSelection(completed_levels) => {
                 let options: Vec<Selection> =
-                    vec![Selection::Play, Selection::Help, Selection::Quit];
+                    vec![Selection::Play(0), Selection::Help, Selection::Quit];
                 let row_padding = 2;
                 let col_padding = 3;
                 let mut current_selection = 0;
@@ -166,7 +167,7 @@ impl Menu {
                     .ok();
                     for i in 0..options.len() {
                         let option = match options[i] {
-                            Selection::Play => "P L A Y",
+                            Selection::Play(_) => "P L A Y",
                             Selection::Help => "H E L P",
                             Selection::Quit => "Q U I T",
                             _ => "",
@@ -195,13 +196,19 @@ impl Menu {
                     }
                     match read().unwrap() {
                         Event::Key(event) => match event.code {
-                            KeyCode::Enter => {
-                                if matches!(options[current_selection], Selection::Help) {
-                                    Menu::draw(MenuType::HelpMenu);
-                                } else {
-                                    break;
+                            KeyCode::Enter => match options[current_selection] {
+                                Selection::Play(_) => {
+                                    if let Some(Selection::Item(i)) = Menu::open(
+                                        MenuType::CoreLevelSelection(completed_levels.clone()),
+                                    ) {
+                                        return Some(Selection::Play(i));
+                                    }
                                 }
-                            }
+                                Selection::Help => {
+                                    Menu::open(MenuType::HelpMenu);
+                                }
+                                _ => break,
+                            },
                             KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('w') => {
                                 if current_selection == 0 {
                                     current_selection = options.len() - 1;
@@ -313,7 +320,7 @@ impl Menu {
                 }
             }
             MenuType::HelpMenu => loop {
-                return Menu::draw(MenuType::ScrollableMenu(vec![
+                return Menu::open(MenuType::ScrollableMenu(vec![
                     vec![
                         "l1t".bold().green(),
                         " - A terminal strategy game about moving".stylize(),
@@ -534,7 +541,90 @@ impl Menu {
                     }
                 }
             }
-            MenuType::CoreLevelSelection(_levels) => {}
+            MenuType::CoreLevelSelection(completed_levels) => {
+                let levels_per_row = 10;
+                let row_padding = 1;
+                let col_padding = 3;
+                let highest_completed_level = match completed_levels.iter().max() {
+                    Some(n) => *n,
+                    None => 0,
+                };
+                let mut current_selection = highest_completed_level;
+                loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let start_row: u16 = (term_rows
+                        - row_padding * 2
+                        - levels_per_row / Level::NUM_CORE_LEVELS as u16
+                        + 1)
+                        / 2;
+                    let start_col: u16 = (term_cols - levels_per_row * 2) / 2 - col_padding;
+                    let end_row: u16 = (term_rows
+                        + row_padding * 2
+                        + levels_per_row / Level::NUM_CORE_LEVELS as u16
+                        + 1)
+                        / 2;
+                    let end_col: u16 = (term_cols + levels_per_row * 2) / 2 + col_padding;
+                    Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
+                    for i in 0..Level::NUM_CORE_LEVELS {
+                        let is_available = i <= highest_completed_level;
+                        if is_available {
+                            execute!(
+                                stdout(),
+                                MoveTo(
+                                    (i as u16 % levels_per_row) * 2 + start_col + col_padding - 1,
+                                    term_rows / 2
+                                ),
+                                SetForegroundColor(if current_selection == i {
+                                    Color::Black
+                                } else {
+                                    Color::Reset
+                                }),
+                                SetBackgroundColor(if current_selection == i {
+                                    Color::White
+                                } else {
+                                    Color::Reset
+                                }),
+                                Print((i + 1).to_string().bold()),
+                            )
+                            .ok();
+                        } else {
+                            execute!(
+                                stdout(),
+                                MoveTo(
+                                    (i as u16 % levels_per_row) * 2 + start_col + col_padding - 1,
+                                    term_rows / 2
+                                ),
+                                Print((i + 1).to_string().bold().black()),
+                            )
+                            .ok();
+                        }
+                    }
+                    match read().unwrap() {
+                        Event::Key(event) => match event.code {
+                            KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => {
+                                if current_selection as isize - 1 < 0 {
+                                    current_selection = highest_completed_level;
+                                } else {
+                                    current_selection -= 1;
+                                }
+                            }
+                            KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => {
+                                if current_selection + 1 > highest_completed_level {
+                                    current_selection = 0;
+                                } else {
+                                    current_selection += 1;
+                                }
+                            }
+                            KeyCode::Char('q') => {
+                                return None;
+                            }
+                            KeyCode::Enter => return Some(Selection::Item(current_selection)),
+                            _ => (),
+                        },
+                        _ => (),
+                    }
+                }
+            }
             _ => (),
         }
         None

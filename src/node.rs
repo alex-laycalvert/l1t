@@ -6,34 +6,45 @@ use crossterm::{
 };
 use std::io::stdout;
 
+#[derive(Debug)]
 pub struct Player;
+#[derive(Debug)]
 pub struct Block;
+#[derive(Debug)]
 pub struct Wall;
+#[derive(Debug)]
 pub struct Switch {
     pub on: bool,
 }
+#[derive(Debug)]
 pub struct ToggleBlock {
     pub visible: bool,
 }
+#[derive(Debug)]
 pub struct Button {
     pub pressed: bool,
 }
+#[derive(Debug)]
 pub struct Mirror {
     pub dir: Direction,
 }
+#[derive(Debug)]
 pub struct Laser {
     pub on: bool,
     pub dir: Direction,
     pub shooting_at: Vec<(u16, u16, char, char)>,
 }
+#[derive(Debug)]
 pub struct Statue {
     pub lit: bool,
     pub reversed: bool,
 }
+#[derive(Debug)]
 pub struct Zapper {
     pub lit: bool,
 }
 
+#[derive(Debug)]
 pub enum NodeType {
     Player(Player),
     Block(Block),
@@ -47,6 +58,7 @@ pub enum NodeType {
     Zapper(Zapper),
 }
 
+#[derive(Debug)]
 pub struct Node {
     pub node_type: NodeType,
     pub row: u16,

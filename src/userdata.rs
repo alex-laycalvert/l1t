@@ -3,15 +3,17 @@ use std::{fs, path};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompletedLevel {
-    name: String,
-    author: String,
-    description: String,
-    completed_at: u64,
+    pub name: String,
+    pub author: String,
+    pub description: String,
+    pub completed_at: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserData {
-    completed_levels: Vec<CompletedLevel>,
+    file: String,
+    pub completed_core_levels: Vec<usize>,
+    pub completed_levels: Vec<CompletedLevel>,
 }
 
 impl UserData {
@@ -23,6 +25,8 @@ impl UserData {
                 _ => (),
             };
             let data = UserData {
+                file: filename.clone(),
+                completed_core_levels: vec![],
                 completed_levels: vec![],
             };
             let content = match serde_json::to_string(&data) {
@@ -34,10 +38,26 @@ impl UserData {
                 _ => (),
             };
         }
-        let file_content = fs::read_to_string(filename).unwrap_or("".to_string());
+        let file_content = fs::read_to_string(&filename).unwrap_or("".to_string());
         match serde_json::from_str::<UserData>(&file_content) {
             Ok(d) => Ok(d),
             Err(e) => Err(e.to_string()),
         }
+    }
+
+    pub fn complete_core(&mut self, level: usize) -> Result<(), String> {
+        if self.completed_core_levels.iter().position(|i| *i == level) != None {
+            return Ok(());
+        }
+        self.completed_core_levels.push(level);
+        let content = match serde_json::to_string(self) {
+            Ok(c) => c,
+            Err(e) => return Err(e.to_string()),
+        };
+        match fs::write(&self.file, content) {
+            Err(e) => return Err(e.to_string()),
+            _ => (),
+        };
+        Ok(())
     }
 }
