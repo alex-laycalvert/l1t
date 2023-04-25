@@ -1,8 +1,8 @@
-name: Releases
+name: Rust Platform Builds
 
 on:
   push:
-    branches: ["main"]
+    branches: ["*"]
 
 jobs:
   build:
