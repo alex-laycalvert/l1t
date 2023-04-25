@@ -13,6 +13,7 @@ readme = "README.md"
 
 [dependencies]
 chrono = "0.4.24"
+clap = { version = "4.2.4", features = ["derive"] }
 crossterm = "0.26.1"
 home = "0.5.4"
 human-sort = "0.2.2"
