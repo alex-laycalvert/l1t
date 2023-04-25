@@ -331,7 +331,7 @@ impl Menu {
                 return Menu::open(MenuType::ScrollableMenu(vec![
                     vec![
                         "l1t".bold().green(),
-                        " - A terminal strategy game about moving".stylize(),
+                        " - A terminal strategy game about shooting".stylize(),
                     ],
                     vec!["      lasers and lighting statues.".stylize()],
                     vec![],
