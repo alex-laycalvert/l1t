@@ -7,11 +7,69 @@ use home::home_dir;
 use l1t::level::*;
 use l1t::menu::*;
 use l1t::userdata::*;
+use std::env::args;
 use std::io::stdout;
 use std::{thread, time};
 
+const SLEEP_TIME: u64 = 500;
+
 fn main() {
-    const SLEEP_TIME: u64 = 500;
+    let mut stdout = stdout();
+    enable_raw_mode().ok();
+    stdout.execute(cursor::Hide).ok();
+    let args: Vec<String> = args().collect();
+    if args.len() > 1 {
+        // File has been provided
+        loop {
+            let mut level = match Level::file(args[1].to_string()) {
+                Ok(l) => l,
+                Err(e) => {
+                    eprintln!("{e}");
+                    return;
+                }
+            };
+            let result = level.play();
+            match result {
+                Ok(result) => {
+                    if result.has_won {
+                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                        Menu::open(MenuType::Message("YAY, You Won!".to_string()));
+                        break;
+                    } else if let Some(r) = result.reason_for_loss {
+                        match r {
+                            LevelLossReason::Zapper => {
+                                thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                Menu::open(MenuType::Message(
+                                    "Uh oh, you lit a zapper!".to_string(),
+                                ));
+                            }
+                            LevelLossReason::Death => {
+                                thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                Menu::open(MenuType::Message(
+                                    "Uh oh, you got shot by a laser beam!".to_string(),
+                                ));
+                            }
+                            LevelLossReason::Quit => break,
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    break;
+                }
+            }
+        }
+        stdout.execute(cursor::Show).ok();
+        disable_raw_mode().ok();
+        stdout.execute(cursor::MoveTo(0, 0)).ok();
+        stdout
+            .execute(Clear(crossterm::terminal::ClearType::All))
+            .ok();
+        return;
+    }
+
     let home = match home_dir() {
         Some(h) => h,
         None => return,
@@ -25,9 +83,6 @@ fn main() {
         }
     };
 
-    let mut stdout = stdout();
-    enable_raw_mode().ok();
-    stdout.execute(cursor::Hide).ok();
     loop {
         let selection = Menu::open(MenuType::MainSelection(
             user_data.completed_core_levels.clone(),

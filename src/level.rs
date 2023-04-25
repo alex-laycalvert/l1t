@@ -305,25 +305,14 @@ IIIIIIIIIIIIIIIIIIIII",
     }
 
     fn play_state(&self) -> PlayState {
+        let mut all_statues_lit = true;
         for i in 0..self.nodes.len() {
             match &self.nodes[i].node_type {
                 NodeType::Statue(s) => {
                     if s.reversed {
-                        if s.lit {
-                            return PlayState {
-                                is_playing: true,
-                                has_won: false,
-                                reason_for_loss: None,
-                            };
-                        }
+                        all_statues_lit = all_statues_lit && !s.lit;
                     } else {
-                        if !s.lit {
-                            return PlayState {
-                                is_playing: true,
-                                has_won: false,
-                                reason_for_loss: None,
-                            };
-                        }
+                        all_statues_lit = all_statues_lit && s.lit;
                     }
                 }
                 NodeType::Zapper(z) => {
@@ -346,6 +335,13 @@ IIIIIIIIIIIIIIIIIIIII",
                 }
                 _ => (),
             }
+        }
+        if !all_statues_lit {
+            return PlayState {
+                is_playing: true,
+                has_won: false,
+                reason_for_loss: None,
+            };
         }
         PlayState {
             is_playing: false,
