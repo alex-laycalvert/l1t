@@ -15,6 +15,7 @@ use std::io::stdout;
 pub enum LevelLossReason {
     Zapper,
     Quit,
+    Death,
 }
 
 #[derive(Debug)]
@@ -307,14 +308,25 @@ IIIIIIIIIIIIIIIIIIIIIIIIIIII",
     }
 
     fn play_state(&self) -> PlayState {
-        let mut all_statues_lit = true;
         for i in 0..self.nodes.len() {
             match &self.nodes[i].node_type {
                 NodeType::Statue(s) => {
                     if s.reversed {
-                        all_statues_lit = all_statues_lit && !s.lit;
+                        if s.lit {
+                            return PlayState {
+                                is_playing: true,
+                                has_won: false,
+                                reason_for_loss: None,
+                            };
+                        }
                     } else {
-                        all_statues_lit = all_statues_lit && s.lit;
+                        if !s.lit {
+                            return PlayState {
+                                is_playing: true,
+                                has_won: false,
+                                reason_for_loss: None,
+                            };
+                        }
                     }
                 }
                 NodeType::Zapper(z) => {
@@ -326,19 +338,21 @@ IIIIIIIIIIIIIIIIIIIIIIIIIIII",
                         };
                     }
                 }
+                NodeType::Player(p) => {
+                    if p.dead {
+                        return PlayState {
+                            is_playing: false,
+                            has_won: false,
+                            reason_for_loss: Some(LevelLossReason::Death),
+                        };
+                    }
+                }
                 _ => (),
             }
         }
-        if all_statues_lit {
-            return PlayState {
-                is_playing: false,
-                has_won: true,
-                reason_for_loss: None,
-            };
-        }
         PlayState {
-            is_playing: true,
-            has_won: false,
+            is_playing: false,
+            has_won: true,
             reason_for_loss: None,
         }
     }
@@ -432,7 +446,7 @@ IIIIIIIIIIIIIIIIIIIIIIIIIIII",
         Level::from_string(content, LevelSource::File(filename.to_string()))
     }
 
-    pub fn url(url: String) -> Result<Level, &'static str> {
+    pub fn url(_url: String) -> Result<Level, &'static str> {
         todo!()
     }
 

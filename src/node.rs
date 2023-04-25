@@ -7,7 +7,9 @@ use crossterm::{
 use std::io::stdout;
 
 #[derive(Debug)]
-pub struct Player;
+pub struct Player {
+    pub dead: bool,
+}
 #[derive(Debug)]
 pub struct Block;
 #[derive(Debug)]
@@ -66,13 +68,26 @@ pub struct Node {
     moveable: bool,
 }
 
+const RED: Color = Color::Rgb { r: 255, g: 0, b: 0 };
+const DIM_RED: Color = Color::Rgb { r: 100, g: 0, b: 0 };
+const YELLOW: Color = Color::Rgb {
+    r: 255,
+    g: 255,
+    b: 0,
+};
+const DIM_YELLOW: Color = Color::Rgb {
+    r: 100,
+    g: 100,
+    b: 0,
+};
+
 impl Node {
     pub fn new(ch: char, row: u16, col: u16) -> Node {
         match ch {
             'X' => Node {
                 row,
                 col,
-                node_type: NodeType::Player(Player),
+                node_type: NodeType::Player(Player { dead: false }),
                 moveable: true,
             },
             'B' => Node {
@@ -273,9 +288,9 @@ impl Node {
     pub fn draw(&self, offset: (u16, u16)) -> crossterm::Result<()> {
         let mut stdout = stdout();
         match &self.node_type {
-            NodeType::Player(_) => execute!(
+            NodeType::Player(p) => execute!(
                 stdout,
-                SetForegroundColor(Color::Green),
+                SetForegroundColor(if p.dead { RED } else { Color::Green }),
                 SetBackgroundColor(Color::Green),
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print("X".bold()),
@@ -342,16 +357,8 @@ impl Node {
             ),
             NodeType::Laser(l) => execute!(
                 stdout,
-                SetForegroundColor(if l.on {
-                    Color::Rgb { r: 255, g: 0, b: 0 }
-                } else {
-                    Color::Rgb { r: 100, g: 0, b: 0 }
-                }),
-                SetBackgroundColor(if l.on {
-                    Color::Rgb { r: 255, g: 0, b: 0 }
-                } else {
-                    Color::Rgb { r: 100, g: 0, b: 0 }
-                }),
+                SetForegroundColor(if l.on { RED } else { DIM_RED }),
+                SetBackgroundColor(if l.on { RED } else { DIM_RED }),
                 MoveTo(self.col + offset.1, self.row + offset.0),
                 Print("L".bold()),
             ),
@@ -360,51 +367,15 @@ impl Node {
                     execute!(
                         stdout,
                         SetForegroundColor(Color::Black),
-                        SetBackgroundColor(if s.lit {
-                            Color::Rgb {
-                                r: 100,
-                                g: 100,
-                                b: 0,
-                            }
-                        } else {
-                            Color::Rgb {
-                                r: 255,
-                                g: 255,
-                                b: 0,
-                            }
-                        }),
+                        SetBackgroundColor(if s.lit { DIM_YELLOW } else { YELLOW }),
                         MoveTo(self.col + offset.1, self.row + offset.0),
                         Print("R".bold()),
                     )
                 } else {
                     execute!(
                         stdout,
-                        SetForegroundColor(if s.lit {
-                            Color::Rgb {
-                                r: 255,
-                                g: 255,
-                                b: 0,
-                            }
-                        } else {
-                            Color::Rgb {
-                                r: 100,
-                                g: 100,
-                                b: 0,
-                            }
-                        }),
-                        SetBackgroundColor(if s.lit {
-                            Color::Rgb {
-                                r: 255,
-                                g: 255,
-                                b: 0,
-                            }
-                        } else {
-                            Color::Rgb {
-                                r: 100,
-                                g: 100,
-                                b: 0,
-                            }
-                        }),
+                        SetForegroundColor(if s.lit { YELLOW } else { DIM_YELLOW }),
+                        SetBackgroundColor(if s.lit { YELLOW } else { DIM_YELLOW }),
                         MoveTo(self.col + offset.1, self.row + offset.0),
                         Print("S".bold()),
                     )
@@ -463,6 +434,7 @@ impl Node {
 
     pub fn is_laser_toggleable(&self) -> bool {
         match &self.node_type {
+            NodeType::Player(_) => true,
             NodeType::Laser(_) => true,
             NodeType::Statue(_) => true,
             NodeType::Zapper(_) => true,
@@ -472,6 +444,7 @@ impl Node {
 
     pub fn turn_on(&mut self) {
         match &mut self.node_type {
+            NodeType::Player(p) => p.dead = true,
             NodeType::Laser(l) => l.on = true,
             NodeType::Statue(s) => s.lit = true,
             NodeType::Zapper(z) => z.lit = true,
@@ -484,6 +457,7 @@ impl Node {
 
     pub fn turn_off(&mut self) {
         match &mut self.node_type {
+            NodeType::Player(p) => p.dead = false,
             NodeType::Laser(l) => l.on = false,
             NodeType::Statue(s) => s.lit = false,
             NodeType::Zapper(z) => z.lit = false,
@@ -496,6 +470,7 @@ impl Node {
 
     pub fn toggle(&mut self) {
         match &mut self.node_type {
+            NodeType::Player(p) => p.dead = !p.dead,
             NodeType::Laser(l) => l.on = !l.on,
             NodeType::Statue(s) => s.lit = !s.lit,
             NodeType::Zapper(z) => z.lit = !z.lit,

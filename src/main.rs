@@ -11,6 +11,7 @@ use std::io::stdout;
 use std::{thread, time};
 
 fn main() {
+    const SLEEP_TIME: u64 = 500;
     let home = match home_dir() {
         Some(h) => h,
         None => return,
@@ -53,7 +54,7 @@ fn main() {
                     match result {
                         Ok(result) => {
                             if result.has_won {
-                                thread::sleep(time::Duration::from_millis(300));
+                                thread::sleep(time::Duration::from_millis(SLEEP_TIME));
                                 Menu::open(MenuType::Message("YAY, You Won!".to_string()));
                                 current_level += 1;
                                 match user_data.complete_core(current_level as usize) {
@@ -66,9 +67,15 @@ fn main() {
                             } else if let Some(r) = result.reason_for_loss {
                                 match r {
                                     LevelLossReason::Zapper => {
-                                        thread::sleep(time::Duration::from_millis(250));
+                                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
                                         Menu::open(MenuType::Message(
                                             "Uh oh, you lit a zapper!".to_string(),
+                                        ));
+                                    }
+                                    LevelLossReason::Death => {
+                                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                        Menu::open(MenuType::Message(
+                                            "Uh oh, you got shot by a laser beam!".to_string(),
                                         ));
                                     }
                                     LevelLossReason::Quit => break,
