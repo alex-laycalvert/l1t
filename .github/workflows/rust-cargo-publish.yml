@@ -1,3 +1,5 @@
+name: "Publish to Cargo"
+
 on:
   release:
     types: [published]
