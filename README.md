@@ -1,152 +1,83 @@
 # l1t
 
+A terminal strategy game about shooting lasers and lighting statues.
+
 ![l1t-logo](https://user-images.githubusercontent.com/45835678/194675329-027fd0d9-e1ee-4149-980b-e2fc7099206e.png)
 
-A terminal game where you position mirrors in a grid to light
-up statues. Light up all the statues in a grid to complete
-the level.
+In l1t, your goal is to use the available lasers to light up all of the
+statues in the level.
 
-## Progress
+## CONTROLS
 
-**_NOTE_**: This project is still in development.
+-   **W** - Move Up
+-   **S**: Move Down
+-   **A**: Move Left
+-   **D**: Move Right
+-   **Space**: Toggle surrounding blocks (if able)
+-   **Shift-H**: Show this help menu
+-   **Q**: Quit
 
-Number of Levels: `3`
+Arrow keys can also be used to move around the level
 
-## Installation and Running
+## PLAYER
 
-**_NOTE_**: Right now, this program will run best on the `kitty` terminal,
-I am working on figuring out the color situations on other
-terminals.
+Hey, that's you!
 
-Follow the steps below to install `l1t` for your OS:
+## LASERS
 
-<details>
-<summary>
-<h3>Linux</h3>
-</summary>
+Lasers shoot laser beams in their set direction (UP, DOWN, LEFT, RIGHT).
+Laser beams are the key to winning the game and can affect various blocks.
 
--   Clone this repository
+Lasers cannot change directions but they can be toggled on and off.
 
-```bash
-git clone https://github.com/alex-laycalvert/l1t
-cd ./l1t
-```
+If a laser is hit by a laser beam, it will turn off and must be toggled on
+by the player.
 
--   Build the project:
+## STATUES
 
-```bash
-make
-```
+All statues in a level must be lit up by a laser beam to win the level.
 
--   Run the game:
+Statues can not be moved or manually toggled.
 
-```bash
-./build/l1t
-```
+## REVERSE STATUES
 
--   For development (optional):
+Same as statues except they must NOT be lit up to win the level.
 
-```bash
-make dev
-./build/l1t.dev
-```
+## MIRRORS
 
-</details>
-<details>
-<summary>
-<h3>macOS</h3>
-</summary>
+Mirrors reflect laser beams in different directions.
 
-For macOS users, you will need to make sure that the proper
-`ncurses` library is installed on your machine. You can install
-[Homebrew](https://brew.sh/) by following the steps on their
-website then run `brew install ncurses`.
+<span style="background-color: red; color: red">L</div> |
 
--   Clone this repository
+L----\ <--/
+|
+V
 
-```bash
-git clone https://github.com/alex-laycalvert/l1t
-cd ./l1t
-```
+Mirrors cannot be moved but their direction can be toggled by the player.
 
--   Build the project:
+## MOVEABLE MIRRORS
 
-```bash
-make
-```
+Moveable Mirrors are the same as mirrors except they CAN be moved.
 
--   Run the game:
+## ZAPPERS
 
-```bash
-./build/l1t
-```
+If any Zappers are lit by a laser beam, you will lose the level.
 
--   For development (optional):
+## OTHER BLOCKS
 
-```bash
-make dev
-./build/l1t.dev
-```
+-   I Walls - Cannot be moved by player, will block
+    laser beams.  
 
-</details>
+-   B Blocks - Can be moved around and will block  
+     laser beams.  
 
-## Gameplay
+-   T Toggle Blocks - Cannot be moved. Switches and
+    buttons can toggle these on  
+     and off.  
 
-You can exit the game by pressing `q`.
+-   s Switches - When toggled, will turn toggle  
+     blocks on/off.  
 
-**_WORK IN PROGRESS_**
-
-The goal of every level in `l1t` is to turn all
-of the statues on using the available laser beams.
-
-### The Player
-
-You can use the normal Vim keybindings to move around:
-
--   `h`: LEFT
--   `j`: DOWN
--   `k`: UP
--   `l`: RIGHT
-
-You can also press `space` to interact with surrounding
-items.
-
-### Lasers
-
-Lasers are the red blocks with red laser beams shooting out
-of them and can be reflected off of mirrors.
-
-Shooting a laser beam into a laser will turn that laser off
-and it cannot be turned back on. Off lasers appear as a
-dimmed red.
-
-### Statues
-
-Statues are the dimmed yellow blocks when off and turn a bright
-yellow when turned on by a laser beam. Turn on all lasers in a
-level to win.
-
-### Mirrors
-
-Mirrors are the `/` and `\` characters that reflect laser beams.
-Mirrors can have their direction toggled but cannot be moved.
-
-### Zappers
-
-Beware! Zappers are the `Z` characters that **cannot be hit by lasers**.
-If a laser hits a zapper, it is game over!
-
-### Other Items
-
-Some items on the grid can be moved around:
-
--   `BLOCKS`: Blocks are the black boxes on the grid and can
-    be used to block a laser beam.
-
-## Configuration
-
-See the options for configurations [here](docs/CONFIGURATION.md).
-
-## Contributing
-
-See the guidelines for contributing [here](docs/CONTRIBUTING.md).
+-   b Buttons - When pressed, will turn toggle  
+     blocks on/off. Player must be  
+     next to button to press.
