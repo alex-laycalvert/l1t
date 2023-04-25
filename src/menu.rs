@@ -35,18 +35,29 @@ pub enum MenuType {
     YesNoSelection(String),
 
     /// Same as `Message` but displays the entire help menu for
-    /// the application.
+    /// the application in a `ScrollableMenu`.
     HelpMenu,
 
     /// Same as `Message` but displays more content and can be scrolled in.
+    /// The `Vec<Vec<StyledContent<&'static str>>>` represents the list
+    /// of `crossterm` styled lines where each inner `Vec` represents
+    /// the list of chunks to print.
     ScrollableMenu(Vec<Vec<StyledContent<&'static str>>>),
 
-    /// Prints out the `Main Menu` of the application with the logo
-    /// and selections for `Play`, `Help`, and `Quit`.
-    /// The `Help` option will open up the `HelpMenu` and not return as selection.
+    /// Draws the `Main Menu` of the application with the logo
+    /// and selections for `Play`, `Help`, and `Quit`. Must
+    /// provide a `Vec<usize>` representing the core levels the
+    /// player has completed.
+    ///
+    /// Selecting `Play` will open the `CoreLevelSelection` and
+    /// will return a `Selection::Play(l)` where `l` is the selected
+    /// level.
     MainSelection(Vec<usize>),
 
-    ///
+    /// Draws the `Core Level` selection menu for the player
+    /// to choose one of the built-in levels. Must be provided
+    /// a `Vec<usize>` representing the core levels the player
+    /// has completed.
     CoreLevelSelection(Vec<usize>),
 }
 
@@ -362,7 +373,11 @@ impl Menu {
                     ],
                     vec![],
                     vec!["Lasers shoot laser beams in their set direction".stylize()],
-                    vec!["(".stylize(), "UP, DOWN, LEFT, RIGHT".bold(), "). Laser beams are the key".stylize()],
+                    vec![
+                        "(".stylize(),
+                        "UP, DOWN, LEFT, RIGHT".bold(),
+                        "). Laser beams are the key".stylize(),
+                    ],
                     vec!["to winning the game and can affect various ".stylize()],
                     vec!["blocks.".stylize()],
                     vec![],
@@ -386,7 +401,11 @@ impl Menu {
                     ],
                     vec![],
                     vec!["All statues in a level must be lit up by a ".stylize()],
-                    vec!["laser beam to ".stylize(), "win".with(YELLOW).bold(), " the level.".stylize()],
+                    vec![
+                        "laser beam to ".stylize(),
+                        "win".with(YELLOW).bold(),
+                        " the level.".stylize(),
+                    ],
                     vec![],
                     vec!["Statues can not be moved or manually toggled.".stylize()],
                     vec![],
@@ -401,7 +420,11 @@ impl Menu {
                         "NOT".bold().italic(),
                         " be lit up ".stylize(),
                     ],
-                    vec!["to ".stylize(), "win".with(YELLOW).bold(), " the level.".stylize()],
+                    vec![
+                        "to ".stylize(),
+                        "win".with(YELLOW).bold(),
+                        " the level.".stylize(),
+                    ],
                     vec![],
                     vec!["/ ".bold(), "MIRRORS".bold().underlined()],
                     vec![],
@@ -430,7 +453,11 @@ impl Menu {
                     ],
                     vec![],
                     vec!["Moveable Mirrors are the same as mirrors except ".stylize()],
-                    vec!["they ".stylize(), "CAN ".bold().italic(), "be moved.".stylize()],
+                    vec![
+                        "they ".stylize(),
+                        "CAN ".bold().italic(),
+                        "be moved.".stylize(),
+                    ],
                     vec![],
                     vec![
                         "Z".bold().yellow().on_black(),
@@ -439,7 +466,11 @@ impl Menu {
                     ],
                     vec![],
                     vec!["If any Zappers are lit by a laser beam, you".stylize()],
-                    vec!["will immediately ".stylize(), "lose".with(RED).bold(), " the level.".stylize()],
+                    vec![
+                        "will immediately ".stylize(),
+                        "lose".with(RED).bold(),
+                        " the level.".stylize(),
+                    ],
                     vec![],
                     vec![
                         "I".bold().white().on_white(),
