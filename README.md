@@ -30,8 +30,9 @@ Laser beams are the key to winning the game and can affect various blocks.
 
 Lasers cannot change directions but they can be toggled on and off.
 
-If a laser is hit by a laser beam, it will turn off and must be toggled on
-by the player.
+If a laser beam hits you, you will die and have to restart the level.
+
+If a laser is hit by a laser beam, it will turn off and must be toggled on by the player.
 
 ## STATUES
 
