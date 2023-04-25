@@ -1,8 +1,6 @@
 name: Rust Build Tests
 
-on:
-  push:
-    branches: ["*"]
+on: ['push']
 
 env:
   CARGO_TERM_COLOR: always
