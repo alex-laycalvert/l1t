@@ -41,23 +41,17 @@ Statues can not be moved or manually toggled.
 
 ## REVERSE STATUES
 
-Same as statues except they must NOT be lit up to win the level.
+Same as statues except they must **NOT** be lit up to win the level.
 
 ## MIRRORS
 
 Mirrors reflect laser beams in different directions.
 
-<span style="background-color: red; color: red">L</div> |
-
-L----\ <--/
-|
-V
-
 Mirrors cannot be moved but their direction can be toggled by the player.
 
 ## MOVEABLE MIRRORS
 
-Moveable Mirrors are the same as mirrors except they CAN be moved.
+Moveable Mirrors are the same as mirrors except they **CAN** be moved.
 
 ## ZAPPERS
 
@@ -65,19 +59,14 @@ If any Zappers are lit by a laser beam, you will lose the level.
 
 ## OTHER BLOCKS
 
--   I Walls - Cannot be moved by player, will block
-    laser beams.  
+-   **Walls**: Cannot be moved by player, will block laser beams.
 
--   B Blocks - Can be moved around and will block  
-     laser beams.  
+-   **Blocks**: Can be moved around and will block laser beams.
 
--   T Toggle Blocks - Cannot be moved. Switches and
-    buttons can toggle these on  
-     and off.  
+-   **Toggle Blocks**: Cannot be moved. Switches and buttons can toggle these
+    on and off.
 
--   s Switches - When toggled, will turn toggle  
-     blocks on/off.  
+-   **Switches**: When toggled, will turn toggle blocks on/off.
 
--   b Buttons - When pressed, will turn toggle  
-     blocks on/off. Player must be  
-     next to button to press.
+-   **Buttons**: When pressed, will turn toggle blocks on/off. Player must be
+    next to button to press.
