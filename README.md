@@ -4,7 +4,7 @@ A terminal strategy game about shooting lasers and lighting statues. Built in Ru
 
 ![l1t-logo](https://user-images.githubusercontent.com/45835678/194675329-027fd0d9-e1ee-4149-980b-e2fc7099206e.png)
 
-In l1t, your goal is to use the available lasers to light up all of the
+In `l1t`, your goal is to use the available lasers to light up all of the
 statues in the level.
 
 ## Installation
