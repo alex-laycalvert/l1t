@@ -16,7 +16,7 @@ fn main() {
         None => return,
     };
     let home = home.to_str().unwrap_or("");
-    let user_data = match UserData::read(home.to_string()) {
+    let _user_data = match UserData::read(home.to_string()) {
         Ok(d) => d,
         Err(e) => {
             eprintln!("{e}");
@@ -39,13 +39,10 @@ fn main() {
         Selection::Play => {
             let mut current_level = 1;
             loop {
-                let filename = String::from(match current_level {
-                    1 => "levels/1.l1t",
-                    2 => "levels/2.l1t",
-                    3 => "levels/3.l1t",
-                    4 => "levels/4.l1t",
-                    _ => "levels/0.l1t",
-                });
+                if current_level > levels.len() {
+                    current_level = 0
+                }
+                let filename = String::from(&levels[current_level].file);
                 let mut level = match Level::new(filename) {
                     Ok(l) => l,
                     Err(e) => {

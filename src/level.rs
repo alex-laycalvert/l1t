@@ -26,6 +26,7 @@ pub struct Level {
 
 #[derive(Debug)]
 pub struct LevelInfo {
+    pub file: String,
     pub name: String,
     pub author: String,
     pub description: String,
@@ -301,6 +302,7 @@ impl Level {
             };
             let lines: Vec<&str> = content.split('\n').collect();
             levels.push(LevelInfo {
+                file: f.to_string(),
                 name: lines[0].to_string(),
                 author: lines[1].to_string(),
                 description: lines[2].to_string(),
@@ -310,7 +312,7 @@ impl Level {
     }
 
     pub fn new(filename: String) -> Result<Level, &'static str> {
-        let file_content = fs::read_to_string(filename).unwrap_or("".to_string());
+        let file_content = fs::read_to_string(&filename).unwrap_or("".to_string());
         if file_content.trim().len() == 0 {
             return Err("Empty level file.");
         }
@@ -348,6 +350,7 @@ impl Level {
         }
         Ok(Level {
             info: LevelInfo {
+                file: filename.to_string(),
                 name,
                 author,
                 description,

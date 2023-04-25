@@ -11,13 +11,14 @@ use crossterm::{
 };
 use std::io::stdout;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Selection {
     Play,
     Help,
     Quit,
     Yes,
     No,
+    Item(String),
 }
 
 pub enum MenuType {
@@ -217,7 +218,7 @@ impl Menu {
                         _ => (),
                     }
                 }
-                return Some(options[current_selection]);
+                return Some(options[current_selection].clone());
             }
             MenuType::Message(message) => {
                 let row_padding = 1;
@@ -533,7 +534,7 @@ impl Menu {
                     }
                 }
             }
-            MenuType::CoreLevelSelection(levels) => {}
+            MenuType::CoreLevelSelection(_levels) => {}
             _ => (),
         }
         None
