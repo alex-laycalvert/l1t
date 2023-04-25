@@ -65,6 +65,9 @@ The `l1t` executable will then be available under `target/release/l1t`
 
 ## Gameplay
 
+The following guide is also built in to `l1t` and can be accessed by selecting
+`HELP` from the main menu or pressing `Shift-H` at anytime while playing a level.
+
 ### CONTROLS
 
 -   **W** - Move Up
