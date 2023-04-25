@@ -61,54 +61,51 @@ impl Level {
         "Level 1
 alex-laycalvert
 The First Level
-IIIIIIIIIIIIIIIIIIIIIIIIIII
-I                         I
-I \\                    \\  I
-I                         I
-I                   \\  /  I
-I                         I
-I 1         X          S  I
-I                         I
-I                   \\  \\  I
-IIIIIIIIIIIIIIIIIIIIIIIIIII",
+IIIIIIIIIIIIIIIII
+I               I
+I\\           /  I
+I               I
+I1     X     S  I
+I               I
+IIIIIIIIIIIIIIIII",
         "Level 2
 alex-laycalvert
 Reverse Statues
-IIIIIIIIIIIIIIIIIIIIIIII
-I                      I
-I                 R    I
-I                      I
-I           X          I
-I                      I
-I   4             /    I
-I   S             \\    I
-IIIIIIIIIIIIIIIIIIIIIIII",
+IIIIIIIIIIIIIIIII
+I               I
+I           R   I
+I               I
+I     X         I
+I               I
+I4          /   I
+IS          \\   I
+IIIIIIIIIIIIIIIII",
         "Level 3
 alex-laycalvert
 Using Your Surroundings
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-I                                 I
-I                R                I
-I                                 I
-I                                 I
-I     4          /   B    X       I
-I                                 I
-I                                 I
-I                R                I
-I                                 I
-IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+IIIIIIIIIIIIIIIIIII
+III               I
+III  R            I
+III               I
+III               I
+I4   /   B    X   I
+III               I
+III               I
+III  R            I
+III               I
+IIIIIIIIIIIIIIIIIII",
         "Level 4
 alex-laycalvert
 What's That Special Block Over There?
-IIIIIIIIIIIIIIIIIIIIIIIIIIII
-I                     Z  \\ I
-I                          I
-I                          I
-I    X    4           \\    I
-I                          I
-I                          I
-I         S           \\  \\ I
-IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+IIIIIIIIIIIIIIIIIIIII
+I              Z  \\ I
+I                   I
+I                   I
+I    X    4    \\    I
+I                   I
+I                   I
+I         S    \\  \\ I
+IIIIIIIIIIIIIIIIIIIII",
     ];
 
     fn draw_walls(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
