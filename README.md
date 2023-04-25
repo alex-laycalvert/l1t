@@ -1,6 +1,6 @@
 # l1t
 
-A terminal strategy game about shooting lasers and lighting statues.
+A terminal strategy game about shooting lasers and lighting statues. Built in Rust.
 
 ![l1t-logo](https://user-images.githubusercontent.com/45835678/194675329-027fd0d9-e1ee-4149-980b-e2fc7099206e.png)
 
