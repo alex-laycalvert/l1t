@@ -1,3 +1,4 @@
+use crate::level::LevelInfo;
 use crossterm::{
     cursor::MoveTo,
     event::{read, Event, KeyCode},
@@ -43,6 +44,8 @@ pub enum MenuType {
     /// and selections for `Play`, `Help`, and `Quit`.
     /// The `Help` option will open up the `HelpMenu` and not return as selection.
     MainSelection,
+
+    CoreLevelSelection(Vec<LevelInfo>),
 }
 
 const RED: Color = Color::Rgb { r: 255, g: 0, b: 0 };
@@ -530,6 +533,7 @@ impl Menu {
                     }
                 }
             }
+            MenuType::CoreLevelSelection(levels) => {}
             _ => (),
         }
         None

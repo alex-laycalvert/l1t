@@ -7,6 +7,7 @@ use crossterm::{
     terminal::{size, Clear, ClearType},
     ExecutableCommand,
 };
+use human_sort::sort;
 use std::fs;
 use std::io::stdout;
 
@@ -16,13 +17,18 @@ pub enum LevelLossReason {
 }
 
 pub struct Level {
-    pub name: String,
-    pub author: String,
-    pub description: String,
+    pub info: LevelInfo,
     pub nodes: Vec<Node>,
     pub rows: u16,
     pub cols: u16,
     pub player_index: Option<usize>,
+}
+
+#[derive(Debug)]
+pub struct LevelInfo {
+    pub name: String,
+    pub author: String,
+    pub description: String,
 }
 
 pub struct LevelResult {
@@ -270,6 +276,39 @@ impl Level {
         }
     }
 
+    pub fn available_levels(level_dir: String) -> Result<Vec<LevelInfo>, String> {
+        let files = match fs::read_dir(level_dir) {
+            Ok(f) => f,
+            Err(e) => return Err(e.to_string()),
+        };
+        let mut filenames = Vec::<String>::new();
+        for f in files {
+            let f = match f {
+                Ok(f) => f,
+                Err(e) => return Err(e.to_string()),
+            };
+            let path = f.path();
+            let s = path.to_string_lossy();
+            filenames.push(s.to_string());
+        }
+        let mut filenames: Vec<&str> = filenames.iter().map(|s| &**s).collect();
+        sort(&mut filenames);
+        let mut levels = Vec::<LevelInfo>::new();
+        for f in filenames {
+            let content = match fs::read_to_string(f) {
+                Ok(c) => c,
+                Err(e) => return Err(e.to_string()),
+            };
+            let lines: Vec<&str> = content.split('\n').collect();
+            levels.push(LevelInfo {
+                name: lines[0].to_string(),
+                author: lines[1].to_string(),
+                description: lines[2].to_string(),
+            });
+        }
+        Ok(levels)
+    }
+
     pub fn new(filename: String) -> Result<Level, &'static str> {
         let file_content = fs::read_to_string(filename).unwrap_or("".to_string());
         if file_content.trim().len() == 0 {
@@ -308,9 +347,11 @@ impl Level {
             }
         }
         Ok(Level {
-            name,
-            author,
-            description,
+            info: LevelInfo {
+                name,
+                author,
+                description,
+            },
             nodes,
             rows: rows - 3,
             cols,

@@ -3,12 +3,34 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, Clear},
     ExecutableCommand,
 };
+use home::home_dir;
 use l1t::level::*;
 use l1t::menu::*;
+use l1t::userdata::*;
 use std::io::stdout;
 use std::{thread, time};
 
 fn main() {
+    let home = match home_dir() {
+        Some(h) => h,
+        None => return,
+    };
+    let home = home.to_str().unwrap_or("");
+    let user_data = match UserData::read(home.to_string()) {
+        Ok(d) => d,
+        Err(e) => {
+            eprintln!("{e}");
+            return;
+        }
+    };
+    let levels = match Level::available_levels("levels".to_string()) {
+        Ok(l) => l,
+        Err(e) => {
+            eprintln!("{e}");
+            return;
+        }
+    };
+
     let mut stdout = stdout();
     enable_raw_mode().ok();
     stdout.execute(cursor::Hide).ok();
