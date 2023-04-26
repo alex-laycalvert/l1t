@@ -27,8 +27,12 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let repo = Repository::from_url("http://localhost:8000/l1t".to_string()).await?;
-    return Ok(());
+    let repo = Repository::new(
+        "My Repo".to_string(),
+        "http://localhost:8000/l1t".to_string(),
+    )
+    .await
+    .ok();
 
     let args = Args::parse();
     let mut stdout = stdout();
@@ -103,11 +107,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let selection = Menu::open(MenuType::MainSelection(
             user_data.completed_core_levels.clone(),
         ))
-        .unwrap_or(Selection::Play(1));
+        .unwrap_or(Selection::Play(LevelSource::Core(0)));
         match selection {
-            Selection::Play(level) => {
-                let mut current_level = level;
-                loop {
+            Selection::Play(level_source) => match level_source {
+                LevelSource::Core(level) => {
+                    let mut current_level = level;
                     if current_level >= Level::NUM_CORE_LEVELS {
                         Menu::open(MenuType::Message(
                             "You've completed all core levels, thanks for playing!".to_string(),
@@ -160,7 +164,55 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         }
                     }
                 }
-            }
+                LevelSource::File(file) => {}
+                LevelSource::Url(url) => {
+                    let mut level = match Level::url(url) {
+                        Ok(l) => l,
+                        Err(e) => {
+                            eprintln!("{e}");
+                            return Ok(());
+                        }
+                    };
+                    let result = level.play();
+                    match result {
+                        Ok(result) => {
+                            if result.has_won {
+                                thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                Menu::open(MenuType::Message("YAY, You Won!".to_string()));
+                                match user_data.complete_repo_level(current_level as usize) {
+                                    Err(e) => {
+                                        eprintln!("{e}");
+                                    }
+                                    _ => (),
+                                };
+                                break;
+                            } else if let Some(r) = result.reason_for_loss {
+                                match r {
+                                    LevelLossReason::Zapper => {
+                                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                        Menu::open(MenuType::Message(
+                                            "Uh oh, you lit a zapper!".to_string(),
+                                        ));
+                                    }
+                                    LevelLossReason::Death => {
+                                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                        Menu::open(MenuType::Message(
+                                            "Uh oh, you got shot by a laser beam!".to_string(),
+                                        ));
+                                    }
+                                    LevelLossReason::Quit => break,
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                            break;
+                        }
+                    }
+                }
+            },
             Selection::Help => {
                 Menu::open(MenuType::HelpMenu);
             }

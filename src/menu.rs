@@ -1,4 +1,4 @@
-use crate::level::Level;
+use crate::level::{Level, LevelSource};
 use crossterm::{
     cursor::MoveTo,
     event::{read, Event, KeyCode},
@@ -13,7 +13,8 @@ use std::io::stdout;
 
 #[derive(Clone)]
 pub enum Selection {
-    Play(usize),
+    Play(LevelSource),
+    OnlineLevels,
     Help,
     Quit,
     Yes,
@@ -104,8 +105,12 @@ impl Menu {
     pub fn open(menu_type: MenuType) -> Option<Selection> {
         match menu_type {
             MenuType::MainSelection(completed_levels) => {
-                let options: Vec<Selection> =
-                    vec![Selection::Play(0), Selection::Help, Selection::Quit];
+                let options: [Selection; 4] = [
+                    Selection::Play(LevelSource::Core(0)),
+                    Selection::OnlineLevels,
+                    Selection::Help,
+                    Selection::Quit,
+                ];
                 let row_padding = 2;
                 let col_padding = 3;
                 let mut current_selection = 0;
@@ -179,6 +184,7 @@ impl Menu {
                     for i in 0..options.len() {
                         let option = match options[i] {
                             Selection::Play(_) => "P L A Y",
+                            Selection::OnlineLevels => "O N L I N E",
                             Selection::Help => "H E L P",
                             Selection::Quit => "Q U I T",
                             _ => "",
@@ -212,7 +218,7 @@ impl Menu {
                                     if let Some(Selection::Item(i)) = Menu::open(
                                         MenuType::CoreLevelSelection(completed_levels.clone()),
                                     ) {
-                                        return Some(Selection::Play(i));
+                                        return Some(Selection::Play(LevelSource::Core(i)));
                                     }
                                 }
                                 _ => break,

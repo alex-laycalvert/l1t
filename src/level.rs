@@ -18,7 +18,7 @@ pub enum LevelLossReason {
     Death,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum LevelSource {
     File(String),
     Url(String),
@@ -384,24 +384,20 @@ IIIIIIIIIIIIIIIIIIIII",
         Ok(levels)
     }
 
-    fn from_string(content: String, source: LevelSource) -> Result<Level, &'static str> {
-        let lines: Vec<&str> = content.trim().split('\n').collect();
-        let rows = lines.len() as u16;
-        if rows < 6 {
+    fn parse_level(content: &[&str], info: LevelInfo) -> Result<Level, &'static str> {
+        let rows = content.len() as u16;
+        if rows < 3 {
             return Err("Level file must include a line for the `name`, `author`, `description`, and lines representing the level grid.");
         }
-        let cols = lines[4].len() as u16;
+        let cols = content[0].len() as u16;
         if cols < 3 {
             return Err("Level grid must be made up of at least one grid space and an even wall of `I` characters representing the walls.");
         }
-        let name: String = lines[0].to_string();
-        let author: String = lines[1].to_string();
-        let description: String = lines[2].to_string();
         let mut nodes: Vec<Node> = vec![];
         let mut player_index: Option<usize> = None;
-        for r in 3..rows {
-            for (c, ch) in lines[r as usize].chars().enumerate() {
-                if r == 3 || r == rows - 1 || c == 0 || c == cols as usize - 1 {
+        for r in 0..rows {
+            for (c, ch) in content[r as usize].chars().enumerate() {
+                if r == 0 || r == rows - 1 || c == 0 || c == cols as usize - 1 {
                     if ch != 'I' {
                         return Err("Level grid must be made up of at least one grid space and an even wall of `I` characters representing the walls.");
                     }
@@ -410,7 +406,7 @@ IIIIIIIIIIIIIIIIIIIII",
                 if ch == ' ' {
                     continue;
                 }
-                let node = Node::new(ch, r - 3, c as u16);
+                let node = Node::new(ch, r, c as u16);
                 if matches!(node.node_type, NodeType::Player(_)) {
                     player_index = Some(nodes.len());
                 }
@@ -418,25 +414,27 @@ IIIIIIIIIIIIIIIIIIIII",
             }
         }
         Ok(Level {
-            info: LevelInfo {
-                source,
-                name,
-                author,
-                description,
-            },
+            info,
             nodes,
-            rows: rows - 3,
+            rows,
             cols,
             player_index,
         })
     }
 
     pub fn file(filename: String) -> Result<Level, &'static str> {
-        let content = fs::read_to_string(&filename).unwrap_or("".to_string());
-        if content.trim().len() == 0 {
+        let content: String = fs::read_to_string(&filename).unwrap_or("".to_string());
+        let content: Vec<&str> = content.trim().split('\n').collect();
+        if content.len() < 3 {
             return Err("Empty level file.");
         }
-        Level::from_string(content, LevelSource::File(filename.to_string()))
+        let info = LevelInfo {
+            source: LevelSource::File(filename),
+            name: content[0].to_string(),
+            author: content[1].to_string(),
+            description: content[2].to_string(),
+        };
+        Level::parse_level(&content, info)
     }
 
     pub fn url(_url: String) -> Result<Level, &'static str> {
@@ -445,7 +443,17 @@ IIIIIIIIIIIIIIIIIIIII",
 
     pub fn core(level: usize) -> Result<Level, &'static str> {
         let content = Level::CORE_LEVELS[level];
-        Level::from_string(content.to_string(), LevelSource::Core(level))
+        let content: Vec<&str> = content.trim().split('\n').collect();
+        if content.len() < 3 {
+            return Err("Empty level file.");
+        }
+        let info = LevelInfo {
+            source: LevelSource::Core(level),
+            name: content[0].to_string(),
+            author: content[1].to_string(),
+            description: content[2].to_string(),
+        };
+        Level::parse_level(&content, info)
     }
 
     pub fn play(&mut self) -> Result<LevelResult, &str> {
