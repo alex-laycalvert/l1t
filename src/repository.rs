@@ -1,5 +1,5 @@
 use crate::level::{LevelInfo, LevelSource};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 #[derive(Debug)]
@@ -23,8 +23,16 @@ pub struct RepositoryResponse {
 }
 
 impl Repository {
-    pub async fn new(name: String, url: String) -> Result<Repository, Box<dyn Error>> {
-        let response = reqwest::get(&url).await?.text().await?;
+    pub fn new(name: String, url: String) -> Repository {
+        Repository {
+            name,
+            url,
+            levels: vec![],
+        }
+    }
+
+    pub async fn download_listing(&mut self) -> Result<(), Box<dyn Error>> {
+        let response = reqwest::get(&self.url).await?.text().await?;
         let response: RepositoryResponse = match serde_json::from_str(&response) {
             Ok(d) => d,
             Err(e) => {
@@ -32,17 +40,16 @@ impl Repository {
                 RepositoryResponse { levels: vec![] }
             }
         };
-        let levels = response
+        self.levels = response
             .levels
             .iter()
             .map(|i| LevelInfo {
-                source: LevelSource::Url(url.to_string() + "/" + &i.source),
+                source: LevelSource::Url(self.url.to_string() + "/" + &i.source),
                 name: i.name.to_string(),
                 author: i.author.to_string(),
                 description: i.description.to_string(),
             })
             .collect();
-
-        Ok(Repository { url, name, levels })
+        Ok(())
     }
 }
