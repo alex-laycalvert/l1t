@@ -9,8 +9,6 @@ homepage = "https://github.com/alex-laycalvert/l1t"
 repository = "https://github.com/alex-laycalvert/l1t"
 readme = "README.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 chrono = "0.4.24"
 clap = { version = "4.2.4", features = ["derive"] }
