@@ -475,7 +475,7 @@ IIIIIIIIIIIIIIIIIIIII",
                     if let Some(s) = Menu::open(MenuType::YesNoSelection(
                         "Are you sure you want to quit?".to_string(),
                     )) {
-                        if matches!(Selection::Yes, s) {
+                        if let Selection::Yes = s {
                             return Ok(LevelResult {
                                 has_won: false,
                                 reason_for_loss: Some(LevelLossReason::Quit),

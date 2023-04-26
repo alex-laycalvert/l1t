@@ -7,7 +7,7 @@ use crossterm::{
 use home::home_dir;
 use l1t::level::*;
 use l1t::menu::*;
-use l1t::repository::*;
+//use l1t::repository::*;
 use l1t::userdata::*;
 use std::{error::Error, io::stdout, thread, time};
 
@@ -41,12 +41,12 @@ fn exit(error: Option<&str>) -> Result<(), Box<dyn Error>> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let repo = Repository::new(
-        "My Repo".to_string(),
-        "http://localhost:8000/l1t".to_string(),
-    )
-    .await
-    .ok();
+    //let repo = Repository::new(
+    //    "My Repo".to_string(),
+    //    "http://localhost:8000/l1t".to_string(),
+    //)
+    //.await
+    //.ok();
 
     let args = Args::parse();
     let mut stdout = stdout();

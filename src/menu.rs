@@ -107,9 +107,9 @@ impl Menu {
     pub fn open(menu_type: MenuType) -> Option<Selection> {
         match menu_type {
             MenuType::MainSelection(completed_levels) => {
-                let options: [Selection; 4] = [
+                let options: [Selection; 3] = [
                     Selection::Play(LevelSource::Core(0)),
-                    Selection::OnlineLevels,
+                    //Selection::OnlineLevels,
                     Selection::Help,
                     Selection::Quit,
                 ];
@@ -186,7 +186,7 @@ impl Menu {
                     for i in 0..options.len() {
                         let option = match options[i] {
                             Selection::Play(_) => "P L A Y",
-                            Selection::OnlineLevels => "O N L I N E",
+                            //Selection::OnlineLevels => "O N L I N E",
                             Selection::Help => "H E L P",
                             Selection::Quit => "Q U I T",
                             _ => "",
