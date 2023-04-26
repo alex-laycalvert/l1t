@@ -1,7 +1,7 @@
 use clap::Parser;
 use crossterm::{
-    cursor,
-    terminal::{disable_raw_mode, enable_raw_mode, Clear},
+    cursor, execute,
+    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
     ExecutableCommand,
 };
 use home::home_dir;
@@ -25,6 +25,20 @@ struct Args {
     //repo_url: Option<String>,
 }
 
+fn exit(error: Option<&str>) -> Result<(), Box<dyn Error>> {
+    disable_raw_mode()?;
+    execute!(
+        stdout(),
+        cursor::Show,
+        cursor::MoveTo(0, 0),
+        Clear(ClearType::All)
+    )?;
+    if let Some(e) = error {
+        eprintln!("Error: {e}");
+    }
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let repo = Repository::new(
@@ -43,10 +57,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         loop {
             let mut level = match Level::file(filename.to_string()) {
                 Ok(l) => l,
-                Err(e) => {
-                    eprintln!("{e}");
-                    return Ok(());
-                }
+                Err(e) => return exit(Some(e)),
             };
             let result = level.play();
             match result {
@@ -75,32 +86,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         break;
                     }
                 }
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    break;
-                }
+                Err(e) => return exit(Some(e)),
             }
         }
-        stdout.execute(cursor::Show).ok();
-        disable_raw_mode().ok();
-        stdout.execute(cursor::MoveTo(0, 0)).ok();
-        stdout
-            .execute(Clear(crossterm::terminal::ClearType::All))
-            .ok();
-        return Ok(());
+        return exit(None);
     }
 
     let home = match home_dir() {
         Some(h) => h,
-        None => return Ok(()),
+        None => return exit(Some("failed to find user's home directory")),
     };
     let home = home.to_str().unwrap_or("");
     let mut user_data = match UserData::read(home.to_string()) {
         Ok(d) => d,
-        Err(e) => {
-            eprintln!("{e}");
-            return Ok(());
-        }
+        Err(e) => return exit(Some(&e)),
     };
 
     loop {
@@ -112,66 +111,57 @@ async fn main() -> Result<(), Box<dyn Error>> {
             Selection::Play(level_source) => match level_source {
                 LevelSource::Core(level) => {
                     let mut current_level = level;
-                    if current_level >= Level::NUM_CORE_LEVELS {
-                        Menu::open(MenuType::Message(
-                            "You've completed all core levels, thanks for playing!".to_string(),
-                        ));
-                        break;
-                    }
-                    let mut level = match Level::core(current_level) {
-                        Ok(l) => l,
-                        Err(e) => {
-                            eprintln!("{e}");
-                            return Ok(());
-                        }
-                    };
-                    let result = level.play();
-                    match result {
-                        Ok(result) => {
-                            if result.has_won {
-                                thread::sleep(time::Duration::from_millis(SLEEP_TIME));
-                                Menu::open(MenuType::Message("YAY, You Won!".to_string()));
-                                current_level += 1;
-                                match user_data.complete_core(current_level as usize) {
-                                    Err(e) => {
-                                        eprintln!("{e}");
-                                    }
-                                    _ => (),
-                                };
-                            } else if let Some(r) = result.reason_for_loss {
-                                match r {
-                                    LevelLossReason::Zapper => {
-                                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
-                                        Menu::open(MenuType::Message(
-                                            "Uh oh, you lit a zapper!".to_string(),
-                                        ));
-                                    }
-                                    LevelLossReason::Death => {
-                                        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
-                                        Menu::open(MenuType::Message(
-                                            "Uh oh, you got shot by a laser beam!".to_string(),
-                                        ));
-                                    }
-                                    LevelLossReason::Quit => break,
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        Err(e) => {
-                            eprintln!("Error: {}", e);
+                    loop {
+                        if current_level >= Level::NUM_CORE_LEVELS {
+                            Menu::open(MenuType::Message(
+                                "You've completed all core levels, thanks for playing!".to_string(),
+                            ));
                             break;
+                        }
+                        let mut level = match Level::core(current_level) {
+                            Ok(l) => l,
+                            Err(e) => return exit(Some(e)),
+                        };
+                        let result = level.play();
+                        match result {
+                            Ok(result) => {
+                                if result.has_won {
+                                    thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                    Menu::open(MenuType::Message("YAY, You Won!".to_string()));
+                                    current_level += 1;
+                                    match user_data.complete(level.info) {
+                                        Err(e) => return exit(Some(&e)),
+                                        _ => (),
+                                    };
+                                } else if let Some(r) = result.reason_for_loss {
+                                    match r {
+                                        LevelLossReason::Zapper => {
+                                            thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                            Menu::open(MenuType::Message(
+                                                "Uh oh, you lit a zapper!".to_string(),
+                                            ));
+                                        }
+                                        LevelLossReason::Death => {
+                                            thread::sleep(time::Duration::from_millis(SLEEP_TIME));
+                                            Menu::open(MenuType::Message(
+                                                "Uh oh, you got shot by a laser beam!".to_string(),
+                                            ));
+                                        }
+                                        LevelLossReason::Quit => break,
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                            Err(e) => return exit(Some(e)),
                         }
                     }
                 }
-                LevelSource::File(file) => {}
+                LevelSource::File(_) => {}
                 LevelSource::Url(url) => {
                     let mut level = match Level::url(url) {
                         Ok(l) => l,
-                        Err(e) => {
-                            eprintln!("{e}");
-                            return Ok(());
-                        }
+                        Err(e) => return exit(Some(e)),
                     };
                     let result = level.play();
                     match result {
@@ -179,10 +169,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             if result.has_won {
                                 thread::sleep(time::Duration::from_millis(SLEEP_TIME));
                                 Menu::open(MenuType::Message("YAY, You Won!".to_string()));
-                                match user_data.complete_repo_level(current_level as usize) {
-                                    Err(e) => {
-                                        eprintln!("{e}");
-                                    }
+                                match user_data.complete(level.info) {
+                                    Err(e) => return exit(Some(&e)),
                                     _ => (),
                                 };
                                 break;
@@ -206,10 +194,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 break;
                             }
                         }
-                        Err(e) => {
-                            eprintln!("Error: {}", e);
-                            break;
-                        }
+                        Err(e) => return exit(Some(e)),
                     }
                 }
             },
@@ -219,11 +204,5 @@ async fn main() -> Result<(), Box<dyn Error>> {
             _ => break,
         }
     }
-    stdout.execute(cursor::Show).ok();
-    disable_raw_mode().ok();
-    stdout.execute(cursor::MoveTo(0, 0)).ok();
-    stdout
-        .execute(Clear(crossterm::terminal::ClearType::All))
-        .ok();
-    Ok(())
+    exit(None)
 }

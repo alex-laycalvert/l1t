@@ -1,3 +1,4 @@
+use crate::level::{LevelInfo, LevelSource};
 use serde::{Deserialize, Serialize};
 use std::{fs, path};
 
@@ -45,7 +46,7 @@ impl UserData {
         }
     }
 
-    pub fn complete_core(&mut self, level: usize) -> Result<(), String> {
+    fn complete_core(&mut self, level: usize) -> Result<(), String> {
         if self.completed_core_levels.iter().position(|i| *i == level) != None {
             return Ok(());
         }
@@ -59,5 +60,12 @@ impl UserData {
             _ => (),
         };
         Ok(())
+    }
+
+    pub fn complete(&mut self, level_info: LevelInfo) -> Result<(), String> {
+        match level_info.source {
+            LevelSource::Core(level) => self.complete_core(level),
+            _ => Err("".to_string()),
+        }
     }
 }

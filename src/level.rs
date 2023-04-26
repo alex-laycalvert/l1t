@@ -384,7 +384,7 @@ IIIIIIIIIIIIIIIIIIIII",
         Ok(levels)
     }
 
-    fn parse_level(content: &[&str], info: LevelInfo) -> Result<Level, &'static str> {
+    fn parse_grid(content: &[&str], info: LevelInfo) -> Result<Level, &'static str> {
         let rows = content.len() as u16;
         if rows < 3 {
             return Err("Level file must include a line for the `name`, `author`, `description`, and lines representing the level grid.");
@@ -422,19 +422,23 @@ IIIIIIIIIIIIIIIIIIIII",
         })
     }
 
-    pub fn file(filename: String) -> Result<Level, &'static str> {
-        let content: String = fs::read_to_string(&filename).unwrap_or("".to_string());
-        let content: Vec<&str> = content.trim().split('\n').collect();
+    fn parse_full(content: &[&str], source: LevelSource) -> Result<Level, &'static str> {
         if content.len() < 3 {
             return Err("Empty level file.");
         }
         let info = LevelInfo {
-            source: LevelSource::File(filename),
+            source,
             name: content[0].to_string(),
             author: content[1].to_string(),
             description: content[2].to_string(),
         };
-        Level::parse_level(&content, info)
+        Level::parse_grid(&content[3..], info)
+    }
+
+    pub fn file(filename: String) -> Result<Level, &'static str> {
+        let content: String = fs::read_to_string(&filename).unwrap_or("".to_string());
+        let content: Vec<&str> = content.trim().split('\n').collect();
+        Level::parse_full(&content, LevelSource::File(filename))
     }
 
     pub fn url(_url: String) -> Result<Level, &'static str> {
@@ -444,16 +448,7 @@ IIIIIIIIIIIIIIIIIIIII",
     pub fn core(level: usize) -> Result<Level, &'static str> {
         let content = Level::CORE_LEVELS[level];
         let content: Vec<&str> = content.trim().split('\n').collect();
-        if content.len() < 3 {
-            return Err("Empty level file.");
-        }
-        let info = LevelInfo {
-            source: LevelSource::Core(level),
-            name: content[0].to_string(),
-            author: content[1].to_string(),
-            description: content[2].to_string(),
-        };
-        Level::parse_level(&content, info)
+        Level::parse_full(&content, LevelSource::Core(level))
     }
 
     pub fn play(&mut self) -> Result<LevelResult, &str> {
