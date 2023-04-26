@@ -43,30 +43,28 @@ Inside the whitespace, you can place any characters representing the level items
 
 ## Items/Characters
 
-+------------------------------+
-| Ascii Character | Level Item |
-| --------------- | ---------- |
-| `X`             | Player |
-| `I`             | Wall |
-| `S`             | Statue |
-| `R`             | Reverse Statue |
-| `Z`             | Zapper |
-| `1`             | Laser facing UP turned ON |
-| `2`             | Laser facing DOWN turned ON |
-| `3`             | Laser facing LEFT turned ON |
-| `4`             | Laser facing RIGHT turned ON |
-| `5`             | Laser facing UP turned OFF |
-| `6`             | Laser facing DOWN turned OFF |
-| `7`             | Laser facing LEFT turned OFF |
-| `8`             | Laser facing RIGHT turned OFF |
-| `B`             | Block |
-| `T`             | Toggle Block |
-| `b`             | Button |
-| `s`             | Switch |
-| `/`             | Mirror facing FORWARD |
-| `\`             | Mirror facing BACKWARD |
-| `?`             | Moveable Mirror facing FORWARD |
+| Ascii Character | Level Item                      |
+| --------------- | ------------------------------- |
+| `X`             | Player                          |
+| `I`             | Wall                            |
+| `S`             | Statue                          |
+| `R`             | Reverse Statue                  |
+| `Z`             | Zapper                          |
+| `1`             | Laser facing UP turned ON       |
+| `2`             | Laser facing DOWN turned ON     |
+| `3`             | Laser facing LEFT turned ON     |
+| `4`             | Laser facing RIGHT turned ON    |
+| `5`             | Laser facing UP turned OFF      |
+| `6`             | Laser facing DOWN turned OFF    |
+| `7`             | Laser facing LEFT turned OFF    |
+| `8`             | Laser facing RIGHT turned OFF   |
+| `B`             | Block                           |
+| `T`             | Toggle Block                    |
+| `b`             | Button                          |
+| `s`             | Switch                          |
+| `/`             | Mirror facing FORWARD           |
+| `\`             | Mirror facing BACKWARD          |
+| `?`             | Moveable Mirror facing FORWARD  |
 | `|`             | Moveable Mirror facing BACKWARD |
-+------------------------------+
 
 Any other characters not listed above inside the level grid will be translated into walls.
