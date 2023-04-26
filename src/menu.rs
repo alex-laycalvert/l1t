@@ -1,7 +1,9 @@
-use crate::level::{Level, LevelSource};
+use crate::{
+    controls::Control,
+    level::{Level, LevelSource},
+};
 use crossterm::{
     cursor::MoveTo,
-    event::{read, Event, KeyCode},
     execute,
     style::{
         Attribute, Color, Print, ResetColor, SetAttribute, SetBackgroundColor, SetForegroundColor,
@@ -211,31 +213,29 @@ impl Menu {
                         )
                         .ok();
                     }
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
-                            KeyCode::Enter => match options[current_selection] {
-                                Selection::Play(_) => {
-                                    if let Some(Selection::Item(i)) = Menu::open(
-                                        MenuType::CoreLevelSelection(completed_levels.clone()),
-                                    ) {
-                                        return Some(Selection::Play(LevelSource::Core(i)));
-                                    }
+                    match Control::read_input() {
+                        Control::Select => {
+                            if let Selection::Play(_) = options[current_selection] {
+                                if let Some(Selection::Item(i)) = Menu::open(
+                                    MenuType::CoreLevelSelection(completed_levels.clone()),
+                                ) {
+                                    return Some(Selection::Play(LevelSource::Core(i)));
                                 }
-                                _ => break,
-                            },
-                            KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('w') => {
-                                if current_selection == 0 {
-                                    current_selection = options.len() - 1;
-                                } else {
-                                    current_selection -= 1;
-                                }
+                            } else {
+                                break;
                             }
-                            KeyCode::Down | KeyCode::Char('j') | KeyCode::Char('s') => {
-                                current_selection = (current_selection + 1) % options.len();
+                        }
+                        Control::Up => {
+                            if current_selection == 0 {
+                                current_selection = options.len() - 1;
+                            } else {
+                                current_selection -= 1;
                             }
-                            KeyCode::Char('q') => return Some(Selection::Quit),
-                            _ => (),
-                        },
+                        }
+                        Control::Down => {
+                            current_selection = (current_selection + 1) % options.len();
+                        }
+                        Control::Quit => return Some(Selection::Quit),
                         _ => (),
                     }
                 }
@@ -257,11 +257,8 @@ impl Menu {
                         Print(message.clone()),
                     )
                     .ok();
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
-                            KeyCode::Enter => break,
-                            _ => (),
-                        },
+                    match Control::read_input() {
+                        Control::Select => break,
                         _ => (),
                     }
                 }
@@ -311,24 +308,16 @@ impl Menu {
                         Print(" NO ".bold())
                     )
                     .ok();
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
-                            KeyCode::Left
-                            | KeyCode::Right
-                            | KeyCode::Char('a')
-                            | KeyCode::Char('d')
-                            | KeyCode::Char('h')
-                            | KeyCode::Char('l') => {
-                                if matches!(current_selection, Selection::No) {
-                                    current_selection = Selection::Yes
-                                } else {
-                                    current_selection = Selection::No
-                                }
+                    match Control::read_input() {
+                        Control::Left | Control::Right => {
+                            if matches!(current_selection, Selection::No) {
+                                current_selection = Selection::Yes
+                            } else {
+                                current_selection = Selection::No
                             }
-                            KeyCode::Char('q') => return Some(Selection::No),
-                            KeyCode::Enter => return Some(current_selection),
-                            _ => (),
-                        },
+                        }
+                        Control::Select => return Some(current_selection),
+                        Control::Quit => return Some(Selection::No),
                         _ => (),
                     }
                 }
@@ -559,25 +548,22 @@ impl Menu {
                             execute!(stdout(), Print(piece)).ok();
                         }
                     }
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
-                            KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
-                                if start_index == 0 {
-                                    continue;
-                                }
-                                start_index -= 1;
+                    match Control::read_input() {
+                        Control::Up => {
+                            if start_index == 0 {
+                                continue;
                             }
-                            KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => {
-                                if start_index + lines >= content.len() {
-                                    continue;
-                                }
-                                start_index += 1;
+                            start_index -= 1;
+                        }
+                        Control::Down => {
+                            if start_index + lines >= content.len() {
+                                continue;
                             }
-                            KeyCode::Char('g') => start_index = 0,
-                            KeyCode::Char('G') => start_index = content.len() - lines,
-                            KeyCode::Enter | KeyCode::Char('q') => break,
-                            _ => (),
-                        },
+                            start_index += 1;
+                        }
+                        Control::GotoTop => start_index = 0,
+                        Control::GotoBottom => start_index = content.len() - lines,
+                        Control::Select | Control::Quit => break,
                         _ => (),
                     }
                 }
@@ -648,28 +634,23 @@ impl Menu {
                             .ok();
                         }
                     }
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
-                            KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => {
-                                if current_selection as isize - 1 < 0 {
-                                    current_selection = highest_completed_level;
-                                } else {
-                                    current_selection -= 1;
-                                }
+                    match Control::read_input() {
+                        Control::Left => {
+                            if current_selection as isize - 1 < 0 {
+                                current_selection = highest_completed_level;
+                            } else {
+                                current_selection -= 1;
                             }
-                            KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => {
-                                if current_selection + 1 > highest_completed_level {
-                                    current_selection = 0;
-                                } else {
-                                    current_selection += 1;
-                                }
+                        }
+                        Control::Right => {
+                            if current_selection + 1 > highest_completed_level {
+                                current_selection = 0;
+                            } else {
+                                current_selection += 1;
                             }
-                            KeyCode::Char('q') => {
-                                return None;
-                            }
-                            KeyCode::Enter => return Some(Selection::Item(current_selection)),
-                            _ => (),
-                        },
+                        }
+                        Control::Quit => return None,
+                        Control::Select => return Some(Selection::Item(current_selection)),
                         _ => (),
                     }
                 }

@@ -1,8 +1,7 @@
+use crate::controls::Control;
 use crate::{direction::Direction, menu::*, node::*};
 use crossterm::{
-    cursor,
-    event::{read, Event, KeyCode},
-    execute,
+    cursor, execute,
     style::{Color, Print, SetBackgroundColor, SetForegroundColor, Stylize},
     terminal::{size, Clear, ClearType},
     ExecutableCommand,
@@ -463,41 +462,27 @@ IIIIIIIIIIIIIIIIIIIII",
                     reason_for_loss: state.reason_for_loss,
                 });
             }
-            match read().unwrap() {
-                Event::Key(event) => match event.code {
-                    KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
-                        self.move_player(Direction::UP)
-                    }
-                    KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => {
-                        self.move_player(Direction::DOWN)
-                    }
-                    KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => {
-                        self.move_player(Direction::LEFT)
-                    }
-                    KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => {
-                        self.move_player(Direction::RIGHT)
-                    }
-                    KeyCode::Char(' ') => self.player_action(),
-                    KeyCode::Char('H') => {
-                        Menu::open(MenuType::HelpMenu);
-                    }
-                    KeyCode::Char('q') => {
-                        if let Some(s) = Menu::open(MenuType::YesNoSelection(
-                            "Are you sure you want to quit?".to_string(),
-                        )) {
-                            match s {
-                                Selection::Yes => {
-                                    return Ok(LevelResult {
-                                        has_won: false,
-                                        reason_for_loss: Some(LevelLossReason::Quit),
-                                    })
-                                }
-                                _ => (),
-                            }
+            match Control::read_input() {
+                Control::Up => self.move_player(Direction::UP),
+                Control::Down => self.move_player(Direction::DOWN),
+                Control::Left => self.move_player(Direction::LEFT),
+                Control::Right => self.move_player(Direction::RIGHT),
+                Control::Action => self.player_action(),
+                Control::Help => {
+                    Menu::open(MenuType::HelpMenu);
+                }
+                Control::Quit => {
+                    if let Some(s) = Menu::open(MenuType::YesNoSelection(
+                        "Are you sure you want to quit?".to_string(),
+                    )) {
+                        if matches!(Selection::Yes, s) {
+                            return Ok(LevelResult {
+                                has_won: false,
+                                reason_for_loss: Some(LevelLossReason::Quit),
+                            });
                         }
                     }
-                    _ => (),
-                },
+                }
                 _ => (),
             }
         }
