@@ -7,9 +7,8 @@ use crossterm::{
     terminal::{size, Clear, ClearType},
     ExecutableCommand,
 };
-use human_sort::sort;
-use std::fs;
-use std::io::stdout;
+use std::{fs, path::Path};
+use std::{io::stdout, path::PathBuf};
 
 #[derive(Debug)]
 pub enum LevelLossReason {
@@ -20,7 +19,7 @@ pub enum LevelLossReason {
 
 #[derive(Debug)]
 pub enum LevelSource {
-    File(String),
+    File(PathBuf),
     Url(String),
     Core(usize),
 }
@@ -345,32 +344,33 @@ IIIIIIIIIIIIIIIIIIIII",
         }
     }
 
-    pub fn available_levels(level_dir: String) -> Result<Vec<LevelInfo>, String> {
+    pub fn available_levels(level_dir: &Path) -> Result<Vec<LevelInfo>, String> {
         let files = match fs::read_dir(level_dir) {
             Ok(f) => f,
             Err(e) => return Err(e.to_string()),
         };
-        let mut filenames = Vec::<String>::new();
+        let mut filenames = Vec::<PathBuf>::new();
         for f in files {
             let f = match f {
                 Ok(f) => f,
                 Err(e) => return Err(e.to_string()),
             };
-            let path = f.path();
-            let s = path.to_string_lossy();
-            filenames.push(s.to_string());
+            filenames.push(f.path().to_path_buf());
         }
-        let mut filenames: Vec<&str> = filenames.iter().map(|s| &**s).collect();
-        sort(&mut filenames);
+        let mut filenames: Vec<_> = filenames
+            .iter()
+            .map(|s| (s.as_path(), s.to_string_lossy()))
+            .collect();
+        filenames.sort_by(|(_, s1), (_, s2)| human_sort::compare(s1, s2));
         let mut levels = Vec::<LevelInfo>::new();
-        for f in filenames {
+        for (f, _) in filenames {
             let content = match fs::read_to_string(f) {
                 Ok(c) => c,
                 Err(e) => return Err(e.to_string()),
             };
             let lines: Vec<&str> = content.split('\n').collect();
             levels.push(LevelInfo {
-                source: LevelSource::File(f.to_string()),
+                source: LevelSource::File(f.to_path_buf()),
                 name: lines[0].to_string(),
                 author: lines[1].to_string(),
                 description: lines[2].to_string(),
@@ -426,12 +426,12 @@ IIIIIIIIIIIIIIIIIIIII",
         })
     }
 
-    pub fn file(filename: String) -> Result<Level, &'static str> {
-        let content = fs::read_to_string(&filename).unwrap_or("".to_string());
+    pub fn file(filename: &Path) -> Result<Level, &'static str> {
+        let content = fs::read_to_string(filename).unwrap_or("".to_string());
         if content.trim().is_empty() {
             return Err("Empty level file.");
         }
-        Level::from_string(content, LevelSource::File(filename))
+        Level::from_string(content, LevelSource::File(filename.to_path_buf()))
     }
 
     pub fn url(_url: String) -> Result<Level, &'static str> {

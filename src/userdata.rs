@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
-use std::{fs, path};
+use std::{
+    fs,
+    path::{self, Path, PathBuf},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompletedLevel {
@@ -11,16 +14,17 @@ pub struct CompletedLevel {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserData {
-    file: String,
+    #[serde(skip)]
+    file: PathBuf,
     pub completed_core_levels: Vec<usize>,
     pub completed_levels: Vec<CompletedLevel>,
 }
 
 impl UserData {
-    pub fn read(home_dir: String) -> Result<UserData, String> {
-        let filename = home_dir.to_string() + "/.l1t/data.json";
+    pub fn read(home_dir: &Path) -> Result<UserData, String> {
+        let filename = home_dir.join("/.l1t/data.json");
         if !path::Path::new(&filename).exists() {
-            if let Err(e) = fs::create_dir(home_dir + "/.l1t") {
+            if let Err(e) = fs::create_dir(home_dir.join("/.l1t")) {
                 return Err(e.to_string());
             };
             let data = UserData {

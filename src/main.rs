@@ -8,7 +8,7 @@ use home::home_dir;
 use l1t::level::*;
 use l1t::menu::*;
 use l1t::userdata::*;
-use std::io::stdout;
+use std::{io::stdout, path::PathBuf};
 use std::{thread, time};
 
 const SLEEP_TIME: u64 = 500;
@@ -19,7 +19,7 @@ const SLEEP_TIME: u64 = 500;
 struct Args {
     /// The `.l1t` file to load a level from
     #[arg(short, long)]
-    file: Option<String>,
+    file: Option<PathBuf>,
     ///// Repository to download levels from
     //#[arg(short, long)]
     //repo_url: Option<String>,
@@ -33,7 +33,7 @@ fn main() {
     if let Some(filename) = &args.file {
         // File has been provided
         loop {
-            let mut level = match Level::file(filename.to_string()) {
+            let mut level = match Level::file(filename.as_path()) {
                 Ok(l) => l,
                 Err(e) => {
                     eprintln!("{e}");
@@ -86,8 +86,7 @@ fn main() {
         Some(h) => h,
         None => return,
     };
-    let home = home.to_str().unwrap_or("");
-    let mut user_data = match UserData::read(home.to_string()) {
+    let mut user_data = match UserData::read(&home) {
         Ok(d) => d,
         Err(e) => {
             eprintln!("{e}");
