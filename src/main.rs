@@ -7,9 +7,9 @@ use crossterm::{
 use home::home_dir;
 use l1t::level::*;
 use l1t::menu::*;
+use l1t::repository::*;
 use l1t::userdata::*;
-use std::io::stdout;
-use std::{thread, time};
+use std::{error::Error, io::stdout, thread, time};
 
 const SLEEP_TIME: u64 = 500;
 
@@ -25,7 +25,11 @@ struct Args {
     //repo_url: Option<String>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+    let repo = Repository::from_url("http://localhost:8000/l1t".to_string()).await?;
+    return Ok(());
+
     let args = Args::parse();
     let mut stdout = stdout();
     enable_raw_mode().ok();
@@ -37,7 +41,7 @@ fn main() {
                 Ok(l) => l,
                 Err(e) => {
                     eprintln!("{e}");
-                    return;
+                    return Ok(());
                 }
             };
             let result = level.play();
@@ -79,19 +83,19 @@ fn main() {
         stdout
             .execute(Clear(crossterm::terminal::ClearType::All))
             .ok();
-        return;
+        return Ok(());
     }
 
     let home = match home_dir() {
         Some(h) => h,
-        None => return,
+        None => return Ok(()),
     };
     let home = home.to_str().unwrap_or("");
     let mut user_data = match UserData::read(home.to_string()) {
         Ok(d) => d,
         Err(e) => {
             eprintln!("{e}");
-            return;
+            return Ok(());
         }
     };
 
@@ -114,7 +118,7 @@ fn main() {
                         Ok(l) => l,
                         Err(e) => {
                             eprintln!("{e}");
-                            return;
+                            return Ok(());
                         }
                     };
                     let result = level.play();
@@ -127,7 +131,6 @@ fn main() {
                                 match user_data.complete_core(current_level as usize) {
                                     Err(e) => {
                                         eprintln!("{e}");
-                                        return;
                                     }
                                     _ => (),
                                 };
@@ -170,4 +173,5 @@ fn main() {
     stdout
         .execute(Clear(crossterm::terminal::ClearType::All))
         .ok();
+    Ok(())
 }
