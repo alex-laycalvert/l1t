@@ -20,9 +20,8 @@ impl UserData {
     pub fn read(home_dir: String) -> Result<UserData, String> {
         let filename = home_dir.to_string() + "/.l1t/data.json";
         if !path::Path::new(&filename).exists() {
-            match fs::create_dir(home_dir + "/.l1t") {
-                Err(e) => return Err(e.to_string()),
-                _ => (),
+            if let Err(e) = fs::create_dir(home_dir + "/.l1t") {
+                return Err(e.to_string());
             };
             let data = UserData {
                 file: filename.clone(),
@@ -33,9 +32,8 @@ impl UserData {
                 Ok(c) => c,
                 Err(e) => return Err(e.to_string()),
             };
-            match fs::write(&filename, content) {
-                Err(e) => return Err(e.to_string()),
-                _ => (),
+            if let Err(e) = fs::write(&filename, content) {
+                return Err(e.to_string());
             };
         }
         let file_content = fs::read_to_string(&filename).unwrap_or("".to_string());
@@ -46,7 +44,7 @@ impl UserData {
     }
 
     pub fn complete_core(&mut self, level: usize) -> Result<(), String> {
-        if self.completed_core_levels.iter().position(|i| *i == level) != None {
+        if self.completed_core_levels.iter().any(|i| *i == level) {
             return Ok(());
         }
         self.completed_core_levels.push(level);
@@ -54,9 +52,8 @@ impl UserData {
             Ok(c) => c,
             Err(e) => return Err(e.to_string()),
         };
-        match fs::write(&self.file, content) {
-            Err(e) => return Err(e.to_string()),
-            _ => (),
+        if let Err(e) = fs::write(&self.file, content) {
+            return Err(e.to_string());
         };
         Ok(())
     }

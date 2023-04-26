@@ -205,8 +205,8 @@ impl Menu {
                         )
                         .ok();
                     }
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
+                    if let Event::Key(event) = read().unwrap() {
+                        match event.code {
                             KeyCode::Enter => match options[current_selection] {
                                 Selection::Play(_) => {
                                     if let Some(Selection::Item(i)) = Menu::open(
@@ -229,8 +229,7 @@ impl Menu {
                             }
                             KeyCode::Char('q') => return Some(Selection::Quit),
                             _ => (),
-                        },
-                        _ => (),
+                        }
                     }
                 }
                 return Some(options[current_selection].clone());
@@ -251,12 +250,10 @@ impl Menu {
                         Print(message.clone()),
                     )
                     .ok();
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
-                            KeyCode::Enter => break,
-                            _ => (),
-                        },
-                        _ => (),
+                    if let Event::Key(event) = read().unwrap() {
+                        if let KeyCode::Enter = event.code {
+                            break;
+                        }
                     }
                 }
             }
@@ -305,8 +302,8 @@ impl Menu {
                         Print(" NO ".bold())
                     )
                     .ok();
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
+                    if let Event::Key(event) = read().unwrap() {
+                        match event.code {
                             KeyCode::Left
                             | KeyCode::Right
                             | KeyCode::Char('a')
@@ -322,12 +319,11 @@ impl Menu {
                             KeyCode::Char('q') => return Some(Selection::No),
                             KeyCode::Enter => return Some(current_selection),
                             _ => (),
-                        },
-                        _ => (),
+                        }
                     }
                 }
             }
-            MenuType::HelpMenu => loop {
+            MenuType::HelpMenu => {
                 return Menu::open(MenuType::ScrollableMenu(vec![
                     vec![
                         "l1t".bold().green(),
@@ -519,7 +515,7 @@ impl Menu {
                     vec!["            blocks on/off. Player must be".stylize()],
                     vec!["            next to button to press.".stylize()],
                 ]));
-            },
+            }
             MenuType::ScrollableMenu(content) => {
                 let row_padding = 1;
                 let col_padding = 2;
@@ -553,8 +549,8 @@ impl Menu {
                             execute!(stdout(), Print(piece)).ok();
                         }
                     }
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
+                    if let Event::Key(event) = read().unwrap() {
+                        match event.code {
                             KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
                                 if start_index == 0 {
                                     continue;
@@ -571,8 +567,7 @@ impl Menu {
                             KeyCode::Char('G') => start_index = content.len() - lines,
                             KeyCode::Enter | KeyCode::Char('q') => break,
                             _ => (),
-                        },
-                        _ => (),
+                        }
                     }
                 }
             }
@@ -642,8 +637,8 @@ impl Menu {
                             .ok();
                         }
                     }
-                    match read().unwrap() {
-                        Event::Key(event) => match event.code {
+                    if let Event::Key(event) = read().unwrap() {
+                        match event.code {
                             KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => {
                                 if current_selection as isize - 1 < 0 {
                                     current_selection = highest_completed_level;
@@ -663,8 +658,7 @@ impl Menu {
                             }
                             KeyCode::Enter => return Some(Selection::Item(current_selection)),
                             _ => (),
-                        },
-                        _ => (),
+                        }
                     }
                 }
             }

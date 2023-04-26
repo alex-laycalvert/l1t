@@ -124,12 +124,9 @@ fn main() {
                                 thread::sleep(time::Duration::from_millis(SLEEP_TIME));
                                 Menu::open(MenuType::Message("YAY, You Won!".to_string()));
                                 current_level += 1;
-                                match user_data.complete_core(current_level as usize) {
-                                    Err(e) => {
-                                        eprintln!("{e}");
-                                        return;
-                                    }
-                                    _ => (),
+                                if let Err(e) = user_data.complete_core(current_level) {
+                                    eprintln!("{e}");
+                                    return;
                                 };
                             } else if let Some(r) = result.reason_for_loss {
                                 match r {

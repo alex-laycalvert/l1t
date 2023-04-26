@@ -162,71 +162,66 @@ IIIIIIIIIIIIIIIIIIIII",
 
     fn set_lasers_shooting_at(&mut self) {
         for i in 0..self.nodes.len() {
-            match &self.nodes[i].node_type {
-                NodeType::Laser(l) => {
-                    if !l.on {
-                        self.nodes[i].set_shooting_at(vec![]);
-                        continue;
+            if let NodeType::Laser(l) = &self.nodes[i].node_type {
+                if !l.on {
+                    self.nodes[i].set_shooting_at(vec![]);
+                    continue;
+                }
+                let mut shooting_at: Vec<(u16, u16, char, char)> = vec![];
+                let mut current_row: i16 = self.nodes[i].row as i16;
+                let mut current_col: i16 = self.nodes[i].col as i16;
+                let mut current_dir: Direction = l.dir;
+                loop {
+                    if !self.is_valid_pos((current_row as u16, current_col as u16)) {
+                        break;
                     }
-                    let mut shooting_at: Vec<(u16, u16, char, char)> = vec![];
-                    let mut current_row: i16 = self.nodes[i].row as i16;
-                    let mut current_col: i16 = self.nodes[i].col as i16;
-                    let mut current_dir: Direction = l.dir;
-                    loop {
-                        if !self.is_valid_pos((current_row as u16, current_col as u16)) {
-                            break;
-                        }
-                        current_row += current_dir.0;
-                        current_col += current_dir.1;
-                        shooting_at.push((
-                            current_row as u16,
-                            current_col as u16,
-                            match current_dir {
-                                Direction::UP | Direction::DOWN => '|',
-                                _ => '-',
-                            },
-                            match current_dir {
-                                Direction::UP => '^',
-                                Direction::DOWN => 'v',
-                                Direction::LEFT => '<',
-                                _ => '>',
-                            },
-                        ));
-                        if let Some(i) =
-                            self.node_index_at((current_row as u16, current_col as u16))
-                        {
-                            match &self.nodes[i].node_type {
-                                NodeType::Mirror(m) => {
-                                    if current_dir.0 == 0 {
-                                        current_dir.0 = current_dir.1.abs();
-                                        if current_dir.1 == (m.dir.0 + m.dir.1) {
-                                            current_dir.0 = -current_dir.0
-                                        }
-                                        current_dir.1 = 0;
+                    current_row += current_dir.0;
+                    current_col += current_dir.1;
+                    shooting_at.push((
+                        current_row as u16,
+                        current_col as u16,
+                        match current_dir {
+                            Direction::UP | Direction::DOWN => '|',
+                            _ => '-',
+                        },
+                        match current_dir {
+                            Direction::UP => '^',
+                            Direction::DOWN => 'v',
+                            Direction::LEFT => '<',
+                            _ => '>',
+                        },
+                    ));
+                    if let Some(i) = self.node_index_at((current_row as u16, current_col as u16)) {
+                        match &self.nodes[i].node_type {
+                            NodeType::Mirror(m) => {
+                                if current_dir.0 == 0 {
+                                    current_dir.0 = current_dir.1.abs();
+                                    if current_dir.1 == (m.dir.0 + m.dir.1) {
+                                        current_dir.0 = -current_dir.0
+                                    }
+                                    current_dir.1 = 0;
+                                } else {
+                                    current_dir.1 = current_dir.0.abs();
+                                    if current_dir.0 == (m.dir.0 + m.dir.1) {
+                                        current_dir.1 = -current_dir.1
+                                    }
+                                    current_dir.0 = 0;
+                                }
+                            }
+                            _ => {
+                                if self.nodes[i].is_laser_toggleable() {
+                                    if let NodeType::Laser(_) = &self.nodes[i].node_type {
+                                        self.nodes[i].turn_off();
                                     } else {
-                                        current_dir.1 = current_dir.0.abs();
-                                        if current_dir.0 == (m.dir.0 + m.dir.1) {
-                                            current_dir.1 = -current_dir.1
-                                        }
-                                        current_dir.0 = 0;
+                                        self.nodes[i].turn_on()
                                     }
                                 }
-                                _ => {
-                                    if self.nodes[i].is_laser_toggleable() {
-                                        if let NodeType::Laser(_) = &self.nodes[i].node_type {
-                                            self.nodes[i].turn_off();
-                                        } else {
-                                            self.nodes[i].turn_on()
-                                        }
-                                    }
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
-                    self.nodes[i].set_shooting_at(shooting_at);
                 }
-                _ => (),
+                self.nodes[i].set_shooting_at(shooting_at);
             }
         }
     }
@@ -288,7 +283,7 @@ IIIIIIIIIIIIIIIIIIIII",
             if !self.is_valid_pos(new_pos) {
                 return;
             }
-            if self.node_index_at(new_pos) != None {
+            if self.node_index_at(new_pos).is_none() {
                 return;
             }
             self.nodes[i].move_in_dir(dir);
@@ -433,10 +428,10 @@ IIIIIIIIIIIIIIIIIIIII",
 
     pub fn file(filename: String) -> Result<Level, &'static str> {
         let content = fs::read_to_string(&filename).unwrap_or("".to_string());
-        if content.trim().len() == 0 {
+        if content.trim().is_empty() {
             return Err("Empty level file.");
         }
-        Level::from_string(content, LevelSource::File(filename.to_string()))
+        Level::from_string(content, LevelSource::File(filename))
     }
 
     pub fn url(_url: String) -> Result<Level, &'static str> {
@@ -460,8 +455,8 @@ IIIIIIIIIIIIIIIIIIIII",
                     reason_for_loss: state.reason_for_loss,
                 });
             }
-            match read().unwrap() {
-                Event::Key(event) => match event.code {
+            if let Event::Key(event) = read().unwrap() {
+                match event.code {
                     KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
                         self.move_player(Direction::UP)
                     }
@@ -479,23 +474,17 @@ IIIIIIIIIIIIIIIIIIIII",
                         Menu::open(MenuType::HelpMenu);
                     }
                     KeyCode::Char('q') => {
-                        if let Some(s) = Menu::open(MenuType::YesNoSelection(
+                        if let Some(Selection::Yes) = Menu::open(MenuType::YesNoSelection(
                             "Are you sure you want to quit?".to_string(),
                         )) {
-                            match s {
-                                Selection::Yes => {
-                                    return Ok(LevelResult {
-                                        has_won: false,
-                                        reason_for_loss: Some(LevelLossReason::Quit),
-                                    })
-                                }
-                                _ => (),
-                            }
+                            return Ok(LevelResult {
+                                has_won: false,
+                                reason_for_loss: Some(LevelLossReason::Quit),
+                            });
                         }
                     }
                     _ => (),
-                },
-                _ => (),
+                }
             }
         }
     }
