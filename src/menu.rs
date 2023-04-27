@@ -24,18 +24,18 @@ pub enum Selection {
     Item(usize),
 }
 
-pub enum MenuType {
+pub enum MenuType<'a> {
     /// Dialog box with a single message. Press `Enter` or `q` to close.
-    Message(String),
+    Message(&'a str),
 
     /// Dialog box that displays the message `String` and will
     /// show a list of the given option `Strings`. Returns the
     /// index of the selected option on enter.
-    Selection(String, Vec<String>),
+    Selection(&'a str, Vec<String>),
 
     /// Same as `MenuType::Selection` but only allows selecting
     /// `Yes` or `No`.
-    YesNoSelection(String),
+    YesNoSelection(&'a str),
 
     /// Same as `Message` but displays the entire help menu for
     /// the application in a `ScrollableMenu`.
@@ -45,7 +45,7 @@ pub enum MenuType {
     /// The `Vec<Vec<StyledContent<&'static str>>>` represents the list
     /// of `crossterm` styled lines where each inner `Vec` represents
     /// the list of chunks to print.
-    ScrollableMenu(Vec<Vec<StyledContent<&'static str>>>),
+    ScrollableMenu(Vec<Vec<StyledContent<&'a str>>>),
 
     /// Draws the `Main Menu` of the application with the logo
     /// and selections for `Play`, `Help`, and `Quit`. Must
@@ -55,13 +55,13 @@ pub enum MenuType {
     /// Selecting `Play` will open the `CoreLevelSelection` and
     /// will return a `Selection::Play(l)` where `l` is the selected
     /// level.
-    MainSelection(Vec<usize>),
+    MainSelection(&'a Vec<usize>),
 
     /// Draws the `Core Level` selection menu for the player
     /// to choose one of the built-in levels. Must be provided
     /// a `Vec<usize>` representing the core levels the player
     /// has completed.
-    CoreLevelSelection(Vec<usize>),
+    CoreLevelSelection(&'a Vec<usize>),
 }
 
 const RED: Color = Color::Rgb { r: 255, g: 0, b: 0 };
@@ -216,9 +216,9 @@ impl Menu {
                     match Control::read_input() {
                         Control::Select => {
                             if let Selection::Play(_) = options[current_selection] {
-                                if let Some(Selection::Item(i)) = Menu::open(
-                                    MenuType::CoreLevelSelection(completed_levels.clone()),
-                                ) {
+                                if let Some(Selection::Item(i)) =
+                                    Menu::open(MenuType::CoreLevelSelection(&completed_levels))
+                                {
                                     return Some(Selection::Play(LevelSource::Core(i)));
                                 }
                             } else {

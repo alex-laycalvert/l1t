@@ -470,9 +470,9 @@ IIIIIIIIIIIIIIIIIIIII",
                     Menu::open(MenuType::HelpMenu);
                 }
                 Control::Quit => {
-                    if let Some(Selection::Yes) = Menu::open(MenuType::YesNoSelection(
-                        "Are you sure you want to quit?".to_string(),
-                    )) {
+                    if let Some(Selection::Yes) =
+                        Menu::open(MenuType::YesNoSelection("Are you sure you want to quit?"))
+                    {
                         return Ok(LevelResult {
                             has_won: false,
                             reason_for_loss: Some(LevelLossReason::Quit),
