@@ -567,7 +567,9 @@ impl Menu {
                 }
             }
             MenuType::CoreLevelSelection(completed_levels) => {
-                let levels_per_row = 5;
+                let num_levels = Level::NUM_CORE_LEVELS as f64;
+                let levels_per_row = num_levels.sqrt() as u16;
+                let num_rows = (num_levels / levels_per_row as f64).ceil() as u16;
                 let highest_available_level = match completed_levels.iter().max() {
                     Some(n) => *n.min(&(Level::NUM_CORE_LEVELS - 1)) + 1,
                     None => 0,
@@ -576,7 +578,6 @@ impl Menu {
                 let message = "  SELECT A LEVEL  ";
                 loop {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
-                    let num_rows = Level::NUM_CORE_LEVELS as u16 / levels_per_row;
                     let start_row: u16 = (term_rows - num_rows * 2) / 2;
                     let mut start_col: u16 = (term_cols / 2) - levels_per_row * 2;
                     let end_row: u16 = (term_rows + num_rows * 2) / 2;
