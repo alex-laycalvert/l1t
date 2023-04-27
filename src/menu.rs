@@ -2,6 +2,7 @@ use crate::{
     controls::Control,
     level::{Level, LevelSource},
     repository::Repository,
+    userdata::CompletedRepoLevel,
 };
 use crossterm::{
     cursor::MoveTo,
@@ -59,7 +60,7 @@ pub enum MenuType<'a> {
     /// level. Selecting `Repository` or `Online` from the menu will
     /// return a `Selection::Play(l)` where `l` is the selected repository
     /// level.
-    MainSelection(&'a Vec<usize>, &'a Vec<Repository>),
+    MainSelection(&'a Vec<usize>),
 
     /// Draws the `Core Level` selection menu for the player
     /// to choose one of the built-in levels. Must be provided
@@ -73,7 +74,7 @@ pub enum MenuType<'a> {
     /// is opened to select the url of the level.
     RepositorySelection(&'a Vec<Repository>),
 
-    RepositoryLevelSelection(&'a mut Repository),
+    RepositoryLevelSelection(Repository, &'a Vec<CompletedRepoLevel>),
 }
 
 const RED: Color = Color::Rgb { r: 255, g: 0, b: 0 };
@@ -120,7 +121,7 @@ impl Menu {
         let row_padding = 1;
         let col_padding = 2;
         match menu_type {
-            MenuType::MainSelection(completed_levels, repositories) => {
+            MenuType::MainSelection(completed_levels) => {
                 let row_padding = 2;
                 let col_padding = 3;
                 let options: [Selection; 4] = [
@@ -239,15 +240,6 @@ impl Menu {
                                     return Some(Selection::Play(LevelSource::Core(i)));
                                 }
                             }
-                            Selection::Repository => {
-                                if let Some(Selection::Item(i)) =
-                                    Menu::open(MenuType::RepositorySelection(repositories))
-                                {
-                                    return Some(Selection::Play(LevelSource::Url(
-                                        repositories[i].url.clone(),
-                                    )));
-                                }
-                            }
                             _ => break,
                         },
                         Control::Up => {
@@ -269,13 +261,14 @@ impl Menu {
             MenuType::Message(message) => loop {
                 let (term_cols, term_rows) = size().unwrap_or((0, 0));
                 let start_row: u16 = term_rows / 2 - row_padding - 1;
-                let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
+                let start_col: u16 =
+                    (term_cols - (term_cols - 4).min(message.len() as u16)) / 2 - col_padding;
                 let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
                 let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
                 Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
                 execute!(
                     stdout(),
-                    MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
+                    MoveTo(start_col + 2, term_rows / 2),
                     Print(message),
                 )
                 .ok();
@@ -342,11 +335,6 @@ impl Menu {
             }
             MenuType::HelpMenu => {
                 return Menu::open(MenuType::ScrollableMenu(vec![
-                    vec![
-                        "l1t".bold().green(),
-                        " - A terminal strategy game about shooting".stylize(),
-                    ],
-                    vec!["      lasers and lighting statues.".stylize()],
                     vec![],
                     vec![
                         "In ".stylize(),
@@ -536,9 +524,10 @@ impl Menu {
             MenuType::ScrollableMenu(content) => {
                 let mut start_index: usize = 0;
                 let scroll_message = "  USE ARROW KEYS OR W, S TO SCROLL  ";
+                let fast_scroll_message = "  USE g AND G to GOTO TOP AND BOTTOM  ";
                 loop {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
-                    let lines: usize = (term_rows - row_padding * 2) as usize - 3;
+                    let lines: usize = (term_rows - row_padding * 2) as usize - 6;
                     let start_row = (term_rows - lines as u16) / 2 - row_padding;
                     let end_row = (term_rows + lines as u16) / 2 + row_padding;
                     let start_col = (term_cols - 50) / 2 - col_padding;
@@ -547,7 +536,12 @@ impl Menu {
                         stdout(),
                         Clear(ClearType::All),
                         MoveTo((term_cols - scroll_message.len() as u16) / 2, start_row - 1),
-                        Print(scroll_message.on_white().black().bold())
+                        Print(scroll_message.on_white().black().bold()),
+                        MoveTo(
+                            (term_cols - fast_scroll_message.len() as u16) / 2,
+                            end_row + 1
+                        ),
+                        Print(fast_scroll_message.on_white().black().bold())
                     )
                     .ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
@@ -561,7 +555,7 @@ impl Menu {
                             stdout(),
                             MoveTo(
                                 start_col + col_padding + 1,
-                                start_row + row_padding + (i - start_index) as u16 + 1
+                                start_row + row_padding + (i - start_index) as u16
                             )
                         )
                         .ok();
@@ -746,7 +740,83 @@ impl Menu {
                                 current_selection += 1;
                             }
                         }
-                        Control::Select => {}
+                        Control::Select => return Some(Selection::Item(current_selection)),
+                        Control::None => continue,
+                        _ => break,
+                    }
+                }
+            }
+            MenuType::RepositoryLevelSelection(repository, completed_levels) => {
+                let message = " SELECT A REPO ";
+                let mut current_selection = 0;
+                loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let num_cols = (term_cols - 4).min(200) as usize;
+                    let level_name_len = num_cols / 5 - 2;
+                    let level_author_len = level_name_len;
+                    let level_desc_len = num_cols - level_name_len - level_author_len - 6;
+                    let start_row: u16 = (term_rows - repository.levels.len() as u16) / 2;
+                    let start_col: u16 = (term_cols - num_cols as u16) / 2;
+                    let end_row: u16 = (term_rows + repository.levels.len() as u16) / 2 + 1;
+                    let end_col: u16 = (term_cols + num_cols as u16) / 2;
+                    execute!(
+                        stdout(),
+                        Clear(ClearType::All),
+                        MoveTo((term_cols - message.len() as u16) / 2, start_row - 1),
+                        Print(message.on_white().black().bold())
+                    )
+                    .ok();
+                    Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
+                    for (i, level) in repository.levels.iter().enumerate() {
+                        if let LevelSource::Url(url) = &level.source {
+                            let completed = completed_levels.iter().any(|l| {
+                                l.url == url.to_string()
+                                    || (l.name == level.name && l.author == level.author)
+                            });
+                            execute!(
+                                stdout(),
+                                SetBackgroundColor(if i == current_selection {
+                                    Color::White
+                                } else {
+                                    Color::Reset
+                                }),
+                                SetForegroundColor(if i == current_selection {
+                                    Color::Black
+                                } else {
+                                    Color::White
+                                }),
+                                MoveTo(start_col + 1, start_row + i as u16 + 1),
+                                Print(
+                                    format!(
+                                        " {} {: <level_name_len$} {: <level_author_len$} {: <level_desc_len$}",
+                                        if completed { "\u{2713}" } else { " " },
+                                        &level.name[0..level.name.len().min(level_name_len)],
+                                        &level.author[0..level.author.len().min(level_author_len)],
+                                        &level.description[0..level.description.len().min(level_desc_len)])
+                                    .bold()
+                                ),
+                                ResetColor
+                            )
+                            .ok();
+                        }
+                    }
+                    match Control::read_input() {
+                        Control::Up => {
+                            if current_selection == 0 {
+                                current_selection = repository.levels.len() - 1;
+                            } else {
+                                current_selection -= 1;
+                            }
+                        }
+                        Control::Down => {
+                            if current_selection == repository.levels.len() - 1 {
+                                current_selection = 0;
+                            } else {
+                                current_selection += 1;
+                            }
+                        }
+                        Control::Select => return Some(Selection::Item(current_selection)),
+                        Control::Quit => return Some(Selection::Quit),
                         Control::None => continue,
                         _ => break,
                     }

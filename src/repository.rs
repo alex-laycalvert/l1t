@@ -2,14 +2,14 @@ use crate::level::{LevelInfo, LevelSource};
 use serde::Deserialize;
 use std::error::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Repository {
     pub name: String,
     pub url: String,
     pub levels: Vec<LevelInfo>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct RepositoryLevelInfo {
     pub source: String,
     pub name: String,
@@ -17,7 +17,7 @@ pub struct RepositoryLevelInfo {
     pub description: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct RepositoryResponse {
     pub levels: Vec<RepositoryLevelInfo>,
 }
@@ -32,7 +32,10 @@ impl Repository {
     }
 
     pub async fn download_listing(&mut self) -> Result<(), Box<dyn Error>> {
-        let response = reqwest::get(&self.url).await?.text().await?;
+        let response = reqwest::get(self.url.to_string() + "/l1t")
+            .await?
+            .text()
+            .await?;
         let response: RepositoryResponse = match serde_json::from_str(&response) {
             Ok(d) => d,
             Err(e) => {
@@ -51,5 +54,10 @@ impl Repository {
             })
             .collect();
         Ok(())
+    }
+
+    pub async fn download_from_url(url: String) -> Result<String, Box<dyn Error>> {
+        let response = reqwest::get(url).await?.text().await?;
+        Ok(response)
     }
 }
