@@ -22,7 +22,7 @@ impl Control {
             }
             return match event.code {
                 KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => Self::Up,
-                KeyCode::Char('s') | KeyCode::Char('j') => Self::Down,
+                KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => Self::Down,
                 KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => Self::Left,
                 KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => Self::Right,
                 KeyCode::Char(' ') => Self::Action,

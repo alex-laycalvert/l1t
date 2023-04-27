@@ -105,16 +105,18 @@ impl Menu {
     }
 
     pub fn open(menu_type: MenuType) -> Option<Selection> {
+        let row_padding = 1;
+        let col_padding = 2;
         match menu_type {
             MenuType::MainSelection(completed_levels) => {
+                let row_padding = 2;
+                let col_padding = 3;
                 let options: [Selection; 3] = [
                     Selection::Play(LevelSource::Core(0)),
                     //Selection::OnlineLevels,
                     Selection::Help,
                     Selection::Quit,
                 ];
-                let row_padding = 2;
-                let col_padding = 3;
                 let mut current_selection = 0;
                 loop {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
@@ -241,30 +243,24 @@ impl Menu {
                 }
                 return Some(options[current_selection].clone());
             }
-            MenuType::Message(message) => {
-                let row_padding = 1;
-                let col_padding = 3;
-                loop {
-                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
-                    let start_row: u16 = term_rows / 2 - row_padding - 1;
-                    let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
-                    let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
-                    let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
-                    Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
-                    execute!(
-                        stdout(),
-                        MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
-                        Print(message),
-                    )
-                    .ok();
-                    if let Control::Select = Control::read_input() {
-                        break;
-                    }
+            MenuType::Message(message) => loop {
+                let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                let start_row: u16 = term_rows / 2 - row_padding - 1;
+                let start_col: u16 = (term_cols - message.len() as u16) / 2 - col_padding;
+                let end_row: u16 = (term_rows + row_padding) / 2 + row_padding;
+                let end_col: u16 = (term_cols + message.len() as u16) / 2 + col_padding;
+                Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
+                execute!(
+                    stdout(),
+                    MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
+                    Print(message),
+                )
+                .ok();
+                if let Control::Select = Control::read_input() {
+                    break;
                 }
-            }
+            },
             MenuType::YesNoSelection(message) => {
-                let row_padding = 1;
-                let col_padding = 3;
                 let mut current_selection = Selection::No;
                 loop {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
@@ -515,8 +511,6 @@ impl Menu {
                 ]))
             }
             MenuType::ScrollableMenu(content) => {
-                let row_padding = 1;
-                let col_padding = 2;
                 let mut start_index: usize = 0;
                 let scroll_message = "  USE ARROW KEYS OR W, S TO SCROLL  ";
                 loop {
@@ -573,29 +567,23 @@ impl Menu {
                 }
             }
             MenuType::CoreLevelSelection(completed_levels) => {
-                let levels_per_row = 10;
-                let row_padding = 1;
-                let col_padding = 3;
-                let highest_completed_level = match completed_levels.iter().max() {
-                    Some(n) => *n.min(&(Level::NUM_CORE_LEVELS - 1)),
+                let levels_per_row = 5;
+                let highest_available_level = match completed_levels.iter().max() {
+                    Some(n) => *n.min(&(Level::NUM_CORE_LEVELS - 1)) + 1,
                     None => 0,
                 };
-                let mut current_selection = highest_completed_level;
+                let mut current_selection = highest_available_level;
                 let message = "  SELECT A LEVEL  ";
                 loop {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
-                    let start_row: u16 = (term_rows
-                        - row_padding * 2
-                        - levels_per_row / Level::NUM_CORE_LEVELS as u16
-                        + 1)
-                        / 2;
-                    let start_col: u16 = (term_cols - levels_per_row * 2) / 2 - col_padding;
-                    let end_row: u16 = (term_rows
-                        + row_padding * 2
-                        + levels_per_row / Level::NUM_CORE_LEVELS as u16
-                        + 1)
-                        / 2;
-                    let end_col: u16 = (term_cols + levels_per_row * 2) / 2 + col_padding;
+                    let num_rows = Level::NUM_CORE_LEVELS as u16 / levels_per_row;
+                    let start_row: u16 = (term_rows - num_rows * 2) / 2;
+                    let mut start_col: u16 = (term_cols / 2) - levels_per_row * 2;
+                    let end_row: u16 = (term_rows + num_rows * 2) / 2;
+                    let end_col: u16 = (term_cols / 2) + levels_per_row * 2;
+                    if (end_col - start_col + 1) % 2 != 0 {
+                        start_col -= 1;
+                    }
                     execute!(
                         stdout(),
                         Clear(ClearType::All),
@@ -605,49 +593,63 @@ impl Menu {
                     .ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
                     for i in 0..Level::NUM_CORE_LEVELS {
-                        let is_available = i <= highest_completed_level;
-                        if is_available {
-                            execute!(
-                                stdout(),
-                                MoveTo(
-                                    (i as u16 % levels_per_row) * 2 + start_col + col_padding - 1,
-                                    term_rows / 2
-                                ),
-                                SetForegroundColor(if current_selection == i {
-                                    Color::Black
-                                } else {
-                                    Color::Reset
-                                }),
-                                SetBackgroundColor(if current_selection == i {
-                                    Color::White
-                                } else {
-                                    Color::Reset
-                                }),
-                                Print((i + 1).to_string().bold()),
-                            )
-                            .ok();
+                        let is_available = i <= highest_available_level;
+                        let fg_color = if is_available && current_selection != i {
+                            Color::White
                         } else {
-                            execute!(
-                                stdout(),
-                                MoveTo(
-                                    (i as u16 % levels_per_row) * 2 + start_col + col_padding - 1,
-                                    term_rows / 2
-                                ),
-                                Print((i + 1).to_string().bold().black()),
-                            )
-                            .ok();
-                        }
+                            Color::Black
+                        };
+                        execute!(
+                            stdout(),
+                            MoveTo(
+                                (i as u16 % levels_per_row) * 2
+                                    + start_col
+                                    + col_padding
+                                    + (i as u16 % levels_per_row) * 2,
+                                start_row + 1 + (i as u16 / levels_per_row) * 2,
+                            ),
+                            SetForegroundColor(fg_color),
+                            SetBackgroundColor(if current_selection == i {
+                                Color::White
+                            } else {
+                                Color::Reset
+                            }),
+                            Print(format!("{:0>2}", (i + 1).to_string()).bold()),
+                        )
+                        .ok();
                     }
                     match Control::read_input() {
+                        Control::Up => {
+                            if current_selection == 0 {
+                                current_selection = highest_available_level;
+                            } else if current_selection >= levels_per_row.into() {
+                                current_selection -= levels_per_row as usize;
+                            } else {
+                                current_selection = 0;
+                            }
+                        }
+                        Control::Down => {
+                            if current_selection == highest_available_level {
+                                current_selection = 0;
+                            } else if current_selection
+                                < (Level::NUM_CORE_LEVELS as i16 - levels_per_row as i16) as usize
+                                && current_selection + (levels_per_row as usize)
+                                    <= highest_available_level
+                            {
+                                current_selection += levels_per_row as usize;
+                            } else {
+                                current_selection = highest_available_level;
+                            }
+                        }
                         Control::Left => {
-                            if current_selection as isize - 1 < 0 {
-                                current_selection = highest_completed_level;
+                            if current_selection == 0 {
+                                current_selection = highest_available_level;
                             } else {
                                 current_selection -= 1;
                             }
                         }
                         Control::Right => {
-                            if current_selection + 1 > highest_completed_level {
+                            if current_selection >= highest_available_level {
                                 current_selection = 0;
                             } else {
                                 current_selection += 1;

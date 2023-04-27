@@ -29,6 +29,13 @@ struct Args {
     //repo_url: Option<String>,
 }
 
+enum PlayStatus<'a> {
+    WonLevel,
+    Quit,
+    LostLevel,
+    Error(&'a str),
+}
+
 fn setup() -> crossterm::Result<()> {
     enable_raw_mode()?;
     execute!(stdout(), cursor::Hide)
@@ -73,10 +80,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Err(e) => return exit(Some(&e)),
     };
 
-    play(user_data)
+    play(user_data).await
 }
 
-fn play(mut user_data: UserData) -> Result<(), Box<dyn Error>> {
+async fn play(mut user_data: UserData) -> Result<(), Box<dyn Error>> {
     loop {
         let selection = Menu::open(MenuType::MainSelection(&user_data.completed_core_levels))
             .unwrap_or(Selection::Play(LevelSource::Core(0)));
@@ -152,13 +159,6 @@ fn play_file(filename: &Path) -> Result<(), Box<dyn Error>> {
         }
     }
     exit(None)
-}
-
-enum PlayStatus<'a> {
-    WonLevel,
-    Quit,
-    LostLevel,
-    Error(&'a str),
 }
 
 fn handle_level_result(result: Result<LevelResult, &str>) -> PlayStatus {
