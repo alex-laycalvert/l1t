@@ -85,8 +85,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 async fn play(mut user_data: UserData) -> Result<(), Box<dyn Error>> {
     loop {
-        let selection = Menu::open(MenuType::MainSelection(&user_data.completed_core_levels))
-            .unwrap_or(Selection::Play(LevelSource::Core(0)));
+        let selection = Menu::open(MenuType::MainSelection(
+            &user_data.completed_core_levels,
+            &user_data.repositories,
+        ))
+        .unwrap_or(Selection::Play(LevelSource::Core(0)));
         match selection {
             Selection::Play(level_source) => match level_source {
                 LevelSource::Core(level) => {

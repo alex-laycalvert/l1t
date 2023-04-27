@@ -1,6 +1,7 @@
 use crate::{
     controls::Control,
     level::{Level, LevelSource},
+    repository::Repository,
 };
 use crossterm::{
     cursor::MoveTo,
@@ -16,7 +17,7 @@ use std::io::stdout;
 #[derive(Clone)]
 pub enum Selection {
     Play(LevelSource),
-    OnlineLevels,
+    Repository,
     Help,
     Quit,
     Yes,
@@ -50,18 +51,29 @@ pub enum MenuType<'a> {
     /// Draws the `Main Menu` of the application with the logo
     /// and selections for `Play`, `Help`, and `Quit`. Must
     /// provide a `Vec<usize>` representing the core levels the
-    /// player has completed.
+    /// player has completed and a `Vec<Repository>` which is
+    /// the list of available repositories the user has.
     ///
     /// Selecting `Play` will open the `CoreLevelSelection` and
     /// will return a `Selection::Play(l)` where `l` is the selected
+    /// level. Selecting `Repository` or `Online` from the menu will
+    /// return a `Selection::Play(l)` where `l` is the selected repository
     /// level.
-    MainSelection(&'a Vec<usize>),
+    MainSelection(&'a Vec<usize>, &'a Vec<Repository>),
 
     /// Draws the `Core Level` selection menu for the player
     /// to choose one of the built-in levels. Must be provided
     /// a `Vec<usize>` representing the core levels the player
     /// has completed.
     CoreLevelSelection(&'a Vec<usize>),
+
+    /// Draws the `Repository` selection menu to allow
+    /// the player to select which repo they want to play
+    /// a level from. After selecting a repo, the `RepositoryLevelSelection`
+    /// is opened to select the url of the level.
+    RepositorySelection(&'a Vec<Repository>),
+
+    RepositoryLevelSelection(&'a mut Repository),
 }
 
 const RED: Color = Color::Rgb { r: 255, g: 0, b: 0 };
@@ -108,12 +120,12 @@ impl Menu {
         let row_padding = 1;
         let col_padding = 2;
         match menu_type {
-            MenuType::MainSelection(completed_levels) => {
+            MenuType::MainSelection(completed_levels, repositories) => {
                 let row_padding = 2;
                 let col_padding = 3;
-                let options: [Selection; 3] = [
+                let options: [Selection; 4] = [
                     Selection::Play(LevelSource::Core(0)),
-                    //Selection::OnlineLevels,
+                    Selection::Repository,
                     Selection::Help,
                     Selection::Quit,
                 ];
@@ -122,10 +134,13 @@ impl Menu {
                     let (term_cols, term_rows) = size().unwrap_or((0, 0));
                     let start_row: u16 =
                         (term_rows - options.len() as u16 * 2 - 10 - row_padding) / 2 - row_padding;
-                    let start_col: u16 = (term_cols - 23) / 2 - col_padding;
+                    let mut start_col: u16 = (term_cols - 23) / 2 - col_padding;
                     let end_row: u16 =
                         (term_rows + options.len() as u16 + 10 + row_padding) / 2 + row_padding;
                     let end_col: u16 = (term_cols + 23) / 2 + col_padding;
+                    if (end_col - start_col) % 2 != 0 {
+                        start_col -= 1;
+                    }
                     execute!(stdout(), Clear(ClearType::All)).ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
                     execute!(
@@ -188,7 +203,7 @@ impl Menu {
                     for (i, _) in options.iter().enumerate() {
                         let option = match options[i] {
                             Selection::Play(_) => "P L A Y",
-                            //Selection::OnlineLevels => "O N L I N E",
+                            Selection::Repository => "O N L I N E",
                             Selection::Help => "H E L P",
                             Selection::Quit => "Q U I T",
                             _ => "",
@@ -206,7 +221,7 @@ impl Menu {
                                 Color::Reset
                             }),
                             MoveTo(
-                                (term_cols - option.len() as u16) / 2 - 8,
+                                (term_cols - 23) / 2,
                                 start_row + row_padding * 2 + i as u16 * 2 + 10,
                             ),
                             SetAttribute(Attribute::Bold),
@@ -216,17 +231,25 @@ impl Menu {
                         .ok();
                     }
                     match Control::read_input() {
-                        Control::Select => {
-                            if let Selection::Play(_) = options[current_selection] {
+                        Control::Select => match options[current_selection] {
+                            Selection::Play(_) => {
                                 if let Some(Selection::Item(i)) =
                                     Menu::open(MenuType::CoreLevelSelection(completed_levels))
                                 {
                                     return Some(Selection::Play(LevelSource::Core(i)));
                                 }
-                            } else {
-                                break;
                             }
-                        }
+                            Selection::Repository => {
+                                if let Some(Selection::Item(i)) =
+                                    Menu::open(MenuType::RepositorySelection(repositories))
+                                {
+                                    return Some(Selection::Play(LevelSource::Url(
+                                        repositories[i].url.clone(),
+                                    )));
+                                }
+                            }
+                            _ => break,
+                        },
                         Control::Up => {
                             if current_selection == 0 {
                                 current_selection = options.len() - 1;
@@ -659,6 +682,73 @@ impl Menu {
                         Control::Quit => return None,
                         Control::Select => return Some(Selection::Item(current_selection)),
                         _ => (),
+                    }
+                }
+            }
+            MenuType::RepositorySelection(repositories) => {
+                let message = " SELECT A REPO ";
+                let mut current_selection = 0;
+                loop {
+                    let (term_cols, term_rows) = size().unwrap_or((0, 0));
+                    let num_cols = (term_cols - 4).min(200) as usize;
+                    let repo_name_len = num_cols / 2 - 2;
+                    let repo_url_len = num_cols - 4 - repo_name_len;
+                    let start_row: u16 = (term_rows - repositories.len() as u16) / 2;
+                    let start_col: u16 = (term_cols - num_cols as u16) / 2;
+                    let end_row: u16 = (term_rows + repositories.len() as u16) / 2 + 1;
+                    let end_col: u16 = (term_cols + num_cols as u16) / 2;
+                    execute!(
+                        stdout(),
+                        Clear(ClearType::All),
+                        MoveTo((term_cols - message.len() as u16) / 2, start_row - 1),
+                        Print(message.on_white().black().bold())
+                    )
+                    .ok();
+                    Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
+                    for (i, repo) in repositories.iter().enumerate() {
+                        execute!(
+                            stdout(),
+                            SetBackgroundColor(if i == current_selection {
+                                Color::White
+                            } else {
+                                Color::Reset
+                            }),
+                            SetForegroundColor(if i == current_selection {
+                                Color::Black
+                            } else {
+                                Color::White
+                            }),
+                            MoveTo(start_col + 1, start_row + i as u16 + 1),
+                            Print(
+                                format!(
+                                    " {: <repo_name_len$} {: <repo_url_len$} ",
+                                    &repo.name[0..repo.name.len().min(repo_name_len)],
+                                    &repo.url[0..repo.url.len().min(repo_url_len)],
+                                )
+                                .bold()
+                            ),
+                            ResetColor
+                        )
+                        .ok();
+                    }
+                    match Control::read_input() {
+                        Control::Up => {
+                            if current_selection == 0 {
+                                current_selection = repositories.len() - 1;
+                            } else {
+                                current_selection -= 1;
+                            }
+                        }
+                        Control::Down => {
+                            if current_selection == repositories.len() - 1 {
+                                current_selection = 0;
+                            } else {
+                                current_selection += 1;
+                            }
+                        }
+                        Control::Select => {}
+                        Control::None => continue,
+                        _ => break,
                     }
                 }
             }
