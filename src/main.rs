@@ -119,8 +119,8 @@ async fn play(mut user_data: UserData) -> Result<(), Box<dyn Error>> {
                 LevelSource::File(_) => {}
                 LevelSource::Url(_url) => {}
             },
-            Selection::Repository => loop {
-                if let Some(Selection::Item(i)) =
+            Selection::Repository => {
+                while let Some(Selection::Item(i)) =
                     Menu::open(MenuType::RepositorySelection(&user_data.repositories))
                 {
                     if let Err(e) = user_data.repositories[i].download_listing().await {
@@ -159,10 +159,8 @@ async fn play(mut user_data: UserData) -> Result<(), Box<dyn Error>> {
                             }
                         }
                     }
-                } else {
-                    break;
                 }
-            },
+            }
             Selection::Help => {
                 Menu::open(MenuType::HelpMenu);
             }

@@ -770,8 +770,7 @@ impl Menu {
                     for (i, level) in repository.levels.iter().enumerate() {
                         if let LevelSource::Url(url) = &level.source {
                             let completed = completed_levels.iter().any(|l| {
-                                l.url == url.to_string()
-                                    || (l.name == level.name && l.author == level.author)
+                                l.url == *url || (l.name == level.name && l.author == level.author)
                             });
                             execute!(
                                 stdout(),
