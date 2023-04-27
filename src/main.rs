@@ -120,6 +120,12 @@ async fn play(mut user_data: UserData) -> Result<(), Box<dyn Error>> {
                 LevelSource::Url(_url) => {}
             },
             Selection::Repository => {
+                if user_data.repositories.is_empty() {
+                    Menu::open(MenuType::Message(
+                        "You don't have any repositories setup in $HOME/.l1t/repositories.l1t_conf",
+                    ));
+                    continue;
+                }
                 while let Some(Selection::Item(i)) =
                     Menu::open(MenuType::RepositorySelection(&user_data.repositories))
                 {

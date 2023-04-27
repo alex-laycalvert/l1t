@@ -519,6 +519,22 @@ impl Menu {
                     ],
                     vec!["            blocks on/off. Player must be".stylize()],
                     vec!["            next to button to press.".stylize()],
+                    vec![],
+                    vec!["REPOSITORIES".bold().underlined()],
+                    vec![],
+                    vec!["Repositories allow you to play levels hosted ".stylize()],
+                    vec!["online. To add a repository, add a line in ".stylize()],
+                    vec!["your `$HOME/.l1t/repositories.l1t_conf` file:".stylize()],
+                    vec![],
+                    vec!["My Repo Name = http://myrepourl.com".stylize()],
+                    vec![],
+                    vec!["The left side of the `=` is the repository ".stylize()],
+                    vec!["name and the right is the URL of the repo.".stylize()],
+                    vec![],
+                    vec!["To host your own repo, checkout the repo ".stylize()],
+                    vec!["documentation at:".stylize()],
+                    vec![],
+                    vec!["https://github.com/alex-laycalvert/l1t/".stylize()],
                 ]))
             }
             MenuType::ScrollableMenu(content) => {
