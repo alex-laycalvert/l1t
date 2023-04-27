@@ -9,7 +9,7 @@ use l1t::level::*;
 use l1t::menu::*;
 //use l1t::repository::*;
 use l1t::userdata::*;
-use std::{error::Error, io::stdout, thread, time};
+use std::{error::Error, io::stdout, path::PathBuf, thread, time};
 
 const SLEEP_TIME: u64 = 500;
 
@@ -19,7 +19,7 @@ const SLEEP_TIME: u64 = 500;
 struct Args {
     /// The `.l1t` file to load a level from
     #[arg(short, long)]
-    file: Option<String>,
+    file: Option<PathBuf>,
     ///// Repository to download levels from
     //#[arg(short, long)]
     //repo_url: Option<String>,
@@ -55,7 +55,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if let Some(filename) = &args.file {
         // File has been provided
         loop {
-            let mut level = match Level::file(filename.to_string()) {
+            let mut level = match Level::file(filename.to_path_buf()) {
                 Ok(l) => l,
                 Err(e) => return exit(Some(e)),
             };
