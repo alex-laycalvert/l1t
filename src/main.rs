@@ -129,9 +129,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                     thread::sleep(time::Duration::from_millis(SLEEP_TIME));
                                     Menu::open(MenuType::Message("YAY, You Won!".to_string()));
                                     current_level += 1;
-                                    match user_data.complete(level.info) {
-                                        Err(e) => return exit(Some(&e)),
-                                        _ => (),
+                                    if let Err(e) = user_data.complete(level.info) {
+                                        return exit(Some(&e));
                                     };
                                 } else if let Some(r) = result.reason_for_loss {
                                     match r {
@@ -169,9 +168,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             if result.has_won {
                                 thread::sleep(time::Duration::from_millis(SLEEP_TIME));
                                 Menu::open(MenuType::Message("YAY, You Won!".to_string()));
-                                match user_data.complete(level.info) {
-                                    Err(e) => return exit(Some(&e)),
-                                    _ => (),
+                                if let Err(e) = user_data.complete(level.info) {
+                                    return exit(Some(&e));
                                 };
                                 break;
                             } else if let Some(r) = result.reason_for_loss {

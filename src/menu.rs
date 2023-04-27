@@ -183,7 +183,7 @@ impl Menu {
                         ResetColor,
                     )
                     .ok();
-                    for i in 0..options.len() {
+                    for (i, _) in options.iter().enumerate() {
                         let option = match options[i] {
                             Selection::Play(_) => "P L A Y",
                             //Selection::OnlineLevels => "O N L I N E",
@@ -257,9 +257,8 @@ impl Menu {
                         Print(message.clone()),
                     )
                     .ok();
-                    match Control::read_input() {
-                        Control::Select => break,
-                        _ => (),
+                    if let Control::Select = Control::read_input() {
+                        break;
                     }
                 }
             }
@@ -322,7 +321,7 @@ impl Menu {
                     }
                 }
             }
-            MenuType::HelpMenu => loop {
+            MenuType::HelpMenu => {
                 return Menu::open(MenuType::ScrollableMenu(vec![
                     vec![
                         "l1t".bold().green(),
@@ -513,8 +512,8 @@ impl Menu {
                     ],
                     vec!["            blocks on/off. Player must be".stylize()],
                     vec!["            next to button to press.".stylize()],
-                ]));
-            },
+                ]))
+            }
             MenuType::ScrollableMenu(content) => {
                 let row_padding = 1;
                 let col_padding = 2;
@@ -535,7 +534,12 @@ impl Menu {
                     )
                     .ok();
                     Menu::draw_borders(start_row, end_row, start_col, end_col).ok();
-                    for i in start_index..(start_index + lines).min(content.len()) {
+                    for (i, line) in content
+                        .iter()
+                        .enumerate()
+                        .take((start_index + lines).min(content.len()))
+                        .skip(start_index)
+                    {
                         execute!(
                             stdout(),
                             MoveTo(
@@ -544,7 +548,7 @@ impl Menu {
                             )
                         )
                         .ok();
-                        for piece in content[i].iter() {
+                        for piece in line.iter() {
                             execute!(stdout(), Print(piece)).ok();
                         }
                     }

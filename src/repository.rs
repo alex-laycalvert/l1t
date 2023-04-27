@@ -1,5 +1,5 @@
 use crate::level::{LevelInfo, LevelSource};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::error::Error;
 
 #[derive(Debug)]

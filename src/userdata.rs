@@ -31,14 +31,10 @@ impl UserData {
     fn read_repositories(home_dir: String) -> Result<Vec<Repository>, String> {
         let file = home_dir.to_string() + "/.l1t/repositories.l1t_conf";
         if !path::Path::new(&file).exists() {
-            match fs::create_dir(home_dir + "/.l1t") {
-                Err(e) => return Err(e.to_string()),
-                _ => (),
-            };
-            match fs::write(&file, "") {
-                Err(e) => return Err(e.to_string()),
-                _ => (),
-            };
+            fs::create_dir(home_dir + "/.l1t").ok();
+            if let Err(e) = fs::write(&file, "") {
+                return Err(e.to_string());
+            }
         }
         let file_content = fs::read_to_string(&file).unwrap_or("".to_string());
         let mut repositories: Vec<Repository> = vec![];
@@ -58,10 +54,7 @@ impl UserData {
     pub fn read(home_dir: String) -> Result<UserData, String> {
         let file = home_dir.to_string() + "/.l1t/data.json";
         if !path::Path::new(&file).exists() {
-            match fs::create_dir(home_dir.clone() + "/.l1t") {
-                Err(e) => return Err(e.to_string()),
-                _ => (),
-            };
+            fs::create_dir(home_dir.clone() + "/.l1t").ok();
             let data = SerializedUserData {
                 file: file.clone(),
                 completed_core_levels: vec![],
@@ -71,9 +64,8 @@ impl UserData {
                 Ok(c) => c,
                 Err(e) => return Err(e.to_string()),
             };
-            match fs::write(&file, content) {
-                Err(e) => return Err(e.to_string()),
-                _ => (),
+            if let Err(e) = fs::write(&file, content) {
+                return Err(e.to_string());
             };
         }
         let file_content = fs::read_to_string(&file).unwrap_or("".to_string());
@@ -92,7 +84,7 @@ impl UserData {
     }
 
     fn complete_core(&mut self, level: usize) -> Result<(), String> {
-        if self.completed_core_levels.iter().position(|i| *i == level) != None {
+        if self.completed_core_levels.iter().any(|i| *i == level) {
             return Ok(());
         }
         self.completed_core_levels.push(level);
@@ -104,9 +96,8 @@ impl UserData {
             Ok(c) => c,
             Err(e) => return Err(e.to_string()),
         };
-        match fs::write(&self.file, content) {
-            Err(e) => return Err(e.to_string()),
-            _ => (),
+        if let Err(e) = fs::write(&self.file, content) {
+            return Err(e.to_string());
         };
         Ok(())
     }

@@ -261,27 +261,24 @@ impl Node {
 
     pub fn draw_overlay(&self, offset: (u16, u16)) -> crossterm::Result<()> {
         let mut stdout = stdout();
-        match &self.node_type {
-            NodeType::Laser(l) => {
-                if l.shooting_at.len() == 0 {
-                    return Ok(());
-                }
-                for i in 0..(l.shooting_at.len() - 1) {
-                    let pos = l.shooting_at[i];
-                    execute!(
-                        stdout,
-                        SetForegroundColor(Color::Rgb { r: 255, g: 0, b: 0 }),
-                        MoveTo(pos.1 + offset.1, pos.0 + offset.0),
-                    )?;
-                    if i == l.shooting_at.len() - 2 {
-                        execute!(stdout, Print(pos.3.bold()),)?;
-                    } else {
-                        execute!(stdout, Print(pos.2.bold()),)?;
-                    }
+        if let NodeType::Laser(l) = &self.node_type {
+            if l.shooting_at.is_empty() {
+                return Ok(());
+            }
+            for i in 0..(l.shooting_at.len() - 1) {
+                let pos = l.shooting_at[i];
+                execute!(
+                    stdout,
+                    SetForegroundColor(Color::Rgb { r: 255, g: 0, b: 0 }),
+                    MoveTo(pos.1 + offset.1, pos.0 + offset.0),
+                )?;
+                if i == l.shooting_at.len() - 2 {
+                    execute!(stdout, Print(pos.3.bold()),)?;
+                } else {
+                    execute!(stdout, Print(pos.2.bold()),)?;
                 }
             }
-            _ => (),
-        };
+        }
         execute!(stdout, ResetColor)
     }
 
@@ -424,22 +421,17 @@ impl Node {
     }
 
     pub fn is_player_toggleable(&self) -> bool {
-        match &self.node_type {
-            NodeType::Laser(_) => true,
-            NodeType::Mirror(_) => true,
-            NodeType::Switch(_) => true,
-            _ => false,
-        }
+        matches!(
+            &self.node_type,
+            NodeType::Laser(_) | NodeType::Mirror(_) | NodeType::Switch(_)
+        )
     }
 
     pub fn is_laser_toggleable(&self) -> bool {
-        match &self.node_type {
-            NodeType::Player(_) => true,
-            NodeType::Laser(_) => true,
-            NodeType::Statue(_) => true,
-            NodeType::Zapper(_) => true,
-            _ => false,
-        }
+        matches!(
+            &self.node_type,
+            NodeType::Player(_) | NodeType::Laser(_) | NodeType::Statue(_) | NodeType::Zapper(_)
+        )
     }
 
     pub fn turn_on(&mut self) {
@@ -489,9 +481,8 @@ impl Node {
     }
 
     pub fn set_shooting_at(&mut self, shooting_at: Vec<(u16, u16, char, char)>) {
-        match &mut self.node_type {
-            NodeType::Laser(l) => l.shooting_at = shooting_at,
-            _ => (),
+        if let NodeType::Laser(l) = &mut self.node_type {
+            l.shooting_at = shooting_at
         }
     }
 }
