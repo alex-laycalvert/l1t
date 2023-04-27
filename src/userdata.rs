@@ -36,7 +36,7 @@ impl UserData {
                 return Err(e.to_string());
             }
         }
-        let file_content = fs::read_to_string(&file).unwrap_or("".to_string());
+        let file_content = fs::read_to_string(&file).unwrap_or_default();
         let mut repositories: Vec<Repository> = vec![];
         for line in file_content.trim().split('\n') {
             let parts: Vec<&str> = line.trim().split('=').collect();
@@ -68,7 +68,7 @@ impl UserData {
                 return Err(e.to_string());
             };
         }
-        let file_content = fs::read_to_string(&file).unwrap_or("".to_string());
+        let file_content = fs::read_to_string(&file).unwrap_or_default();
         let data = match serde_json::from_str::<SerializedUserData>(&file_content) {
             Ok(d) => d,
             Err(e) => return Err(e.to_string()),

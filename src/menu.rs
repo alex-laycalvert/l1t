@@ -217,7 +217,7 @@ impl Menu {
                         Control::Select => {
                             if let Selection::Play(_) = options[current_selection] {
                                 if let Some(Selection::Item(i)) =
-                                    Menu::open(MenuType::CoreLevelSelection(&completed_levels))
+                                    Menu::open(MenuType::CoreLevelSelection(completed_levels))
                                 {
                                     return Some(Selection::Play(LevelSource::Core(i)));
                                 }
@@ -254,7 +254,7 @@ impl Menu {
                     execute!(
                         stdout(),
                         MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
-                        Print(message.clone()),
+                        Print(message),
                     )
                     .ok();
                     if let Control::Select = Control::read_input() {
@@ -276,7 +276,7 @@ impl Menu {
                     execute!(
                         stdout(),
                         MoveTo((term_cols - message.len() as u16) / 2, term_rows / 2),
-                        Print(message.clone()),
+                        Print(message),
                     )
                     .ok();
                     execute!(

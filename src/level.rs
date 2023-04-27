@@ -433,7 +433,7 @@ IIIIIIIIIIIIIIIIIIIII",
     }
 
     pub fn file(filename: PathBuf) -> Result<Level, &'static str> {
-        let content: String = fs::read_to_string(&filename).unwrap_or("".to_string());
+        let content: String = fs::read_to_string(&filename).unwrap_or_default();
         let content: Vec<&str> = content.trim().split('\n').collect();
         Level::parse_full(&content, LevelSource::File(filename))
     }
