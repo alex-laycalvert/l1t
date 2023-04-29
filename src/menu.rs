@@ -607,6 +607,11 @@ impl Menu {
                     Some(n) => *n.min(&(Level::NUM_CORE_LEVELS - 1)) + 1,
                     None => 0,
                 };
+                let highest_available_level = if highest_available_level >= Level::NUM_CORE_LEVELS {
+                    Level::NUM_CORE_LEVELS - 1
+                } else {
+                    highest_available_level
+                };
                 let mut current_selection = highest_available_level;
                 let message = "  SELECT A LEVEL  ";
                 loop {
