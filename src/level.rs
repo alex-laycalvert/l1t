@@ -57,7 +57,7 @@ struct PlayState {
 }
 
 impl Level {
-    pub const NUM_CORE_LEVELS: usize = 4;
+    pub const NUM_CORE_LEVELS: usize = 5;
     pub const CORE_LEVELS: [&str; Level::NUM_CORE_LEVELS] = [
         "Level 1
 alex-laycalvert
@@ -107,6 +107,15 @@ I                   I
 I                   I
 I         S    \\  \\ I
 IIIIIIIIIIIIIIIIIIIII",
+        "Level 5
+alex-laycalvert
+Cramped
+IIIIIIIIIIIII
+I\\ \\ \\ \\ \\ \\I
+I           I
+I/ / / / / /I
+I1    X    SI
+IIIIIIIIIIIII",
     ];
 
     fn draw_walls(&self, row_offset: u16, col_offset: u16) -> crossterm::Result<()> {
