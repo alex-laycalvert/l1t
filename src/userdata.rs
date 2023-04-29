@@ -3,10 +3,12 @@ use crate::{
     repository::Repository,
 };
 use serde::{Deserialize, Serialize};
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, path};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct CompletedLevel {
+pub struct CompletedRepoLevel {
+    pub url: String,
     pub name: String,
     pub author: String,
     pub description: String,
@@ -16,7 +18,7 @@ pub struct CompletedLevel {
 pub struct UserData {
     file: String,
     pub completed_core_levels: Vec<usize>,
-    pub completed_levels: Vec<CompletedLevel>,
+    pub completed_levels: Vec<CompletedRepoLevel>,
     pub repositories: Vec<Repository>,
 }
 
@@ -24,7 +26,7 @@ pub struct UserData {
 pub struct SerializedUserData {
     file: String,
     pub completed_core_levels: Vec<usize>,
-    pub completed_levels: Vec<CompletedLevel>,
+    pub completed_levels: Vec<CompletedRepoLevel>,
 }
 
 impl UserData {
@@ -36,7 +38,7 @@ impl UserData {
                 return Err(e.to_string());
             }
         }
-        let file_content = fs::read_to_string(&file).unwrap_or("".to_string());
+        let file_content = fs::read_to_string(&file).unwrap_or_default();
         let mut repositories: Vec<Repository> = vec![];
         for line in file_content.trim().split('\n') {
             let parts: Vec<&str> = line.trim().split('=').collect();
@@ -68,7 +70,7 @@ impl UserData {
                 return Err(e.to_string());
             };
         }
-        let file_content = fs::read_to_string(&file).unwrap_or("".to_string());
+        let file_content = fs::read_to_string(&file).unwrap_or_default();
         let data = match serde_json::from_str::<SerializedUserData>(&file_content) {
             Ok(d) => d,
             Err(e) => return Err(e.to_string()),
@@ -102,9 +104,43 @@ impl UserData {
         Ok(())
     }
 
+    fn complete_repo(&mut self, level_info: LevelInfo) -> Result<(), String> {
+        if let LevelSource::Url(url) = level_info.source {
+            if self.completed_levels.iter().any(|l| {
+                l.url == url || (l.name == level_info.name && l.author == level_info.author)
+            }) {
+                return Ok(());
+            }
+            let completed_at = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs();
+            self.completed_levels.push(CompletedRepoLevel {
+                url,
+                completed_at,
+                name: level_info.name,
+                author: level_info.author,
+                description: level_info.description,
+            });
+            let content = match serde_json::to_string(&SerializedUserData {
+                file: self.file.clone(),
+                completed_core_levels: self.completed_core_levels.clone(),
+                completed_levels: self.completed_levels.clone(),
+            }) {
+                Ok(c) => c,
+                Err(e) => return Err(e.to_string()),
+            };
+            if let Err(e) = fs::write(&self.file, content) {
+                return Err(e.to_string());
+            };
+        }
+        Ok(())
+    }
+
     pub fn complete(&mut self, level_info: LevelInfo) -> Result<(), String> {
         match level_info.source {
             LevelSource::Core(level) => self.complete_core(level),
+            LevelSource::Url(_) => self.complete_repo(level_info),
             _ => Err("".to_string()),
         }
     }

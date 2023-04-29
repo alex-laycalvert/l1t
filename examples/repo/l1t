@@ -1,19 +1,19 @@
 {
     "levels": [
         {
-            "source": "levels/level1.l1t",
+            "source": "levels/test_level1.l1t",
             "name": "Test Level 1",
             "author": "alex-laycalvert",
             "description": "A test repo level"
         },
         {
-            "source": "levels/level2.l1t",
+            "source": "levels/test_level2.l1t",
             "name": "Test Level 2",
             "author": "alex-laycalvert",
             "description": "Another test repo"
         },
         {
-            "source": "levels/level3.l1t",
+            "source": "levels/test_level3.l1t",
             "name": "Test Level 3",
             "author": "alex-laycalvert",
             "description": "The final test level"

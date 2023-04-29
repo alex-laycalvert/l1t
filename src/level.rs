@@ -1,5 +1,4 @@
-use crate::controls::Control;
-use crate::{direction::Direction, menu::*, node::*};
+use crate::{controls::Control, direction::Direction, menu::*, node::*, repository::Repository};
 use crossterm::{
     cursor, execute,
     style::{Color, Print, SetBackgroundColor, SetForegroundColor, Stylize},
@@ -35,7 +34,7 @@ pub struct Level {
     pub player_index: Option<usize>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LevelInfo {
     pub source: LevelSource,
     pub name: String,
@@ -218,6 +217,11 @@ IIIIIIIIIIIII",
                                     current_dir.0 = 0;
                                 }
                             }
+                            NodeType::ToggleBlock(t) => {
+                                if t.visible {
+                                    break;
+                                }
+                            }
                             _ => {
                                 if self.nodes[i].is_laser_toggleable() {
                                     if let NodeType::Laser(_) = &self.nodes[i].node_type {
@@ -263,6 +267,17 @@ IIIIIIIIIIIII",
                 continue;
             }
             self.nodes[i].toggle();
+            if let NodeType::Switch(_) = &self.nodes[i].node_type {
+                self.toggle_blocks();
+            }
+        }
+    }
+
+    fn toggle_blocks(&mut self) {
+        for i in 0..self.nodes.len() {
+            if matches!(self.nodes[i].node_type, NodeType::ToggleBlock(_)) {
+                self.nodes[i].toggle();
+            }
         }
     }
 
@@ -442,13 +457,22 @@ IIIIIIIIIIIII",
     }
 
     pub fn file(filename: PathBuf) -> Result<Level, &'static str> {
-        let content: String = fs::read_to_string(&filename).unwrap_or("".to_string());
+        let content: String = fs::read_to_string(&filename).unwrap_or_default();
         let content: Vec<&str> = content.trim().split('\n').collect();
         Level::parse_full(&content, LevelSource::File(filename))
     }
 
-    pub fn url(_url: String) -> Result<Level, &'static str> {
-        todo!()
+    pub async fn url(info: LevelInfo) -> Result<Level, &'static str> {
+        if let LevelSource::Url(url) = &info.source {
+            let content = match Repository::download_from_url(url.to_string()).await {
+                Ok(c) => c,
+                Err(_) => return Err("Error downloading level"),
+            };
+            let content: Vec<&str> = content.trim().split('\n').collect();
+            Level::parse_grid(&content, info)
+        } else {
+            Err("Level source was not a URL")
+        }
     }
 
     pub fn core(level: usize) -> Result<Level, &'static str> {
@@ -479,9 +503,9 @@ IIIIIIIIIIIII",
                     Menu::open(MenuType::HelpMenu);
                 }
                 Control::Quit => {
-                    if let Some(Selection::Yes) = Menu::open(MenuType::YesNoSelection(
-                        "Are you sure you want to quit?".to_string(),
-                    )) {
+                    if let Some(Selection::Yes) =
+                        Menu::open(MenuType::YesNoSelection("Are you sure you want to quit?"))
+                    {
                         return Ok(LevelResult {
                             has_won: false,
                             reason_for_loss: Some(LevelLossReason::Quit),
