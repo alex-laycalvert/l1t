@@ -57,7 +57,7 @@ struct PlayState {
 
 impl Level {
     pub const NUM_CORE_LEVELS: usize = 5;
-    pub const CORE_LEVELS: [&str; Level::NUM_CORE_LEVELS] = [
+    pub const CORE_LEVELS: [&'static str; Level::NUM_CORE_LEVELS] = [
         "Level 1
 alex-laycalvert
 The First Level
